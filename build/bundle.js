@@ -11845,10 +11845,6 @@ class NodeView {
    }
 
    getModel() {
-//      this._model.name = this._name.val();
-//      this._model.title = this._title.val();
-//      this._model.type = this._type.val();
-//      this._model.parent = this._parent.val();
       return this._model;
    }
 
@@ -11874,6 +11870,22 @@ class NodeView {
    }
 
    _behaviour() {
+
+      this._name.on("keyup", () => {
+         this._model.name = this._name.val();
+      });
+
+      this._title.on("keyup", () => {
+         this._model.title = this._title.val();
+      });
+
+      this._type.on("change", () => {
+         this._model.type = this._type.val();
+      });
+
+      this._parent.on("change", () => {
+         this._model.parent = this._parent.val();
+      });
 
       this._deleteButton.click((e) => {
          e.preventDefault();
@@ -11957,6 +11969,10 @@ class NodesListView {
             this._nodes.splice(index, 1);
          }
 
+         this._updateNodesParentSelect();
+      });
+
+      this._eventHub.on("node-name-updated", (e, model) => {
          this._updateNodesParentSelect();
       });
    }

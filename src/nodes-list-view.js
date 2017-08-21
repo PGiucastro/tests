@@ -69,6 +69,10 @@ class NodesListView {
 
          this._updateNodesParentSelect();
       });
+
+      this._eventHub.on("node-name-updated", (e, model) => {
+         this._updateNodesParentSelect();
+      });
    }
 
    _updateNodesParentSelect() {
