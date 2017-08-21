@@ -32,8 +32,23 @@ class NodesListView {
          this._nodes.push(nodeView);
       });
 
-      this._eventHub.on("node-removed", function(e, model) {
-         console.log(model);
+      this._eventHub.on("node-removed", (e, model) => {
+         var index = -1;
+         
+         for (var i = 0; i < this._nodes.length; i++) {
+            var node = this._nodes[i];
+            if (node.getModel() === model) {
+               node.getRootNode().remove();
+               index = i;
+               break;
+            }
+         }
+         
+         if (index !== -1) {
+            this._nodes.splice(index, 1);
+         }
+         
+         console.log("remaining nodes", this._nodes);
       });
    }
 }

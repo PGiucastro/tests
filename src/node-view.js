@@ -21,7 +21,11 @@ class NodeView {
       return this._root;
    }
 
-   getData() {
+   getRootNode() {
+      return this._root;
+   }
+
+   getModel() {
       this._model.name = this._name.val();
       this._model.title = this._title.val();
       this._model.type = this._type.val();
@@ -32,7 +36,7 @@ class NodeView {
    _behaviour() {
       this._deleteButton.click((e) => {
          e.preventDefault();
-         this._eventHub.trigger("node-removed", this.getData());
+         this._eventHub.trigger("node-removed", this.getModel());
       });
    }
 }

@@ -11833,7 +11833,11 @@ class NodeView {
       return this._root;
    }
 
-   getData() {
+   getRootNode() {
+      return this._root;
+   }
+
+   getModel() {
       this._model.name = this._name.val();
       this._model.title = this._title.val();
       this._model.type = this._type.val();
@@ -11844,7 +11848,7 @@ class NodeView {
    _behaviour() {
       this._deleteButton.click((e) => {
          e.preventDefault();
-         this._eventHub.trigger("node-removed", this.getData());
+         this._eventHub.trigger("node-removed", this.getModel());
       });
    }
 }
@@ -11885,8 +11889,23 @@ class NodesListView {
          this._nodes.push(nodeView);
       });
 
-      this._eventHub.on("node-removed", function(e, model) {
-         console.log(model);
+      this._eventHub.on("node-removed", (e, model) => {
+         var index = -1;
+         
+         for (var i = 0; i < this._nodes.length; i++) {
+            var node = this._nodes[i];
+            if (node.getModel() === model) {
+               node.getRootNode().remove();
+               index = i;
+               break;
+            }
+         }
+         
+         if (index !== -1) {
+            this._nodes.splice(index, 1);
+         }
+         
+         console.log("remaining nodes", this._nodes);
       });
    }
 }
