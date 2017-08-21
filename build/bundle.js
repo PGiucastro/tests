@@ -11822,13 +11822,20 @@ class NodeView {
    }
 
    render() {
+
       var tmpl = _.template(templates["node-view"]);
       this._root = $(tmpl(this._model));
+
       this._name = this._root.find(".name");
       this._title = this._root.find(".title");
       this._type = this._root.find(".type");
       this._parent = this._root.find(".parent");
       this._deleteButton = this._root.find("button");
+
+      this._name.val(this._model.name);
+      this._title.val(this._model.title);
+      this._type.val(this._model.type || "-");
+
       this._behaviour();
       return this._root;
    }
@@ -11838,17 +11845,43 @@ class NodeView {
    }
 
    getModel() {
-      this._model.name = this._name.val();
-      this._model.title = this._title.val();
-      this._model.type = this._type.val();
-      this._model.parent = this._parent.val();
+//      this._model.name = this._name.val();
+//      this._model.title = this._title.val();
+//      this._model.type = this._type.val();
+//      this._model.parent = this._parent.val();
       return this._model;
    }
 
+   updateParentSelect(nodes) {
+      console.log("update select", this._model.parent);
+
+      var i, option;
+
+      this._parent.empty();
+      this._parent.append("<option value='-'>-</option>");
+
+      for (var i = 0; i < nodes.length; i++) {
+         option = $("<option>" + nodes[i].name + "</option>");
+         option.attr("value", nodes[i].id);
+         this._parent.append(option);
+      }
+
+      if (this._model.parent) {
+         this._parent.val(this._model.parent);
+      } else {
+         this._parent.val("-");
+      }
+   }
+
    _behaviour() {
+
       this._deleteButton.click((e) => {
          e.preventDefault();
          this._eventHub.trigger("node-removed", this.getModel());
+      });
+
+      this._name.on("keyup", (e) => {
+         this._eventHub.trigger("node-name-updated", this.getModel());
       });
    }
 }
@@ -11859,6 +11892,20 @@ const NodeView = require('./node-view');
 const templates = require('./templates');
 const _ = require('underscore');
 const $ = require('jquery');
+
+var _models_ = [{
+      id: 4,
+      name: "a_node_name",
+      title: "A node title",
+      type: "text",
+      parent: null
+   }, {
+      id: 5,
+      name: "another_node_name",
+      title: "Another node title",
+      type: "checkbox",
+      parent: 4
+   }];
 
 class NodesListView {
 
@@ -11872,6 +11919,12 @@ class NodesListView {
    }
 
    render() {
+
+      for (var i = 0; i < _models_.length; i++) {
+         this._addNode(_models_[i]);
+      }
+
+      this._updateNodesParentSelect();
       this._behaviour();
       return this._root;
    }
@@ -11884,14 +11937,13 @@ class NodesListView {
          var nodeModel = {
             id: this._counter
          };
-         var nodeView = new NodeView(nodeModel, this._eventHub);
-         this._list.append(nodeView.render());
-         this._nodes.push(nodeView);
+         this._addNode(nodeModel);
+         //this._updateNodesParentSelect();
       });
 
       this._eventHub.on("node-removed", (e, model) => {
          var index = -1;
-         
+
          for (var i = 0; i < this._nodes.length; i++) {
             var node = this._nodes[i];
             if (node.getModel() === model) {
@@ -11900,23 +11952,36 @@ class NodesListView {
                break;
             }
          }
-         
+
          if (index !== -1) {
             this._nodes.splice(index, 1);
          }
-         
-         console.log("remaining nodes", this._nodes);
+
+         this._updateNodesParentSelect();
       });
+   }
+
+   _updateNodesParentSelect() {
+      for (var i = 0; i < this._nodes.length; i++) {
+         this._nodes[i].updateParentSelect(this._nodes.map((n) => {
+            return n.getModel();
+         }));
+      }
+   }
+
+   _addNode(nodeModel) {
+      var nodeView = new NodeView(nodeModel, this._eventHub);
+      this._list.append(nodeView.render());
+      this._nodes.push(nodeView);
    }
 }
 
 module.exports = NodesListView;
-
 },{"./node-view":4,"./templates":6,"jquery":1,"underscore":2}],6:[function(require,module,exports){
 
 
 module.exports = {
    "nodes-list-view": "<div class=\"nodes-list-view\">\n   <button>Add new node</button>\n   <div class=\"list\"></div>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-id='<%= id %>\"'>\n   <input type='text' class='name' placeholder='Add the node name' />\n   <input type='text' class='title' placeholder='Add the node title' />\n   <select class='type'>\n      <option>-type-</option>\n      <option>checkbox</option>\n      <option>radio</option>\n      <option>text</option>\n   </select>\n   <select class='parent'>\n      <option>-parent-</option>\n   </select>\n   <button>Delete</button>\n</div>"
+   "node-view": "<div class=\"node-view\" data-node-id=\"<%= id %>\">\n   <input type='text' class='name' placeholder='Add the node name' />\n   <input type='text' class='title' placeholder='Add the node title' />\n   <select class='type'>\n      <option>-</option>\n      <option>checkbox</option>\n      <option>radio</option>\n      <option>text</option>\n   </select>\n   <select class='parent'>\n      <option>-</option>\n   </select>\n   <button>Delete</button>\n</div>"
 };
 },{}]},{},[3]);

@@ -3,6 +3,20 @@ const templates = require('./templates');
 const _ = require('underscore');
 const $ = require('jquery');
 
+var _models_ = [{
+      id: 4,
+      name: "a_node_name",
+      title: "A node title",
+      type: "text",
+      parent: null
+   }, {
+      id: 5,
+      name: "another_node_name",
+      title: "Another node title",
+      type: "checkbox",
+      parent: 4
+   }];
+
 class NodesListView {
 
    constructor(eventHub) {
@@ -15,6 +29,12 @@ class NodesListView {
    }
 
    render() {
+
+      for (var i = 0; i < _models_.length; i++) {
+         this._addNode(_models_[i]);
+      }
+
+      this._updateNodesParentSelect();
       this._behaviour();
       return this._root;
    }
@@ -27,14 +47,13 @@ class NodesListView {
          var nodeModel = {
             id: this._counter
          };
-         var nodeView = new NodeView(nodeModel, this._eventHub);
-         this._list.append(nodeView.render());
-         this._nodes.push(nodeView);
+         this._addNode(nodeModel);
+         //this._updateNodesParentSelect();
       });
 
       this._eventHub.on("node-removed", (e, model) => {
          var index = -1;
-         
+
          for (var i = 0; i < this._nodes.length; i++) {
             var node = this._nodes[i];
             if (node.getModel() === model) {
@@ -43,13 +62,27 @@ class NodesListView {
                break;
             }
          }
-         
+
          if (index !== -1) {
             this._nodes.splice(index, 1);
          }
-         
-         console.log("remaining nodes", this._nodes);
+
+         this._updateNodesParentSelect();
       });
+   }
+
+   _updateNodesParentSelect() {
+      for (var i = 0; i < this._nodes.length; i++) {
+         this._nodes[i].updateParentSelect(this._nodes.map((n) => {
+            return n.getModel();
+         }));
+      }
+   }
+
+   _addNode(nodeModel) {
+      var nodeView = new NodeView(nodeModel, this._eventHub);
+      this._list.append(nodeView.render());
+      this._nodes.push(nodeView);
    }
 }
 
