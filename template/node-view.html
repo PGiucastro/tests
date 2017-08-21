@@ -1,11 +1,14 @@
-<div class="node-view">
+<div class="node-view" data-node-id='<%= id %>"'>
    <input type='text' class='name' placeholder='Add the node name' />
    <input type='text' class='title' placeholder='Add the node title' />
-   <select>
-      <option>-</option>
+   <select class='type'>
+      <option>-type-</option>
       <option>checkbox</option>
       <option>radio</option>
       <option>text</option>
+   </select>
+   <select class='parent'>
+      <option>-parent-</option>
    </select>
    <button>Delete</button>
 </div>

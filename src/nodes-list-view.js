@@ -3,7 +3,9 @@ const templates = require('./templates');
 
 class NodesListView {
 
-   constructor() {
+   constructor(eventHub) {
+      this._counter = 0;
+      this._eventHub = eventHub;
       this._root = $(templates["nodes-list-view"]);
       this._addButton = this._root.find("button");
       this._list = this._root.find(".list");
@@ -17,7 +19,10 @@ class NodesListView {
    _behaviour() {
       this._addButton.click((e) => {
          e.preventDefault();
-         this._list.append(new NodeView().render());
+         this._counter++;
+         this._list.append(new NodeView({
+            id: this._counter
+         }, this._eventHub).render());
       });
    }
 }

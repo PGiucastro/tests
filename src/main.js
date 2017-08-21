@@ -1,3 +1,4 @@
 const NodesList = require('./nodes-list-view');
 
-$("body").append(new NodesList().render());
+var list = new NodesList($({})).render();
+$("body").append(list);
