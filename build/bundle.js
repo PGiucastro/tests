@@ -11827,6 +11827,7 @@ class NodeView {
       this._name = this._root.find(".name");
       this._title = this._root.find(".title");
       this._type = this._root.find(".type");
+      this._parent = this._root.find(".parent");
       this._deleteButton = this._root.find("button");
       this._behaviour();
       return this._root;
@@ -11836,13 +11837,14 @@ class NodeView {
       this._model.name = this._name.val();
       this._model.title = this._title.val();
       this._model.type = this._type.val();
+      this._model.parent = this._parent.val();
       return this._model;
    }
 
    _behaviour() {
       this._deleteButton.click((e) => {
          e.preventDefault();
-         this._root.remove();
+         this._eventHub.trigger("node-removed", this.getData());
       });
    }
 }
@@ -11854,12 +11856,12 @@ const templates = require('./templates');
 const _ = require('underscore');
 const $ = require('jquery');
 
-
 class NodesListView {
 
    constructor(eventHub) {
       this._counter = 0;
       this._eventHub = eventHub;
+      this._nodes = [];
       this._root = $(templates["nodes-list-view"]);
       this._addButton = this._root.find("button");
       this._list = this._root.find(".list");
@@ -11871,12 +11873,20 @@ class NodesListView {
    }
 
    _behaviour() {
+
       this._addButton.click((e) => {
          e.preventDefault();
          this._counter++;
-         this._list.append(new NodeView({
+         var nodeModel = {
             id: this._counter
-         }, this._eventHub).render());
+         };
+         var nodeView = new NodeView(nodeModel, this._eventHub);
+         this._list.append(nodeView.render());
+         this._nodes.push(nodeView);
+      });
+
+      this._eventHub.on("node-removed", function(e, model) {
+         console.log(model);
       });
    }
 }
