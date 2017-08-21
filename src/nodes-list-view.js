@@ -48,7 +48,7 @@ class NodesListView {
             id: this._counter
          };
          this._addNode(nodeModel);
-         //this._updateNodesParentSelect();
+         this._updateNodesParentSelect();
       });
 
       this._eventHub.on("node-removed", (e, model) => {

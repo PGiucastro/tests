@@ -37,20 +37,32 @@ class NodeView {
    }
 
    updateParentSelect(nodes) {
-      console.log("update select", this._model.parent);
-
-      var i, option;
+      
+      var i, option, name, id, parentsIds = [];
 
       this._parent.empty();
       this._parent.append("<option value='-'>-</option>");
 
       for (var i = 0; i < nodes.length; i++) {
-         option = $("<option>" + nodes[i].name + "</option>");
-         option.attr("value", nodes[i].id);
+
+         name = nodes[i].name;
+         id = nodes[i].id;
+
+         parentsIds.push(id);
+
+         if (id === this._model.id) {
+            continue;
+         }
+
+         if (!name) {
+            name = "...";
+         }
+         option = $("<option>" + name + "</option>");
+         option.attr("value", id);
          this._parent.append(option);
       }
 
-      if (this._model.parent) {
+      if (this._model.parent && parentsIds.indexOf(this._model.parent) > -1) {
          this._parent.val(this._model.parent);
       } else {
          this._parent.val("-");
