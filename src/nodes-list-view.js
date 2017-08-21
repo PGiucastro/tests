@@ -1,5 +1,8 @@
 const NodeView = require('./node-view');
 const templates = require('./templates');
+const _ = require('underscore');
+const $ = require('jquery');
+
 
 class NodesListView {
 
