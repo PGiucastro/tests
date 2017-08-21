@@ -37,7 +37,7 @@ class NodeView {
    }
 
    updateParentSelect(nodes) {
-      
+
       var i, option, name, id, parentsIds = [];
 
       this._parent.empty();
@@ -71,6 +71,10 @@ class NodeView {
 
    _behaviour() {
 
+      setInterval(() => {
+         this._root.find(".model").text(JSON.stringify(this._model, null, "  "));
+      }, 500);
+
       this._name.on("keyup", () => {
          this._model.name = this._name.val();
       });
@@ -84,7 +88,7 @@ class NodeView {
       });
 
       this._parent.on("change", () => {
-         this._model.parent = this._parent.val();
+         this._model.parent = parseInt(this._parent.val());
       });
 
       this._deleteButton.click((e) => {

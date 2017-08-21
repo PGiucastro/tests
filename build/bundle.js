@@ -11849,7 +11849,7 @@ class NodeView {
    }
 
    updateParentSelect(nodes) {
-      
+
       var i, option, name, id, parentsIds = [];
 
       this._parent.empty();
@@ -11883,6 +11883,10 @@ class NodeView {
 
    _behaviour() {
 
+      setInterval(() => {
+         this._root.find(".model").text(JSON.stringify(this._model, null, "  "));
+      }, 500);
+
       this._name.on("keyup", () => {
          this._model.name = this._name.val();
       });
@@ -11896,7 +11900,7 @@ class NodeView {
       });
 
       this._parent.on("change", () => {
-         this._model.parent = this._parent.val();
+         this._model.parent = parseInt(this._parent.val());
       });
 
       this._deleteButton.click((e) => {
@@ -12010,6 +12014,6 @@ module.exports = NodesListView;
 
 module.exports = {
    "nodes-list-view": "<div class=\"nodes-list-view\">\n   <button>Add new node</button>\n   <div class=\"list\"></div>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-id=\"<%= id %>\">\n   <input type='text' class='name' placeholder='Add the node name' />\n   <input type='text' class='title' placeholder='Add the node title' />\n   <select class='type'>\n      <option>-</option>\n      <option>checkbox</option>\n      <option>radio</option>\n      <option>text</option>\n   </select>\n   <select class='parent'>\n      <option>-</option>\n   </select>\n   <button>Delete</button>\n</div>"
+   "node-view": "<div class=\"node-view\" data-node-id=\"<%= id %>\">\n   \n   <div class=\"model\"></div>\n\n   <div class=\"input-wrapper\">\n      <label>Name</label>\n      <input type='text' class='name' />\n   </div>\n\n   <div class=\"input-wrapper\">\n      <label>Description</label>\n      <input type='text' class='title' />\n   </div>\n\n   <div class=\"input-wrapper\">\n      <label>Type</label>\n      <select class='type'>\n         <option>-</option>\n         <option>checkbox</option>\n         <option>radio</option>\n         <option>text</option>\n      </select>\n   </div>\n\n   <div class=\"input-wrapper\">\n      <label>Parent</label>\n      <select class='parent'>\n         <option>-</option>\n      </select>\n   </div>\n\n   <div class=\"clauses\">\n      <span>add clauses [+]</span>\n      <div class=\"clauses-list-view\">clauses</div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>"
 };
 },{}]},{},[3]);

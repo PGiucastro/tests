@@ -1,14 +1,41 @@
 <div class="node-view" data-node-id="<%= id %>">
-   <input type='text' class='name' placeholder='Add the node name' />
-   <input type='text' class='title' placeholder='Add the node title' />
-   <select class='type'>
-      <option>-</option>
-      <option>checkbox</option>
-      <option>radio</option>
-      <option>text</option>
-   </select>
-   <select class='parent'>
-      <option>-</option>
-   </select>
-   <button>Delete</button>
+   
+   <div class="model"></div>
+
+   <div class="input-wrapper">
+      <label>Name</label>
+      <input type='text' class='name' />
+   </div>
+
+   <div class="input-wrapper">
+      <label>Description</label>
+      <input type='text' class='title' />
+   </div>
+
+   <div class="input-wrapper">
+      <label>Type</label>
+      <select class='type'>
+         <option>-</option>
+         <option>checkbox</option>
+         <option>radio</option>
+         <option>text</option>
+      </select>
+   </div>
+
+   <div class="input-wrapper">
+      <label>Parent</label>
+      <select class='parent'>
+         <option>-</option>
+      </select>
+   </div>
+
+   <div class="clauses">
+      <span>add clauses [+]</span>
+      <div class="clauses-list-view">clauses</div>   
+   </div>
+
+   <div class="buttons">
+      <button>Delete</button>
+   </div>
+
 </div>

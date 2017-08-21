@@ -16,23 +16,64 @@
          body {
             padding: 30px;
             margin: 0;
+            font-family: arial;
+            font-size: 14px;
          }
 
          .node-view {
             border: 1px solid #ccc;
             margin: 20px 0;
             padding: 20px;
+            position: relative;
+         }
+
+         .node-view .model {
+            background: black;
+            color: lime;
+            width: 300px;
+            white-space: pre;
+            padding: 10px;
+            color: lime;
+            font-family: monospace;
+            position: absolute;
+            top:0;
+            right: 0;
+         }
+
+         .input-wrapper {
+            margin-bottom: 20px;
+         }
+
+         .input-wrapper label {
+            margin-bottom: 5px;
+            display: block;
          }
 
          button,
          .node-view input,
          .node-view select,
          .node-view button {
+            font-size: 14px;
             padding: 5px;
          }
-         
+
+         .node-view input,
          .node-view select {
-            width: 200px;
+            width: 400px;
+            box-sizing: border-box;
+         }
+
+         .node-view .clauses {
+            margin-top: 20px;
+         }
+
+         .node-view .clauses .clauses-list-view {
+            display: none;
+         }
+
+         .node-view .buttons {
+            margin-top: 20px;
+            text-align: right;
          }
 
       </style>
