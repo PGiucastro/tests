@@ -9,6 +9,14 @@ class NodeView {
       this._model = model;
    }
 
+   getRootNode() {
+      return this._root;
+   }
+
+   getModel() {
+      return this._model;
+   }
+
    render() {
 
       var tmpl = _.template(templates["node-view"]);
@@ -26,14 +34,6 @@ class NodeView {
 
       this._behaviour();
       return this._root;
-   }
-
-   getRootNode() {
-      return this._root;
-   }
-
-   getModel() {
-      return this._model;
    }
 
    updateParentSelect(nodes) {
@@ -66,6 +66,7 @@ class NodeView {
          this._parent.val(this._model.parent);
       } else {
          this._parent.val("-");
+         this._model.parent = null;
       }
    }
 

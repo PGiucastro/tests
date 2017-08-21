@@ -1,32 +1,36 @@
 <div class="node-view" data-node-id="<%= id %>">
-   
+
    <div class="model"></div>
 
-   <div class="input-wrapper">
-      <label>Name</label>
-      <input type='text' class='name' />
+   <div class="left">
+      <div class="input-wrapper">
+         <label>Name</label>
+         <input type='text' class='name' />
+      </div>
+
+      <div class="input-wrapper">
+         <label>Description</label>
+         <input type='text' class='title' />
+      </div>   
    </div>
 
-   <div class="input-wrapper">
-      <label>Description</label>
-      <input type='text' class='title' />
-   </div>
+   <div class="left">
+      <div class="input-wrapper">
+         <label>Type</label>
+         <select class='type'>
+            <option>-</option>
+            <option>checkbox</option>
+            <option>radio</option>
+            <option>text</option>
+         </select>
+      </div>
 
-   <div class="input-wrapper">
-      <label>Type</label>
-      <select class='type'>
-         <option>-</option>
-         <option>checkbox</option>
-         <option>radio</option>
-         <option>text</option>
-      </select>
-   </div>
-
-   <div class="input-wrapper">
-      <label>Parent</label>
-      <select class='parent'>
-         <option>-</option>
-      </select>
+      <div class="input-wrapper">
+         <label>Parent</label>
+         <select class='parent'>
+            <option>-</option>
+         </select>
+      </div>
    </div>
 
    <div class="clauses">
