@@ -1,7 +1,8 @@
-const NodeView = require('./node-view');
-const templates = require('./templates');
 const _ = require('underscore');
 const $ = require('jquery');
+const NodeView = require('./node-view');
+const templates = require('./templates');
+const SchemaBuilder = require('./../schema-builder');
 
 class NodesListView {
 
@@ -12,7 +13,8 @@ class NodesListView {
       this._clausesModel = null;
 
       this._root = $(templates["nodes-list-view"]);
-      this._addButton = this._root.find("button");
+      this._addButton = this._root.find("button.add");
+      this._saveButton = this._root.find("button.save");
       this._loader = this._root.find(".loading");
       this._list = this._root.find(".list");
    }
@@ -40,6 +42,11 @@ class NodesListView {
    }
 
    _behaviour() {
+
+      this._saveButton.click((e) => {
+         var json = SchemaBuilder.build(this._renderedNodeViews);
+         alert(JSON.stringify(json, null, "   "));
+      });
 
       this._addButton.click((e) => {
          e.preventDefault();
@@ -84,6 +91,9 @@ class NodesListView {
    }
 
    _renderNode(nodeModel) {
+      if (this._renderedNodeViews.length === 0) {
+         this._list.empty(); // removes the `no nodes` message
+      }
       var nodeView = new NodeView(nodeModel, this._clausesModel, this._eventHub);
       this._list.append(nodeView.render());
       this._renderedNodeViews.push(nodeView);

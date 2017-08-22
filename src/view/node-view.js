@@ -9,7 +9,7 @@ class NodeView {
       this._model = model;
       this._clauses = clauses;
       this._eventHub = eventHub;
-
+      this._clausesView;
    }
 
    getRootNode() {
@@ -17,7 +17,9 @@ class NodeView {
    }
 
    getModel() {
-      return this._model;
+      var model = this._model;
+      model.clauses = this._clausesView.getChosenClausues();
+      return model;
    }
 
    render() {
@@ -111,7 +113,8 @@ class NodeView {
    }
 
    _renderSubViews() {
-      this._clausesContainer.append(new ClausesView(this._clauses).render());
+      this._clausesView = new ClausesView(this._clauses);
+      this._clausesContainer.append(this._clausesView.render());
    }
 
    _loadModelData() {

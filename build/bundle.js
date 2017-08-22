@@ -11809,15 +11809,43 @@ const NodesList = require('./view/nodes-list-view');
 
 var list = new NodesList($({})).render();
 $("body").append(list);
-},{"./view/nodes-list-view":6,"jquery":1}],4:[function(require,module,exports){
+},{"./view/nodes-list-view":7,"jquery":1}],4:[function(require,module,exports){
+class SchemaBuilder {
+
+   static build(nodeViews) {
+
+      var schema = {
+         $schema: "http://json-schema.org/draft-04/schema#",
+         type: "object",
+         properties: {
+
+         }
+      };
+
+      nodeViews.forEach((node) => {
+         var m = node.getModel();
+         schema.properties[m.name] = {
+            title: m.title,
+            type: m.type,
+            _iub_clauses: m.clauses,
+            _iub_parent: m.parent
+         };
+      });
+
+      return schema;
+   }
+}
+
+module.exports = SchemaBuilder;
+},{}],5:[function(require,module,exports){
 const $ = require('jquery');
 const _ = require('underscore');
 const templates = require('./templates');
 
 class ClausesView {
 
-   constructor(model) {
-      this._model = model;
+   constructor(clauses) {
+      this._clauses = clauses;
    }
 
    render() {
@@ -11828,15 +11856,18 @@ class ClausesView {
       return this._root;
    }
 
-   toJSON() {
-      return this._root.find("input:checked").map((i, el) => {
-         return el.name;
-      });
+   getChosenClausues() {
+      var clauses = [];
+      var checked = this._root.find("input:checked");
+      for (var i = 0; i < checked.length; i++) {
+         clauses.push(checked[i].name);
+      }
+      return clauses;
    }
 
    _createCheckboxesHTML() {
       var html = "";
-      for (var key in this._model) {
+      for (var key in this._clauses) {
          html += `<label><input name="${key}" type="checkbox" />${key}</label>`;
       }
       return html;
@@ -11844,7 +11875,7 @@ class ClausesView {
 }
 
 module.exports = ClausesView;
-},{"./templates":7,"jquery":1,"underscore":2}],5:[function(require,module,exports){
+},{"./templates":8,"jquery":1,"underscore":2}],6:[function(require,module,exports){
 const templates = require('./templates');
 const _ = require('underscore');
 const $ = require('jquery');
@@ -11856,7 +11887,7 @@ class NodeView {
       this._model = model;
       this._clauses = clauses;
       this._eventHub = eventHub;
-
+      this._clausesView;
    }
 
    getRootNode() {
@@ -11864,7 +11895,9 @@ class NodeView {
    }
 
    getModel() {
-      return this._model;
+      var model = this._model;
+      model.clauses = this._clausesView.getChosenClausues();
+      return model;
    }
 
    render() {
@@ -11958,7 +11991,8 @@ class NodeView {
    }
 
    _renderSubViews() {
-      this._clausesContainer.append(new ClausesView(this._clauses).render());
+      this._clausesView = new ClausesView(this._clauses);
+      this._clausesContainer.append(this._clausesView.render());
    }
 
    _loadModelData() {
@@ -11969,11 +12003,12 @@ class NodeView {
 }
 
 module.exports = NodeView;
-},{"./clauses-view":4,"./templates":7,"jquery":1,"underscore":2}],6:[function(require,module,exports){
-const NodeView = require('./node-view');
-const templates = require('./templates');
+},{"./clauses-view":5,"./templates":8,"jquery":1,"underscore":2}],7:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
+const NodeView = require('./node-view');
+const templates = require('./templates');
+const SchemaBuilder = require('./../schema-builder');
 
 class NodesListView {
 
@@ -11984,7 +12019,8 @@ class NodesListView {
       this._clausesModel = null;
 
       this._root = $(templates["nodes-list-view"]);
-      this._addButton = this._root.find("button");
+      this._addButton = this._root.find("button.add");
+      this._saveButton = this._root.find("button.save");
       this._loader = this._root.find(".loading");
       this._list = this._root.find(".list");
    }
@@ -12012,6 +12048,11 @@ class NodesListView {
    }
 
    _behaviour() {
+
+      this._saveButton.click((e) => {
+         var json = SchemaBuilder.build(this._renderedNodeViews);
+         alert(JSON.stringify(json, null, "   "));
+      });
 
       this._addButton.click((e) => {
          e.preventDefault();
@@ -12056,6 +12097,9 @@ class NodesListView {
    }
 
    _renderNode(nodeModel) {
+      if (this._renderedNodeViews.length === 0) {
+         this._list.empty(); // removes the `no nodes` message
+      }
       var nodeView = new NodeView(nodeModel, this._clausesModel, this._eventHub);
       this._list.append(nodeView.render());
       this._renderedNodeViews.push(nodeView);
@@ -12063,11 +12107,11 @@ class NodesListView {
 }
 
 module.exports = NodesListView;
-},{"./node-view":5,"./templates":7,"jquery":1,"underscore":2}],7:[function(require,module,exports){
+},{"./../schema-builder":4,"./node-view":6,"./templates":8,"jquery":1,"underscore":2}],8:[function(require,module,exports){
 
 
 module.exports = {
-   "nodes-list-view": "<div class=\"nodes-list-view\">\n   <div class=\"loading\">Loading</div>\n   <button class=\"add\">Add new node</button>\n   <div class=\"list\"></div>\n</div>",
+   "nodes-list-view": "<div class=\"nodes-list-view\">\n   <div class=\"loading\">Loading</div>\n   <button class=\"add\">Add new node</button>\n   <div class=\"list\">No nodes yet :(</div>\n   <button class=\"save\">Save schema</button>\n</div>",
    "node-view": "<div class=\"node-view\" data-node-id=\"<%= id %>\">\n\n   <div class=\"model\"></div>\n\n   <div class=\"left\">\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Description</label>\n         <input type='text' class='title' />\n      </div>   \n   </div>\n\n   <div class=\"left\">\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option>-</option>\n            <option>checkbox</option>\n            <option>radio</option>\n            <option>text</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>"
 };

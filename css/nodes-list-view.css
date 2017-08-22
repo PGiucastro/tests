@@ -4,3 +4,7 @@
    padding: 5px;
    margin-bottom: 20px;
 }
+
+.nodes-list-view .list {
+   margin: 10px 0;
+}

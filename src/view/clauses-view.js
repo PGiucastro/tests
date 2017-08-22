@@ -4,8 +4,8 @@ const templates = require('./templates');
 
 class ClausesView {
 
-   constructor(model) {
-      this._model = model;
+   constructor(clauses) {
+      this._clauses = clauses;
    }
 
    render() {
@@ -16,15 +16,18 @@ class ClausesView {
       return this._root;
    }
 
-   toJSON() {
-      return this._root.find("input:checked").map((i, el) => {
-         return el.name;
-      });
+   getChosenClausues() {
+      var clauses = [];
+      var checked = this._root.find("input:checked");
+      for (var i = 0; i < checked.length; i++) {
+         clauses.push(checked[i].name);
+      }
+      return clauses;
    }
 
    _createCheckboxesHTML() {
       var html = "";
-      for (var key in this._model) {
+      for (var key in this._clauses) {
          html += `<label><input name="${key}" type="checkbox" />${key}</label>`;
       }
       return html;
