@@ -16,6 +16,12 @@ class ClausesView {
       return this._root;
    }
 
+   toJSON() {
+      return this._root.find("input:checked").map((i, el) => {
+         return el.name;
+      });
+   }
+
    _createCheckboxesHTML() {
       var html = "";
       for (var key in this._model) {
