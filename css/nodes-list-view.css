@@ -1,0 +1,6 @@
+.nodes-list-view .loading {
+   background: yellow;
+   text-align: center;
+   padding: 5px;
+   margin-bottom: 20px;
+}

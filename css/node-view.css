@@ -1,0 +1,57 @@
+.node-view {
+   border: 1px solid #ccc;
+   margin: 20px 0;
+   padding: 20px;
+   position: relative;
+}
+
+.node-view .model {
+   background: black;
+   color: lime;
+   width: 300px;
+   white-space: pre;
+   padding: 10px;
+   color: lime;
+   font-family: monospace;
+   position: absolute;
+   top:0;
+   right: 0;
+}
+
+.node-view .input-wrapper {
+   margin-bottom: 20px;
+}
+
+.node-view .input-wrapper label {
+   margin-bottom: 5px;
+   display: block;
+}
+
+.node-view input,
+.node-view select {
+   width: 400px;
+   box-sizing: border-box;
+}
+
+.node-view .left {
+   float: left;
+   padding-right: 50px
+}
+
+.node-view .clauses {
+   margin-top: 20px;
+   clear: both;
+}
+
+.node-view .clauses .expand {
+   cursor: pointer;
+}
+
+.node-view .clauses .container {
+   display: none;
+}
+
+.node-view .buttons {
+   margin-top: 20px;
+   text-align: right;
+}

@@ -11816,14 +11816,24 @@ const templates = require('./templates');
 
 class ClausesView {
 
-   construct(model) {
+   constructor(model) {
       this._model = model;
    }
 
    render() {
       var tmpl = _.template(templates["clauses-view"]);
-      this._root = $(tmpl(this._model));
+      this._root = $(tmpl({
+         html: this._createCheckboxesHTML()
+      }));
       return this._root;
+   }
+
+   _createCheckboxesHTML() {
+      var html = "";
+      for (var key in this._model) {
+         html += `<label><input name="${key}" type="checkbox" />${key}</label>`;
+      }
+      return html;
    }
 }
 
@@ -12052,7 +12062,7 @@ module.exports = NodesListView;
 
 module.exports = {
    "nodes-list-view": "<div class=\"nodes-list-view\">\n   <div class=\"loading\">Loading</div>\n   <button class=\"add\">Add new node</button>\n   <div class=\"list\"></div>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-id=\"<%= id %>\">\n\n   <div class=\"model\"></div>\n\n   <div class=\"left\">\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Description</label>\n         <input type='text' class='title' />\n      </div>   \n   </div>\n\n   <div class=\"left\">\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option>-</option>\n            <option>checkbox</option>\n            <option>radio</option>\n            <option>text</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">associate clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
-   "clauses-view": "<div class=\"clauses-view\">\n   clauses\n</div>"
+   "node-view": "<div class=\"node-view\" data-node-id=\"<%= id %>\">\n\n   <div class=\"model\"></div>\n\n   <div class=\"left\">\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Description</label>\n         <input type='text' class='title' />\n      </div>   \n   </div>\n\n   <div class=\"left\">\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option>-</option>\n            <option>checkbox</option>\n            <option>radio</option>\n            <option>text</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
+   "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>"
 };
 },{}]},{},[3]);
