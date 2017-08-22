@@ -28,11 +28,9 @@ class NodeView {
       this._parent = this._root.find(".parent");
       this._deleteButton = this._root.find("button");
 
-      this._name.val(this._model.name);
-      this._title.val(this._model.title);
-      this._type.val(this._model.type || "-");
-
+      this._loadModelData();
       this._behaviour();
+
       return this._root;
    }
 
@@ -74,7 +72,7 @@ class NodeView {
 
       setInterval(() => {
          this._root.find(".model").text(JSON.stringify(this._model, null, "  "));
-      }, 500);
+      }, 1000);
 
       this._name.on("keyup", () => {
          this._model.name = this._name.val();
@@ -100,6 +98,12 @@ class NodeView {
       this._name.on("keyup", (e) => {
          this._eventHub.trigger("node-name-updated", this.getModel());
       });
+   }
+
+   _loadModelData() {
+      this._name.val(this._model.name);
+      this._title.val(this._model.title);
+      this._type.val(this._model.type || "-");
    }
 }
 

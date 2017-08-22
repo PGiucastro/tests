@@ -7,13 +7,13 @@
     "build-watch": "watchify -t brfs src/main.js -o build/bundle.js -v"
   },
   "dependencies": {
-    "jquery": "^3.2.1",
-    "underscore": "^1.8.3"
-  },
-  "devDependencies": {
     "brfs": "^1.4.3",
     "browserify": "^14.4.0",
     "browserify-fs": "^1.0.0",
+    "jquery": "^3.2.1",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {    
     "serve": "^6.0.6",
     "watchify": "^3.9.0"
   }

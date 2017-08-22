@@ -1,0 +1,15 @@
+[
+   {
+      "id": 4,
+      "name": "a_node_name",
+      "title": "A node title",
+      "type": "text",
+      "parent": null
+   }, {
+      "id": 5,
+      "name": "another_node_name",
+      "title": "Another node title",
+      "type": "checkbox",
+      "parent": 4
+   }
+]

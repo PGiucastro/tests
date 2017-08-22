@@ -11840,11 +11840,9 @@ class NodeView {
       this._parent = this._root.find(".parent");
       this._deleteButton = this._root.find("button");
 
-      this._name.val(this._model.name);
-      this._title.val(this._model.title);
-      this._type.val(this._model.type || "-");
-
+      this._loadModelData();
       this._behaviour();
+
       return this._root;
    }
 
@@ -11886,7 +11884,7 @@ class NodeView {
 
       setInterval(() => {
          this._root.find(".model").text(JSON.stringify(this._model, null, "  "));
-      }, 500);
+      }, 1000);
 
       this._name.on("keyup", () => {
          this._model.name = this._name.val();
@@ -11913,6 +11911,12 @@ class NodeView {
          this._eventHub.trigger("node-name-updated", this.getModel());
       });
    }
+
+   _loadModelData() {
+      this._name.val(this._model.name);
+      this._title.val(this._model.title);
+      this._type.val(this._model.type || "-");
+   }
 }
 
 module.exports = NodeView;
@@ -11922,39 +11926,33 @@ const templates = require('./templates');
 const _ = require('underscore');
 const $ = require('jquery');
 
-var _models_ = [{
-      id: 4,
-      name: "a_node_name",
-      title: "A node title",
-      type: "text",
-      parent: null
-   }, {
-      id: 5,
-      name: "another_node_name",
-      title: "Another node title",
-      type: "checkbox",
-      parent: 4
-   }];
-
 class NodesListView {
 
    constructor(eventHub) {
       this._counter = 0;
       this._eventHub = eventHub;
-      this._nodes = [];
+      this._renderedNodeViews = [];
       this._root = $(templates["nodes-list-view"]);
       this._addButton = this._root.find("button");
+      this._loader = this._root.find(".loading");
       this._list = this._root.find(".list");
    }
 
    render() {
 
-      for (var i = 0; i < _models_.length; i++) {
-         this._addNode(_models_[i]);
-      }
+      $.get("/mock-data/nodes.json")
+         .then((data) => {
+            this._loader.hide();
+            for (var i = 0; i < data.length; i++) {
+               if (this._counter < data[i].id) {
+                  this._counter = data[i].id;
+               }
+               this._renderNode(data[i]);
+            }
+            this._updateNodesParentSelect();
+            this._behaviour();
+         });
 
-      this._updateNodesParentSelect();
-      this._behaviour();
       return this._root;
    }
 
@@ -11966,15 +11964,15 @@ class NodesListView {
          var nodeModel = {
             id: this._counter
          };
-         this._addNode(nodeModel);
+         this._renderNode(nodeModel);
          this._updateNodesParentSelect();
       });
 
       this._eventHub.on("node-removed", (e, model) => {
          var index = -1;
 
-         for (var i = 0; i < this._nodes.length; i++) {
-            var node = this._nodes[i];
+         for (var i = 0; i < this._renderedNodeViews.length; i++) {
+            var node = this._renderedNodeViews[i];
             if (node.getModel() === model) {
                node.getRootNode().remove();
                index = i;
@@ -11983,7 +11981,7 @@ class NodesListView {
          }
 
          if (index !== -1) {
-            this._nodes.splice(index, 1);
+            this._renderedNodeViews.splice(index, 1);
          }
 
          this._updateNodesParentSelect();
@@ -11995,17 +11993,17 @@ class NodesListView {
    }
 
    _updateNodesParentSelect() {
-      for (var i = 0; i < this._nodes.length; i++) {
-         this._nodes[i].updateParentSelect(this._nodes.map((n) => {
+      for (var i = 0; i < this._renderedNodeViews.length; i++) {
+         this._renderedNodeViews[i].updateParentSelect(this._renderedNodeViews.map((n) => {
             return n.getModel();
          }));
       }
    }
 
-   _addNode(nodeModel) {
+   _renderNode(nodeModel) {
       var nodeView = new NodeView(nodeModel, this._eventHub);
       this._list.append(nodeView.render());
-      this._nodes.push(nodeView);
+      this._renderedNodeViews.push(nodeView);
    }
 }
 
@@ -12014,7 +12012,7 @@ module.exports = NodesListView;
 
 
 module.exports = {
-   "nodes-list-view": "<div class=\"nodes-list-view\">\n   <button>Add new node</button>\n   <div class=\"list\"></div>\n</div>",
+   "nodes-list-view": "<div class=\"nodes-list-view\">\n   <div class=\"loading\">Loading</div>\n   <button class=\"add\">Add new node</button>   \n   <div class=\"list\"></div>\n</div>",
    "node-view": "<div class=\"node-view\" data-node-id=\"<%= id %>\">\n\n   <div class=\"model\"></div>\n\n   <div class=\"left\">\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Description</label>\n         <input type='text' class='title' />\n      </div>   \n   </div>\n\n   <div class=\"left\">\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option>-</option>\n            <option>checkbox</option>\n            <option>radio</option>\n            <option>text</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n   </div>\n\n   <div class=\"clauses\">\n      <span>add clauses [+]</span>\n      <div class=\"clauses-list-view\">clauses</div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>"
 };
 },{}]},{},[3]);
