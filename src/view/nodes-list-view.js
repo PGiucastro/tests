@@ -6,9 +6,11 @@ const $ = require('jquery');
 class NodesListView {
 
    constructor(eventHub) {
-      this._counter = 0;
+      this._lastUsedId = 0;
       this._eventHub = eventHub;
       this._renderedNodeViews = [];
+      this._clausesModel = null;
+
       this._root = $(templates["nodes-list-view"]);
       this._addButton = this._root.find("button");
       this._loader = this._root.find(".loading");
@@ -17,15 +19,19 @@ class NodesListView {
 
    render() {
 
-      $.get("/mock-data/nodes.json")
-         .then((data) => {
+      $.when($.get("/mock-data/nodes.json"), $.get("/mock-data/clauses.json"))
+         .then((nodes, clauses) => {
+            nodes = nodes[0];
+            this._clausesModel = clauses[0];
             this._loader.hide();
-            for (var i = 0; i < data.length; i++) {
-               if (this._counter < data[i].id) {
-                  this._counter = data[i].id;
+
+            for (var i = 0; i < nodes.length; i++) {
+               if (this._lastUsedId < nodes[i].id) {
+                  this._lastUsedId = nodes[i].id;
                }
-               this._renderNode(data[i]);
+               this._renderNode(nodes[i]);
             }
+
             this._updateNodesParentSelect();
             this._behaviour();
          });
@@ -37,9 +43,9 @@ class NodesListView {
 
       this._addButton.click((e) => {
          e.preventDefault();
-         this._counter++;
+         this._lastUsedId++;
          var nodeModel = {
-            id: this._counter
+            id: this._lastUsedId
          };
          this._renderNode(nodeModel);
          this._updateNodesParentSelect();
@@ -78,7 +84,7 @@ class NodesListView {
    }
 
    _renderNode(nodeModel) {
-      var nodeView = new NodeView(nodeModel, this._eventHub);
+      var nodeView = new NodeView(nodeModel, this._clausesModel, this._eventHub);
       this._list.append(nodeView.render());
       this._renderedNodeViews.push(nodeView);
    }

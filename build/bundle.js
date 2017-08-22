@@ -11805,20 +11805,42 @@ return jQuery;
 
 },{}],3:[function(require,module,exports){
 const $ = require('jquery');
-const NodesList = require('./nodes-list-view');
+const NodesList = require('./view/nodes-list-view');
 
 var list = new NodesList($({})).render();
 $("body").append(list);
-},{"./nodes-list-view":5,"jquery":1}],4:[function(require,module,exports){
+},{"./view/nodes-list-view":6,"jquery":1}],4:[function(require,module,exports){
+const $ = require('jquery');
+const _ = require('underscore');
+const templates = require('./templates');
+
+class ClausesView {
+
+   construct(model) {
+      this._model = model;
+   }
+
+   render() {
+      var tmpl = _.template(templates["clauses-view"]);
+      this._root = $(tmpl(this._model));
+      return this._root;
+   }
+}
+
+module.exports = ClausesView;
+},{"./templates":7,"jquery":1,"underscore":2}],5:[function(require,module,exports){
 const templates = require('./templates');
 const _ = require('underscore');
 const $ = require('jquery');
+const ClausesView = require('./clauses-view');
 
 class NodeView {
 
-   constructor(model, eventHub) {
-      this._eventHub = eventHub;
+   constructor(model, clauses, eventHub) {
       this._model = model;
+      this._clauses = clauses;
+      this._eventHub = eventHub;
+
    }
 
    getRootNode() {
@@ -11839,8 +11861,11 @@ class NodeView {
       this._type = this._root.find(".type");
       this._parent = this._root.find(".parent");
       this._deleteButton = this._root.find("button");
+      this._clausesExpansionButton = this._root.find(".clauses .expand");
+      this._clausesContainer = this._root.find(".clauses .container");
 
       this._loadModelData();
+      this._renderSubViews();
       this._behaviour();
 
       return this._root;
@@ -11886,6 +11911,10 @@ class NodeView {
          this._root.find(".model").text(JSON.stringify(this._model, null, "  "));
       }, 1000);
 
+      this._clausesExpansionButton.click((e) => {
+         this._clausesContainer.toggle();
+      });
+
       this._name.on("keyup", () => {
          this._model.name = this._name.val();
       });
@@ -11912,6 +11941,10 @@ class NodeView {
       });
    }
 
+   _renderSubViews() {
+      this._clausesContainer.append(new ClausesView(this._clauses).render());
+   }
+
    _loadModelData() {
       this._name.val(this._model.name);
       this._title.val(this._model.title);
@@ -11920,7 +11953,7 @@ class NodeView {
 }
 
 module.exports = NodeView;
-},{"./templates":6,"jquery":1,"underscore":2}],5:[function(require,module,exports){
+},{"./clauses-view":4,"./templates":7,"jquery":1,"underscore":2}],6:[function(require,module,exports){
 const NodeView = require('./node-view');
 const templates = require('./templates');
 const _ = require('underscore');
@@ -11929,9 +11962,11 @@ const $ = require('jquery');
 class NodesListView {
 
    constructor(eventHub) {
-      this._counter = 0;
+      this._lastUsedId = 0;
       this._eventHub = eventHub;
       this._renderedNodeViews = [];
+      this._clausesModel = null;
+
       this._root = $(templates["nodes-list-view"]);
       this._addButton = this._root.find("button");
       this._loader = this._root.find(".loading");
@@ -11940,15 +11975,19 @@ class NodesListView {
 
    render() {
 
-      $.get("/mock-data/nodes.json")
-         .then((data) => {
+      $.when($.get("/mock-data/nodes.json"), $.get("/mock-data/clauses.json"))
+         .then((nodes, clauses) => {
+            nodes = nodes[0];
+            this._clausesModel = clauses[0];
             this._loader.hide();
-            for (var i = 0; i < data.length; i++) {
-               if (this._counter < data[i].id) {
-                  this._counter = data[i].id;
+
+            for (var i = 0; i < nodes.length; i++) {
+               if (this._lastUsedId < nodes[i].id) {
+                  this._lastUsedId = nodes[i].id;
                }
-               this._renderNode(data[i]);
+               this._renderNode(nodes[i]);
             }
+
             this._updateNodesParentSelect();
             this._behaviour();
          });
@@ -11960,9 +11999,9 @@ class NodesListView {
 
       this._addButton.click((e) => {
          e.preventDefault();
-         this._counter++;
+         this._lastUsedId++;
          var nodeModel = {
-            id: this._counter
+            id: this._lastUsedId
          };
          this._renderNode(nodeModel);
          this._updateNodesParentSelect();
@@ -12001,18 +12040,19 @@ class NodesListView {
    }
 
    _renderNode(nodeModel) {
-      var nodeView = new NodeView(nodeModel, this._eventHub);
+      var nodeView = new NodeView(nodeModel, this._clausesModel, this._eventHub);
       this._list.append(nodeView.render());
       this._renderedNodeViews.push(nodeView);
    }
 }
 
 module.exports = NodesListView;
-},{"./node-view":4,"./templates":6,"jquery":1,"underscore":2}],6:[function(require,module,exports){
+},{"./node-view":5,"./templates":7,"jquery":1,"underscore":2}],7:[function(require,module,exports){
 
 
 module.exports = {
-   "nodes-list-view": "<div class=\"nodes-list-view\">\n   <div class=\"loading\">Loading</div>\n   <button class=\"add\">Add new node</button>   \n   <div class=\"list\"></div>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-id=\"<%= id %>\">\n\n   <div class=\"model\"></div>\n\n   <div class=\"left\">\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Description</label>\n         <input type='text' class='title' />\n      </div>   \n   </div>\n\n   <div class=\"left\">\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option>-</option>\n            <option>checkbox</option>\n            <option>radio</option>\n            <option>text</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n   </div>\n\n   <div class=\"clauses\">\n      <span>add clauses [+]</span>\n      <div class=\"clauses-list-view\">clauses</div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>"
+   "nodes-list-view": "<div class=\"nodes-list-view\">\n   <div class=\"loading\">Loading</div>\n   <button class=\"add\">Add new node</button>\n   <div class=\"list\"></div>\n</div>",
+   "node-view": "<div class=\"node-view\" data-node-id=\"<%= id %>\">\n\n   <div class=\"model\"></div>\n\n   <div class=\"left\">\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Description</label>\n         <input type='text' class='title' />\n      </div>   \n   </div>\n\n   <div class=\"left\">\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option>-</option>\n            <option>checkbox</option>\n            <option>radio</option>\n            <option>text</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">associate clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
+   "clauses-view": "<div class=\"clauses-view\">\n   clauses\n</div>"
 };
 },{}]},{},[3]);

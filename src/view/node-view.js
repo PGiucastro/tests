@@ -1,12 +1,15 @@
 const templates = require('./templates');
 const _ = require('underscore');
 const $ = require('jquery');
+const ClausesView = require('./clauses-view');
 
 class NodeView {
 
-   constructor(model, eventHub) {
-      this._eventHub = eventHub;
+   constructor(model, clauses, eventHub) {
       this._model = model;
+      this._clauses = clauses;
+      this._eventHub = eventHub;
+
    }
 
    getRootNode() {
@@ -27,8 +30,11 @@ class NodeView {
       this._type = this._root.find(".type");
       this._parent = this._root.find(".parent");
       this._deleteButton = this._root.find("button");
+      this._clausesExpansionButton = this._root.find(".clauses .expand");
+      this._clausesContainer = this._root.find(".clauses .container");
 
       this._loadModelData();
+      this._renderSubViews();
       this._behaviour();
 
       return this._root;
@@ -74,6 +80,10 @@ class NodeView {
          this._root.find(".model").text(JSON.stringify(this._model, null, "  "));
       }, 1000);
 
+      this._clausesExpansionButton.click((e) => {
+         this._clausesContainer.toggle();
+      });
+
       this._name.on("keyup", () => {
          this._model.name = this._name.val();
       });
@@ -98,6 +108,10 @@ class NodeView {
       this._name.on("keyup", (e) => {
          this._eventHub.trigger("node-name-updated", this.getModel());
       });
+   }
+
+   _renderSubViews() {
+      this._clausesContainer.append(new ClausesView(this._clauses).render());
    }
 
    _loadModelData() {
