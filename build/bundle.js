@@ -11812,7 +11812,11 @@ $("body").append(list);
 },{"./view/nodes-list-view":7,"jquery":1}],4:[function(require,module,exports){
 class SchemaBuilder {
 
-   static build(nodeViews) {
+   constructor(models) {
+      this._models = models;
+   }
+
+   build() {
 
       var schema = {
          $schema: "http://json-schema.org/draft-04/schema#",
@@ -11822,9 +11826,7 @@ class SchemaBuilder {
          }
       };
 
-      nodeViews.forEach((node) => {
-         var m = node.getModel();
-         var parentView = SchemaBuilder.findNodeViewByModelId(nodeViews, m.parent);
+      this._models.forEach((m) => {
          schema.properties[m.name] = {
             title: m.title_EN,
             _iub_title_IT: m.title_IT,
@@ -11832,19 +11834,19 @@ class SchemaBuilder {
             _iub_title_DE: m.title_DE,
             type: m.type,
             _iub_clauses: m.clauses,
-            _iub_parent: parentView ? parentView.getModel().name : null
+            _iub_parent: m.parent ? this._findModelId(m.parent).name : null
          };
       });
 
       return schema;
    }
 
-   static findNodeViewByModelId(nodeViews, id) {
+   _findModelId(id) {
       var m;
-      for (var i = 0; i < nodeViews.length; i++) {
-         m = nodeViews[i].getModel();
+      for (var i = 0; i < this._models.length; i++) {
+         m = this._models[i];
          if (m.id === id) {
-            return nodeViews[i];
+            return m;
          }
       }
    }
@@ -12076,8 +12078,11 @@ class NodesListView {
    _behaviour() {
 
       this._saveButton.click((e) => {
-         var json = SchemaBuilder.build(this._renderedNodeViews);
-         alert(JSON.stringify(json, null, "   "));
+         var sb = new SchemaBuilder(this._renderedNodeViews.map((view) => {
+            return view.getModel();
+         }));
+         var json = sb.build();
+         console.log(JSON.stringify(json, null, "   "));
       });
 
       this._addButton.click((e) => {

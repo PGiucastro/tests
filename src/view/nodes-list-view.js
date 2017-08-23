@@ -44,8 +44,11 @@ class NodesListView {
    _behaviour() {
 
       this._saveButton.click((e) => {
-         var json = SchemaBuilder.build(this._renderedNodeViews);
-         alert(JSON.stringify(json, null, "   "));
+         var sb = new SchemaBuilder(this._renderedNodeViews.map((view) => {
+            return view.getModel();
+         }));
+         var json = sb.build();
+         console.log(JSON.stringify(json, null, "   "));
       });
 
       this._addButton.click((e) => {
