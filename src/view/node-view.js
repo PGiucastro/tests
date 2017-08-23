@@ -15,7 +15,7 @@ class NodeView {
    getRootNode() {
       return this._root;
    }
-   
+
    getModel() {
       var model = this._model;
       model.clauses = this._clausesView.getChosenClausues();
@@ -80,9 +80,13 @@ class NodeView {
 
    _behaviour() {
 
-      setInterval(() => {
-         this._root.find(".model").text(JSON.stringify(this._model, null, "  "));
-      }, 1000);
+      // Uncomment for debugging
+      // setInterval(() => {
+      //   this._root.find(".model").text(JSON.stringify(this._model, null, "  "));
+      // }, 1000);
+
+      // Comment out for debugging
+      this._root.find(".model").hide();
 
       this._clausesExpansionButton.click((e) => {
          this._clausesContainer.toggle();
