@@ -14,7 +14,8 @@ npm run build-watch  # watch mode for developers
 ```
 
 ```cmd
-# How to play with demos
+# How to play with the demo
+npm run build
 npm run demo
 
 # And then visit
