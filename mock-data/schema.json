@@ -1,0 +1,121 @@
+{
+
+   "$schema": "http://json-schema.org/draft-04/schema#",
+   "type": "object",
+
+   "properties": {
+      "user_registration_offered": {
+         "title": "Are you offering user registration on your application?",
+         "type": "boolean"
+      },
+      "user_allowed_to_add_contents": {
+         "title": "Do you allow user to add content?",
+         "type": "boolean",
+         "_iub_group_validation": "at-least-one-checkbox-selected"
+      },
+      "paid_goods_and_or_services": {
+         "title": "Are you providing paid goods and/or paid services in your application?",
+         "type": "boolean"
+      },
+      "implied_use_or_provision_of_software": {
+         "title": "Does the use of your goods and/or services imply the use/provision of software?",
+         "type": "boolean"
+      },
+      "right_of_cancellation": {
+         "title": "I offer right of cancellation",
+         "type": "boolean",
+         "_iub_parent": "user_allowed_to_add_contents"
+      },
+      "right_of_cancellation.min_days": {
+         "title": "Min",
+         "type": "number",
+         "default": 3,
+         "_iub_min": 1,
+         "_iub_max": "right_of_cancellation.max_days",
+         "_iub_parent": "right_of_cancellation"
+      },
+      "right_of_cancellation.max_days": {
+         "title": "Max",
+         "type": "number",
+         "default": 10,
+         "_iub_parent": "right_of_cancellation"
+      },
+      "user_generated_content_for_apple_apps_possible": {
+         "title": "Are you making user generated content for Apple apps possible?",
+         "type": "boolean",
+         "_iub_parent": "user_allowed_to_add_contents"
+      },
+      "permissive_licence_for_user_content": {
+         "title": "Do you need a permissive licence for user content (i.e.: leaving all rights to user)",
+         "type": "boolean",
+         "_iub_parent": "user_allowed_to_add_contents"
+      },
+      "permissive_licence_for_user_content_choice": {
+         "type": "string",
+         "enum": [
+            "license_your_user_content",
+            "all_rights_remain_with_users"
+         ],
+         "default": "license_your_user_content",
+         "_iub_labels": [
+            "License your users' content",
+            "All rights remain with users"
+         ],
+         "_iub_parent": "permissive_licence_for_user_content",
+         "_iub_validation": "required"
+      },
+      "offered_type": {
+         "title": "What do you offer?",
+         "type": "string",
+         "enum": [
+            "goods",
+            "services"
+         ],
+         "_iub_labels": [
+            "Goods",
+            "Services"
+         ],
+         "_iub_triggering_value": "goods",
+         "_iub_parent": "paid_goods_and_or_services",
+         "_iub_validation": "required"
+      },
+      "trial_offered": {
+         "title": "Trail offered?",
+         "type": "boolean",
+         "_iub_parent": "paid_goods_and_or_services"
+      },
+      "in_app_purchase_offered": {
+         "title": "In-app purchase offered?",
+         "type": "boolean",
+         "_iub_parent": "paid_goods_and_or_services"
+      },
+      "coupons_offered": {
+         "title": "Do you offer discount coupons?",
+         "type": "boolean",
+         "_iub_parent": "paid_goods_and_or_services"
+      },
+      "recurring_subscription_offered": {
+         "title": "Recurring subscription offered?",
+         "type": "boolean",
+         "_iub_parent": "paid_goods_and_or_services"
+      },
+      "automatic_renewal": {
+         "title": "Do you offer automatic renewal?",
+         "type": "string",
+         "enum": [
+            "yes",
+            "no"
+         ],
+         "_iub_labels": [
+            "Yes",
+            "No"
+         ],
+         "_iub_parent": "recurring_subscription_offered"
+      },
+      "alcoholic_goods": {
+         "title": "Are you selling alcoholic goods?",
+         "type": "boolean",
+         "_iub_parent": "offered_type"
+      }
+   }
+}

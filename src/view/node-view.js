@@ -1,6 +1,6 @@
-const templates = require('./templates');
 const _ = require('underscore');
 const $ = require('jquery');
+const templates = require('./../templates');
 const ClausesView = require('./clauses-view');
 
 class NodeView {

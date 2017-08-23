@@ -1,7 +1,7 @@
 const _ = require('underscore');
 const $ = require('jquery');
 const NodeView = require('./node-view');
-const templates = require('./templates');
+const templates = require('./../templates');
 const SchemaBuilder = require('./../schema-builder');
 
 class NodesListView {

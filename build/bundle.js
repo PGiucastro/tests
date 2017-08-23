@@ -11809,7 +11809,7 @@ const NodesList = require('./view/nodes-list-view');
 
 var list = new NodesList($({})).render();
 $("body").append(list);
-},{"./view/nodes-list-view":7,"jquery":1}],4:[function(require,module,exports){
+},{"./view/nodes-list-view":8,"jquery":1}],4:[function(require,module,exports){
 class SchemaBuilder {
 
    constructor(models) {
@@ -11854,9 +11854,17 @@ class SchemaBuilder {
 
 module.exports = SchemaBuilder;
 },{}],5:[function(require,module,exports){
+
+
+module.exports = {
+   "nodes-list-view": "<div class=\"nodes-list-view\">\n   <div class=\"loading\">Loading</div>\n   <button class=\"add\">Add new node</button>\n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   <div class=\"list\"></div>\n   <button class=\"save\">Save schema</button>\n</div>",
+   "node-view": "<div class=\"node-view\" data-node-id=\"<%= id %>\">\n\n   <div class=\"model\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option>-</option>\n            <option>checkbox</option>\n            <option>radio</option>\n            <option>text</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
+   "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>"
+};
+},{}],6:[function(require,module,exports){
 const $ = require('jquery');
 const _ = require('underscore');
-const templates = require('./templates');
+const templates = require('./../templates');
 
 class ClausesView {
 
@@ -11891,10 +11899,10 @@ class ClausesView {
 }
 
 module.exports = ClausesView;
-},{"./templates":8,"jquery":1,"underscore":2}],6:[function(require,module,exports){
-const templates = require('./templates');
+},{"./../templates":5,"jquery":1,"underscore":2}],7:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
+const templates = require('./../templates');
 const ClausesView = require('./clauses-view');
 
 class NodeView {
@@ -12035,11 +12043,11 @@ class NodeView {
 }
 
 module.exports = NodeView;
-},{"./clauses-view":5,"./templates":8,"jquery":1,"underscore":2}],7:[function(require,module,exports){
+},{"./../templates":5,"./clauses-view":6,"jquery":1,"underscore":2}],8:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const NodeView = require('./node-view');
-const templates = require('./templates');
+const templates = require('./../templates');
 const SchemaBuilder = require('./../schema-builder');
 
 class NodesListView {
@@ -12151,12 +12159,4 @@ class NodesListView {
 }
 
 module.exports = NodesListView;
-},{"./../schema-builder":4,"./node-view":6,"./templates":8,"jquery":1,"underscore":2}],8:[function(require,module,exports){
-
-
-module.exports = {
-   "nodes-list-view": "<div class=\"nodes-list-view\">\n   <div class=\"loading\">Loading</div>\n   <button class=\"add\">Add new node</button>\n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   <div class=\"list\"></div>\n   <button class=\"save\">Save schema</button>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-id=\"<%= id %>\">\n\n   <div class=\"model\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option>-</option>\n            <option>checkbox</option>\n            <option>radio</option>\n            <option>text</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
-   "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>"
-};
-},{}]},{},[3]);
+},{"./../schema-builder":4,"./../templates":5,"./node-view":7,"jquery":1,"underscore":2}]},{},[3]);
