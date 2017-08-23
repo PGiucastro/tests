@@ -2,6 +2,9 @@
    padding: 10px;
    background: #eee;
    margin-top: 20px;
+   -webkit-column-count: 3; /* Chrome, Safari, Opera */
+   -moz-column-count: 3; /* Firefox */
+   column-count: 3;
 }
 
 .clauses-view label {
