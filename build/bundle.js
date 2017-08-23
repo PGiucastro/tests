@@ -11825,7 +11825,10 @@ class SchemaBuilder {
       nodeViews.forEach((node) => {
          var m = node.getModel();
          schema.properties[m.name] = {
-            title: m.title,
+            title: m.title_EN,
+            _iub_title_IT: m.title_IT,
+            _iub_title_EN: m.title_EN,
+            _iub_title_DE: m.title_DE,
             type: m.type,
             _iub_clauses: m.clauses,
             _iub_parent: m.parent
@@ -11906,7 +11909,9 @@ class NodeView {
       this._root = $(tmpl(this._model));
 
       this._name = this._root.find(".name");
-      this._title = this._root.find(".title");
+      this._title_IT = this._root.find(".title_IT");
+      this._title_EN = this._root.find(".title_EN");
+      this._title_DE = this._root.find(".title_DE");
       this._type = this._root.find(".type");
       this._parent = this._root.find(".parent");
       this._deleteButton = this._root.find("button");
@@ -11968,8 +11973,16 @@ class NodeView {
          this._model.name = this._name.val();
       });
 
-      this._title.on("keyup", () => {
-         this._model.title = this._title.val();
+      this._title_IT.on("keyup", () => {
+         this._model.title_IT = this._title_IT.val();
+      });
+
+      this._title_EN.on("keyup", () => {
+         this._model.title_EN = this._title_EN.val();
+      });
+
+      this._title_DE.on("keyup", () => {
+         this._model.title_DE = this._title_DE.val();
       });
 
       this._type.on("change", () => {
@@ -11997,7 +12010,9 @@ class NodeView {
 
    _loadModelData() {
       this._name.val(this._model.name);
-      this._title.val(this._model.title);
+      this._title_IT.val(this._model.title_IT);
+      this._title_EN.val(this._model.title_EN);
+      this._title_DE.val(this._model.title_DE);
       this._type.val(this._model.type || "-");
    }
 }
@@ -12112,7 +12127,7 @@ module.exports = NodesListView;
 
 module.exports = {
    "nodes-list-view": "<div class=\"nodes-list-view\">\n   <div class=\"loading\">Loading</div>\n   <button class=\"add\">Add new node</button>\n   <div class=\"list\">No nodes yet :(</div>\n   <button class=\"save\">Save schema</button>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-id=\"<%= id %>\">\n\n   <div class=\"model\"></div>\n\n   <div class=\"left\">\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Description</label>\n         <input type='text' class='title' />\n      </div>   \n   </div>\n\n   <div class=\"left\">\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option>-</option>\n            <option>checkbox</option>\n            <option>radio</option>\n            <option>text</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
+   "node-view": "<div class=\"node-view\" data-node-id=\"<%= id %>\">\n\n   <div class=\"model\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option>-</option>\n            <option>checkbox</option>\n            <option>radio</option>\n            <option>text</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_IT' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_EN' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_DE' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>"
 };
 },{}]},{},[3]);

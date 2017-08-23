@@ -28,7 +28,9 @@ class NodeView {
       this._root = $(tmpl(this._model));
 
       this._name = this._root.find(".name");
-      this._title = this._root.find(".title");
+      this._title_IT = this._root.find(".title_IT");
+      this._title_EN = this._root.find(".title_EN");
+      this._title_DE = this._root.find(".title_DE");
       this._type = this._root.find(".type");
       this._parent = this._root.find(".parent");
       this._deleteButton = this._root.find("button");
@@ -90,8 +92,16 @@ class NodeView {
          this._model.name = this._name.val();
       });
 
-      this._title.on("keyup", () => {
-         this._model.title = this._title.val();
+      this._title_IT.on("keyup", () => {
+         this._model.title_IT = this._title_IT.val();
+      });
+
+      this._title_EN.on("keyup", () => {
+         this._model.title_EN = this._title_EN.val();
+      });
+
+      this._title_DE.on("keyup", () => {
+         this._model.title_DE = this._title_DE.val();
       });
 
       this._type.on("change", () => {
@@ -119,7 +129,9 @@ class NodeView {
 
    _loadModelData() {
       this._name.val(this._model.name);
-      this._title.val(this._model.title);
+      this._title_IT.val(this._model.title_IT);
+      this._title_EN.val(this._model.title_EN);
+      this._title_DE.val(this._model.title_DE);
       this._type.val(this._model.type || "-");
    }
 }
