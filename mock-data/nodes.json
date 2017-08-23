@@ -2,17 +2,17 @@
    {
       "id": 4,
       "name": "a_node_name",
-      "title_IT": "Il titolo del nodo 1",
-      "title_EN": "The node 1 title",
-      "title_DE": "Der Knotentitel 1",
+      "title_it": "Il titolo del nodo 1",
+      "title_en": "The node 1 title",
+      "title_de": "Der Knotentitel 1",
       "type": "text",
       "parent": null
    }, {
       "id": 5,
       "name": "another_node_name",
-      "title_IT": "Il titolo del nodo 2",
-      "title_EN": "The node 2 title",
-      "title_DE": "Der Knotentitel 2",
+      "title_it": "Il titolo del nodo 2",
+      "title_en": "The node 2 title",
+      "title_de": "Der Knotentitel 2",
       "type": "checkbox",
       "parent": 4
    }

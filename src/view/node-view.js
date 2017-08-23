@@ -28,9 +28,9 @@ class NodeView {
       this._root = $(tmpl(this._model));
 
       this._name = this._root.find(".name");
-      this._title_IT = this._root.find(".title_IT");
-      this._title_EN = this._root.find(".title_EN");
-      this._title_DE = this._root.find(".title_DE");
+      this._title_it = this._root.find(".title_it");
+      this._title_en = this._root.find(".title_en");
+      this._title_de = this._root.find(".title_de");
       this._type = this._root.find(".type");
       this._parent = this._root.find(".parent");
       this._deleteButton = this._root.find("button");
@@ -92,16 +92,16 @@ class NodeView {
          this._model.name = this._name.val();
       });
 
-      this._title_IT.on("keyup", () => {
-         this._model.title_IT = this._title_IT.val();
+      this._title_it.on("keyup", () => {
+         this._model.title_it = this._title_it.val();
       });
 
-      this._title_EN.on("keyup", () => {
-         this._model.title_EN = this._title_EN.val();
+      this._title_en.on("keyup", () => {
+         this._model.title_en = this._title_en.val();
       });
 
-      this._title_DE.on("keyup", () => {
-         this._model.title_DE = this._title_DE.val();
+      this._title_de.on("keyup", () => {
+         this._model.title_de = this._title_de.val();
       });
 
       this._type.on("change", () => {
@@ -129,9 +129,9 @@ class NodeView {
 
    _loadModelData() {
       this._name.val(this._model.name);
-      this._title_IT.val(this._model.title_IT);
-      this._title_EN.val(this._model.title_EN);
-      this._title_DE.val(this._model.title_DE);
+      this._title_it.val(this._model.title_it);
+      this._title_en.val(this._model.title_en);
+      this._title_de.val(this._model.title_de);
       this._type.val(this._model.type || "-");
    }
 }

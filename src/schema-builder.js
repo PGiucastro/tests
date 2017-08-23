@@ -16,10 +16,10 @@ class SchemaBuilder {
 
       this._models.forEach((m) => {
          schema.properties[m.name] = {
-            title: m.title_EN,
-            _iub_title_IT: m.title_IT,
-            _iub_title_EN: m.title_EN,
-            _iub_title_DE: m.title_DE,
+            title: m.title_en,
+            _iub_title_it: m.title_it,
+            _iub_title_en: m.title_en,
+            _iub_title_de: m.title_de,
             type: m.type,
             _iub_clauses: m.clauses,
             _iub_parent: m.parent ? this._findModelId(m.parent).name : null
