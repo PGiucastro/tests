@@ -15,7 +15,7 @@ class NodeView {
    getRootNode() {
       return this._root;
    }
-
+   
    getModel() {
       var model = this._model;
       model.clauses = this._clausesView.getChosenClausues();
