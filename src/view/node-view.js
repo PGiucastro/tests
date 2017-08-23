@@ -26,12 +26,20 @@ class NodeView {
       return this._name;
    }
 
+   getModel() {
+      return this._model;
+   }
+
+   getClauses() {
+      return this._clausesView.getChosenClausues();
+   }
+
    getData() {
       return {
          id: this._id,
          name: this._name,
          model: this._model,
-         clauses: this._clausesView.getChosenClausues()
+         clauses: this.getClauses()
       };
    }
 

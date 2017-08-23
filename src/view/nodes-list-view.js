@@ -45,9 +45,7 @@ class NodesListView {
    _behaviour() {
 
       this._saveButton.click((e) => {
-         var sb = new SchemaBuilder(this._renderedNodeViews.map((view) => {
-            return view.getData();
-         }));
+         var sb = new SchemaBuilder(this._renderedNodeViews);
          var json = sb.build();
          console.log(JSON.stringify(json, null, "   "));
       });

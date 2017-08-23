@@ -11812,8 +11812,8 @@ $("body").append(list);
 },{"./view/nodes-list-view":8,"jquery":1}],4:[function(require,module,exports){
 class SchemaBuilder {
 
-   constructor(models) {
-      this._models = models;
+   constructor(nodeViews) {
+      this._views = nodeViews;
    }
 
    build() {
@@ -11825,30 +11825,13 @@ class SchemaBuilder {
 
          }
       };
-
-      this._models.forEach((m) => {
-         schema.properties[m.name] = {
-            title: m.title_en,
-            _iub_title_it: m.title_it,
-            _iub_title_en: m.title_en,
-            _iub_title_de: m.title_de,
-            type: m.type,
-            _iub_clauses: m.clauses,
-            _iub_parent: m.parent ? this._findModelId(m.parent).name : null
-         };
+      this._views.forEach((v) => {
+         var model = v.getModel();
+         model.clauses = v.getClauses();
+         schema.properties[v.getName()] = model;
       });
-
+      
       return schema;
-   }
-
-   _findModelId(id) {
-      var m;
-      for (var i = 0; i < this._models.length; i++) {
-         m = this._models[i];
-         if (m.id === id) {
-            return m;
-         }
-      }
    }
 }
 
@@ -11928,12 +11911,20 @@ class NodeView {
       return this._name;
    }
 
+   getModel() {
+      return this._model;
+   }
+
+   getClauses() {
+      return this._clausesView.getChosenClausues();
+   }
+
    getData() {
       return {
          id: this._id,
          name: this._name,
          model: this._model,
-         clauses: this._clausesView.getChosenClausues()
+         clauses: this.getClauses()
       };
    }
 
@@ -12134,9 +12125,7 @@ class NodesListView {
    _behaviour() {
 
       this._saveButton.click((e) => {
-         var sb = new SchemaBuilder(this._renderedNodeViews.map((view) => {
-            return view.getData();
-         }));
+         var sb = new SchemaBuilder(this._renderedNodeViews);
          var json = sb.build();
          console.log(JSON.stringify(json, null, "   "));
       });

@@ -1,7 +1,7 @@
 class SchemaBuilder {
 
-   constructor(models) {
-      this._models = models;
+   constructor(nodeViews) {
+      this._views = nodeViews;
    }
 
    build() {
@@ -13,30 +13,13 @@ class SchemaBuilder {
 
          }
       };
-
-      this._models.forEach((m) => {
-         schema.properties[m.name] = {
-            title: m.title_en,
-            _iub_title_it: m.title_it,
-            _iub_title_en: m.title_en,
-            _iub_title_de: m.title_de,
-            type: m.type,
-            _iub_clauses: m.clauses,
-            _iub_parent: m.parent ? this._findModelId(m.parent).name : null
-         };
+      this._views.forEach((v) => {
+         var model = v.getModel();
+         model.clauses = v.getClauses();
+         schema.properties[v.getName()] = model;
       });
-
+      
       return schema;
-   }
-
-   _findModelId(id) {
-      var m;
-      for (var i = 0; i < this._models.length; i++) {
-         m = this._models[i];
-         if (m.id === id) {
-            return m;
-         }
-      }
    }
 }
 
