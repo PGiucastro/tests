@@ -5,7 +5,9 @@ const ClausesView = require('./clauses-view');
 
 class NodeView {
 
-   constructor(model, clauses, eventHub) {
+   constructor(id, name, model, clauses, eventHub) {
+      this._id = id;
+      this._name = name;
       this._model = model;
       this._clauses = clauses;
       this._eventHub = eventHub;
@@ -16,23 +18,37 @@ class NodeView {
       return this._root;
    }
 
-   getModel() {
-      var model = this._model;
-      model.clauses = this._clausesView.getChosenClausues();
-      return model;
+   getId() {
+      return this._id;
+   }
+
+   getName() {
+      return this._name;
+   }
+
+   getData() {
+      return {
+         id: this._id,
+         name: this._name,
+         model: this._model,
+         clauses: this._clausesView.getChosenClausues()
+      };
    }
 
    render() {
 
       var tmpl = _.template(templates["node-view"]);
-      this._root = $(tmpl(this._model));
+      this._root = $(tmpl({
+         id: this._id
+      }));
 
-      this._name = this._root.find(".name");
-      this._title_it = this._root.find(".title_it");
-      this._title_en = this._root.find(".title_en");
-      this._title_de = this._root.find(".title_de");
-      this._type = this._root.find(".type");
-      this._parent = this._root.find(".parent");
+      this._nameInput = this._root.find(".name");
+      this._titleInput_IT = this._root.find(".title_it");
+      this._titleInput_EN = this._root.find(".title_en");
+      this._titleInput_DE = this._root.find(".title_de");
+      this._typeInput = this._root.find(".type");
+      this._parentInput = this._root.find(".parent");
+
       this._deleteButton = this._root.find("button");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
       this._clausesContainer = this._root.find(".clauses .container");
@@ -46,35 +62,40 @@ class NodeView {
 
    updateParentSelect(nodes) {
 
-      var i, option, name, id, parentsIds = [];
+      var i, option, name, id, parentId, parentsIds = [];
 
-      this._parent.empty();
-      this._parent.append("<option value='-'>-</option>");
+      this._parentInput.empty();
+      this._parentInput.append("<option value='-'>-</option>");
+      this._sortByName(nodes);
 
       for (var i = 0; i < nodes.length; i++) {
 
          name = nodes[i].name;
          id = nodes[i].id;
 
-         parentsIds.push(id);
+         if (name === this._model._iub_parent) {
+            parentId = id;
+         }
 
-         if (id === this._model.id) {
+         if (id === this.getId()) {
             continue;
          }
+
+         parentsIds.push(id);
 
          if (!name) {
             name = "...";
          }
          option = $("<option>" + name + "</option>");
          option.attr("value", id);
-         this._parent.append(option);
+         this._parentInput.append(option);
       }
 
-      if (this._model.parent && parentsIds.indexOf(this._model.parent) > -1) {
-         this._parent.val(this._model.parent);
+      if (this._model._iub_parent && parentsIds.indexOf(parentId) > -1) {
+         this._parentInput.val(parentId);
       } else {
-         this._parent.val("-");
-         this._model.parent = null;
+         this._parentInput.val("-");
+         this._model._iub_parent = null;
       }
    }
 
@@ -92,37 +113,35 @@ class NodeView {
          this._clausesContainer.toggle();
       });
 
-      this._name.on("keyup", () => {
-         this._model.name = this._name.val();
+      this._nameInput.on("keyup", () => {
+         this._name = this._nameInput.val();
+         this._eventHub.trigger("node-name-updated", this.getData());
       });
 
-      this._title_it.on("keyup", () => {
-         this._model.title_it = this._title_it.val();
+      this._titleInput_IT.on("keyup", () => {
+         this._model.title_it = this._titleInput_IT.val();
       });
 
-      this._title_en.on("keyup", () => {
-         this._model.title_en = this._title_en.val();
+      this._titleInput_EN.on("keyup", () => {
+         this._model.title = this._titleInput_EN.val();
+         this._model.title_en = this._titleInput_EN.val();
       });
 
-      this._title_de.on("keyup", () => {
-         this._model.title_de = this._title_de.val();
+      this._titleInput_DE.on("keyup", () => {
+         this._model.title_de = this._titleInput_DE.val();
       });
 
-      this._type.on("change", () => {
-         this._model.type = this._type.val();
+      this._typeInput.on("change", () => {
+         this._model.type = this._typeInput.val();
       });
 
-      this._parent.on("change", () => {
-         this._model.parent = parseInt(this._parent.val());
+      this._parentInput.on("change", () => {
+         this._model.parent = parseInt(this._parentInput.val());
       });
 
       this._deleteButton.click((e) => {
          e.preventDefault();
-         this._eventHub.trigger("node-removed", this.getModel());
-      });
-
-      this._name.on("keyup", (e) => {
-         this._eventHub.trigger("node-name-updated", this.getModel());
+         this._eventHub.trigger("node-removed", this.getId());
       });
    }
 
@@ -132,11 +151,35 @@ class NodeView {
    }
 
    _loadModelData() {
-      this._name.val(this._model.name);
-      this._title_it.val(this._model.title_it);
-      this._title_en.val(this._model.title_en);
-      this._title_de.val(this._model.title_de);
-      this._type.val(this._model.type || "-");
+      var type;
+
+      if (this._model.type === "boolean") {
+         type = "checkbox";
+      } else if (this._model.type === "string" && !this._model.enum) {
+         type = "text";
+      } else if (this._model.type === "string" && this._model.enum) {
+         type = "radio";
+      } else if (this._model.type === "number") {
+         type = "number";
+      }
+
+      this._nameInput.val(this._name);
+      this._titleInput_IT.val(this._model.title_it);
+      this._titleInput_EN.val(this._model.title);
+      this._titleInput_DE.val(this._model.title_de);
+      this._typeInput.val(type || "-");
+   }
+
+   _sortByName(nodes) {
+      return nodes.sort((a, b) => {
+         if (a.name < b.name) {
+            return -1;
+         }
+         if (a.name > b.name) {
+            return 1;
+         }
+         return 0;
+      });
    }
 }
 

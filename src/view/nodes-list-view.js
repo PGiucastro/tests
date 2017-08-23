@@ -22,17 +22,16 @@ class NodesListView {
 
    render() {
 
-      $.when($.get("/mock-data/nodes.json"), $.get("/mock-data/clauses.json"))
-         .then((nodes, clauses) => {
-            nodes = nodes[0];
+      $.when($.get("/mock-data/schema.json"), $.get("/mock-data/clauses.json"))
+         .then((schema, clauses) => {
+            var nodes = schema[0].properties;
+
             this._clausesModel = clauses[0];
             this._loader.hide();
 
-            for (var i = 0; i < nodes.length; i++) {
-               if (this._lastUsedId < nodes[i].id) {
-                  this._lastUsedId = nodes[i].id;
-               }
-               this._renderNode(nodes[i]);
+            for (var name in nodes) {
+               this._lastUsedId++;
+               this._renderNode(this._lastUsedId, name, nodes[name]);
             }
 
             this._updateNodesParentSelect();
@@ -47,7 +46,7 @@ class NodesListView {
 
       this._saveButton.click((e) => {
          var sb = new SchemaBuilder(this._renderedNodeViews.map((view) => {
-            return view.getModel();
+            return view.getData();
          }));
          var json = sb.build();
          console.log(JSON.stringify(json, null, "   "));
@@ -56,20 +55,17 @@ class NodesListView {
       this._addButton.click((e) => {
          e.preventDefault();
          this._lastUsedId++;
-         var nodeModel = {
-            id: this._lastUsedId
-         };
-         this._renderNode(nodeModel);
+         this._renderNode(this._lastUsedId, "", {});
          this._updateNodesParentSelect();
          this._handleNoNodesYetMessage();
       });
 
-      this._eventHub.on("node-removed", (e, model) => {
+      this._eventHub.on("node-removed", (e, id) => {
          var index = -1;
 
          for (var i = 0; i < this._renderedNodeViews.length; i++) {
             var node = this._renderedNodeViews[i];
-            if (node.getModel() === model) {
+            if (node.getId() === id) {
                node.getRootNode().remove();
                index = i;
                break;
@@ -90,15 +86,16 @@ class NodesListView {
    }
 
    _updateNodesParentSelect() {
+      var data = this._renderedNodeViews.map((view) => {
+         return view.getData();
+      });
       for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         this._renderedNodeViews[i].updateParentSelect(this._renderedNodeViews.map((n) => {
-            return n.getModel();
-         }));
+         this._renderedNodeViews[i].updateParentSelect(data);
       }
    }
 
-   _renderNode(nodeModel) {
-      var nodeView = new NodeView(nodeModel, this._clausesModel, this._eventHub);
+   _renderNode(id, name, nodeModel) {
+      var nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
       this._list.append(nodeView.render());
       this._renderedNodeViews.push(nodeView);
    }
