@@ -127,16 +127,16 @@ class NodeView {
       });
 
       this._titleInput_IT.on("keyup", () => {
-         this._model.title_it = this._titleInput_IT.val();
+         this._model._iub_title_it = this._titleInput_IT.val();
       });
 
       this._titleInput_EN.on("keyup", () => {
          this._model.title = this._titleInput_EN.val();
-         this._model.title_en = this._titleInput_EN.val();
+         this._model._iub_title_en = this._titleInput_EN.val();
       });
 
       this._titleInput_DE.on("keyup", () => {
-         this._model.title_de = this._titleInput_DE.val();
+         this._model._iub_title_de = this._titleInput_DE.val();
       });
 
       this._typeInput.on("change", () => {
@@ -144,12 +144,15 @@ class NodeView {
       });
 
       this._parentInput.on("change", () => {
-         this._model.parent = parseInt(this._parentInput.val());
+         this._model._iub_parent = parseInt(this._parentInput.val());
       });
 
       this._deleteButton.click((e) => {
          e.preventDefault();
-         this._eventHub.trigger("node-removed", this.getId());
+         var yes = window.confirm("Are you sure? This cannot be undone.");
+         if (yes) {
+            this._eventHub.trigger("node-removed", this.getId());
+         }
       });
    }
 

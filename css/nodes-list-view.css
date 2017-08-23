@@ -1,3 +1,13 @@
+.nodes-list-view header {
+   background: deepskyblue;
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   z-index: 2;
+   padding: 10px 30px;
+}
+
 .nodes-list-view .loading {
    background: yellow;
    text-align: center;
@@ -6,9 +16,9 @@
 }
 
 .nodes-list-view .no-nodes-yet {
-   margin: 20px 0;
+   display: none;
 }
 
 .nodes-list-view .list {
-   margin: 10px 0;
+   margin: 0;
 }

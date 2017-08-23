@@ -11840,7 +11840,7 @@ module.exports = SchemaBuilder;
 
 
 module.exports = {
-   "nodes-list-view": "<div class=\"nodes-list-view\">\n   <div class=\"loading\">Loading</div>\n   <button class=\"add\">Add new node</button>\n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   <div class=\"list\"></div>\n   <button class=\"save\">Save schema</button>\n</div>",
+   "nodes-list-view": "<div class=\"nodes-list-view\">\n   <header>\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   <div class=\"loading\">Loading...</div>\n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   <div class=\"list\"></div>\n</div>",
    "node-view": "<div class=\"node-view\" data-node-id=\"<%= id %>\">\n\n   <div class=\"model\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>"
 };
@@ -12012,16 +12012,16 @@ class NodeView {
       });
 
       this._titleInput_IT.on("keyup", () => {
-         this._model.title_it = this._titleInput_IT.val();
+         this._model._iub_title_it = this._titleInput_IT.val();
       });
 
       this._titleInput_EN.on("keyup", () => {
          this._model.title = this._titleInput_EN.val();
-         this._model.title_en = this._titleInput_EN.val();
+         this._model._iub_title_en = this._titleInput_EN.val();
       });
 
       this._titleInput_DE.on("keyup", () => {
-         this._model.title_de = this._titleInput_DE.val();
+         this._model._iub_title_de = this._titleInput_DE.val();
       });
 
       this._typeInput.on("change", () => {
@@ -12029,12 +12029,15 @@ class NodeView {
       });
 
       this._parentInput.on("change", () => {
-         this._model.parent = parseInt(this._parentInput.val());
+         this._model._iub_parent = parseInt(this._parentInput.val());
       });
 
       this._deleteButton.click((e) => {
          e.preventDefault();
-         this._eventHub.trigger("node-removed", this.getId());
+         var yes = window.confirm("Are you sure? This cannot be undone.");
+         if (yes) {
+            this._eventHub.trigger("node-removed", this.getId());
+         }
       });
    }
 
@@ -12104,19 +12107,21 @@ class NodesListView {
 
       $.when($.get("/mock-data/schema.json"), $.get("/mock-data/clauses.json"))
          .then((schema, clauses) => {
-            var nodes = schema[0].properties;
+            setTimeout(() => {
+               var nodes = schema[0].properties;
 
-            this._clausesModel = clauses[0];
-            this._loader.hide();
+               this._clausesModel = clauses[0];
+               this._loader.hide();
 
-            for (var name in nodes) {
-               this._lastUsedId++;
-               this._renderNode(this._lastUsedId, name, nodes[name]);
-            }
+               for (var name in nodes) {
+                  this._lastUsedId++;
+                  this._renderNode(this._lastUsedId, name, nodes[name]);
+               }
 
-            this._updateNodesParentSelect();
-            this._handleNoNodesYetMessage();
-            this._behaviour();
+               this._updateNodesParentSelect();
+               this._handleNoNodesYetMessage();
+               this._behaviour();
+            }, 500);
          });
 
       return this._root;

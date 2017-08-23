@@ -24,19 +24,21 @@ class NodesListView {
 
       $.when($.get("/mock-data/schema.json"), $.get("/mock-data/clauses.json"))
          .then((schema, clauses) => {
-            var nodes = schema[0].properties;
+            setTimeout(() => {
+               var nodes = schema[0].properties;
 
-            this._clausesModel = clauses[0];
-            this._loader.hide();
+               this._clausesModel = clauses[0];
+               this._loader.hide();
 
-            for (var name in nodes) {
-               this._lastUsedId++;
-               this._renderNode(this._lastUsedId, name, nodes[name]);
-            }
+               for (var name in nodes) {
+                  this._lastUsedId++;
+                  this._renderNode(this._lastUsedId, name, nodes[name]);
+               }
 
-            this._updateNodesParentSelect();
-            this._handleNoNodesYetMessage();
-            this._behaviour();
+               this._updateNodesParentSelect();
+               this._handleNoNodesYetMessage();
+               this._behaviour();
+            }, 500);
          });
 
       return this._root;
