@@ -5,6 +5,10 @@
    margin-bottom: 20px;
 }
 
+.nodes-list-view .no-nodes-yet {
+   margin: 20px 0;
+}
+
 .nodes-list-view .list {
    margin: 10px 0;
 }

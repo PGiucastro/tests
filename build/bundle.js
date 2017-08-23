@@ -12051,6 +12051,7 @@ class NodesListView {
       this._saveButton = this._root.find("button.save");
       this._loader = this._root.find(".loading");
       this._list = this._root.find(".list");
+      this._noNodesYet = this._root.find(".no-nodes-yet");
    }
 
    render() {
@@ -12069,6 +12070,7 @@ class NodesListView {
             }
 
             this._updateNodesParentSelect();
+            this._handleNoNodesYetMessage();
             this._behaviour();
          });
 
@@ -12093,6 +12095,7 @@ class NodesListView {
          };
          this._renderNode(nodeModel);
          this._updateNodesParentSelect();
+         this._handleNoNodesYetMessage();
       });
 
       this._eventHub.on("node-removed", (e, model) => {
@@ -12112,6 +12115,7 @@ class NodesListView {
          }
 
          this._updateNodesParentSelect();
+         this._handleNoNodesYetMessage();
       });
 
       this._eventHub.on("node-name-updated", (e, model) => {
@@ -12128,12 +12132,17 @@ class NodesListView {
    }
 
    _renderNode(nodeModel) {
-      if (this._renderedNodeViews.length === 0) {
-         this._list.empty(); // removes the `no nodes` message
-      }
       var nodeView = new NodeView(nodeModel, this._clausesModel, this._eventHub);
       this._list.append(nodeView.render());
       this._renderedNodeViews.push(nodeView);
+   }
+
+   _handleNoNodesYetMessage() {
+      if (this._renderedNodeViews.length === 0) {
+         this._noNodesYet.show();
+      } else {
+         this._noNodesYet.hide();
+      }
    }
 }
 
@@ -12142,7 +12151,7 @@ module.exports = NodesListView;
 
 
 module.exports = {
-   "nodes-list-view": "<div class=\"nodes-list-view\">\n   <div class=\"loading\">Loading</div>\n   <button class=\"add\">Add new node</button>\n   <div class=\"list\">No nodes yet :(</div>\n   <button class=\"save\">Save schema</button>\n</div>",
+   "nodes-list-view": "<div class=\"nodes-list-view\">\n   <div class=\"loading\">Loading</div>\n   <button class=\"add\">Add new node</button>\n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   <div class=\"list\"></div>\n   <button class=\"save\">Save schema</button>\n</div>",
    "node-view": "<div class=\"node-view\" data-node-id=\"<%= id %>\">\n\n   <div class=\"model\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option>-</option>\n            <option>checkbox</option>\n            <option>radio</option>\n            <option>text</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>"
 };

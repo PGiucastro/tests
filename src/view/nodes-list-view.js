@@ -17,6 +17,7 @@ class NodesListView {
       this._saveButton = this._root.find("button.save");
       this._loader = this._root.find(".loading");
       this._list = this._root.find(".list");
+      this._noNodesYet = this._root.find(".no-nodes-yet");
    }
 
    render() {
@@ -35,6 +36,7 @@ class NodesListView {
             }
 
             this._updateNodesParentSelect();
+            this._handleNoNodesYetMessage();
             this._behaviour();
          });
 
@@ -59,6 +61,7 @@ class NodesListView {
          };
          this._renderNode(nodeModel);
          this._updateNodesParentSelect();
+         this._handleNoNodesYetMessage();
       });
 
       this._eventHub.on("node-removed", (e, model) => {
@@ -78,6 +81,7 @@ class NodesListView {
          }
 
          this._updateNodesParentSelect();
+         this._handleNoNodesYetMessage();
       });
 
       this._eventHub.on("node-name-updated", (e, model) => {
@@ -94,12 +98,17 @@ class NodesListView {
    }
 
    _renderNode(nodeModel) {
-      if (this._renderedNodeViews.length === 0) {
-         this._list.empty(); // removes the `no nodes` message
-      }
       var nodeView = new NodeView(nodeModel, this._clausesModel, this._eventHub);
       this._list.append(nodeView.render());
       this._renderedNodeViews.push(nodeView);
+   }
+
+   _handleNoNodesYetMessage() {
+      if (this._renderedNodeViews.length === 0) {
+         this._noNodesYet.show();
+      } else {
+         this._noNodesYet.hide();
+      }
    }
 }
 
