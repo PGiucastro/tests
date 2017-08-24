@@ -8,6 +8,14 @@
    padding: 10px 30px;
 }
 
+.nodes-list-view header button {
+   width: 160px;
+}
+
+.nodes-list-view header .save {
+   margin-left: 20px;
+}
+
 .nodes-list-view .loading {
    background: yellow;
    text-align: center;

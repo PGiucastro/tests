@@ -1,15 +1,21 @@
 .clauses-view {
-   padding: 10px;
+   padding: 20px;
    background: #eee;
    margin-top: 20px;
    -webkit-column-count: 3; /* Chrome, Safari, Opera */
    -moz-column-count: 3; /* Firefox */
    column-count: 3;
+   -webkit-column-gap: 20px; /* Chrome, Safari, Opera */
+   -moz-column-gap: 20px; /* Firefox */
+   column-gap: 20px;
 }
 
 .clauses-view label {
    display: block;
    margin-bottom: 10px;
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
 }
 
 .clauses-view input {
