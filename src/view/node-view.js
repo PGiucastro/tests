@@ -27,10 +27,6 @@ class NodeView {
       return this._parentId;
    }
 
-   setParentId(id) {
-      this._parentId = id;
-   }
-
    getName() {
       return this._name;
    }
@@ -56,6 +52,14 @@ class NodeView {
       };
    }
 
+   setParentId(id) {
+      this._parentId = id;
+   }
+
+   setParentSelectValue(parentId) {
+      this._parentInput.val(parentId);
+   }
+
    updateParentName(parentId) {
       var parentName;
 
@@ -65,10 +69,6 @@ class NodeView {
       } else {
          delete this._model._iub_parent;
       }
-   }
-
-   setParentSelectValue(parentId) {
-      this._parentInput.val(parentId);
    }
 
    render() {
