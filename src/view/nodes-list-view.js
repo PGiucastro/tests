@@ -66,11 +66,15 @@ class NodesListView {
 
       this._eventHub.on("node-removed", (e, id) => {
          var index = -1;
+         var node, dom;
 
          for (var i = 0; i < this._renderedNodeViews.length; i++) {
-            var node = this._renderedNodeViews[i];
+            node = this._renderedNodeViews[i];
             if (node.getId() === id) {
-               node.getRootNode().remove();
+               dom = node.getRootNode();
+               dom.slideUp(() => {
+                  dom.remove();
+               });
                index = i;
                break;
             }

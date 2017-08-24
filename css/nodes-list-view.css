@@ -9,7 +9,7 @@
 }
 
 .nodes-list-view header button {
-   width: 160px;
+
 }
 
 .nodes-list-view header .save {
@@ -33,5 +33,4 @@
 
 footer {
    padding: 10px 0px;
-   font-size: 16px;
 }
