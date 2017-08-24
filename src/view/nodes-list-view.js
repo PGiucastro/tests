@@ -27,18 +27,20 @@ class NodesListView {
             setTimeout(() => {
                var nodes = schema[0].properties;
 
-               this._clausesModel = clauses[0];
                this._loader.hide();
+               this._clausesModel = clauses[0];
 
                for (var name in nodes) {
                   this._lastUsedId++;
                   this._renderNode(this._lastUsedId, name, nodes[name]);
                }
 
-               this._updateNodesParentSelect();
+               this._setNodesParentId();
+               this._drawNodesParentSelect();
+               this._setNodesParentSelectValue();
                this._handleNoNodesYetMessage();
                this._behaviour();
-            }, 500);
+            }, 300);
          });
 
       return this._root;
@@ -56,7 +58,8 @@ class NodesListView {
          e.preventDefault();
          this._lastUsedId++;
          this._renderNode(this._lastUsedId, "", {});
-         this._updateNodesParentSelect();
+         this._drawNodesParentSelect();
+         this._setNodesParentSelectValue();
          this._handleNoNodesYetMessage();
       });
 
@@ -76,22 +79,15 @@ class NodesListView {
             this._renderedNodeViews.splice(index, 1);
          }
 
-         this._updateNodesParentSelect();
+         this._drawNodesParentSelect();
+         this._setNodesParentSelectValue();
          this._handleNoNodesYetMessage();
       });
 
-      this._eventHub.on("node-name-updated", (e, model) => {
-         this._updateNodesParentSelect();
+      this._eventHub.on("node-name-updated", (e) => {
+         this._drawNodesParentSelect();
+         this._setNodesParentSelectValue();
       });
-   }
-
-   _updateNodesParentSelect() {
-      var data = this._renderedNodeViews.map((view) => {
-         return view.getData();
-      });
-      for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         this._renderedNodeViews[i].updateParentSelect(data);
-      }
    }
 
    _renderNode(id, name, nodeModel) {
@@ -100,11 +96,48 @@ class NodesListView {
       this._renderedNodeViews.push(nodeView);
    }
 
+   _drawNodesParentSelect() {
+      var data = this._renderedNodeViews.map((view) => {
+         return view.getData();
+      });
+      for (var i = 0; i < this._renderedNodeViews.length; i++) {
+         this._renderedNodeViews[i].updateParentSelect(data);
+      }
+   }
+
+   _setNodesParentSelectValue() {
+      var parentId, view, parentId, parentId;
+      for (var i = 0; i < this._renderedNodeViews.length; i++) {
+         view = this._renderedNodeViews[i];
+         parentId = view.getParentId() || "-";
+         view.setParentSelectValue(parentId);
+      }
+   }
+
    _handleNoNodesYetMessage() {
       if (this._renderedNodeViews.length === 0) {
          this._noNodesYet.show();
       } else {
          this._noNodesYet.hide();
+      }
+   }
+
+   _getViewByName(name) {
+      for (var i = 0; i < this._renderedNodeViews.length; i++) {
+         var view = this._renderedNodeViews[i];
+         if (view.getName() === name) {
+            return view;
+         }
+      }
+   }
+
+   _setNodesParentId() {
+      for (var i = 0; i < this._renderedNodeViews.length; i++) {
+         var view = this._renderedNodeViews[i];
+         var parentName = view.getModel()._iub_parent;
+         if (parentName) {
+            view.setParentId(this._getViewByName(parentName).getId());
+         }
       }
    }
 }

@@ -11825,12 +11825,13 @@ class SchemaBuilder {
 
          }
       };
+
       this._views.forEach((v) => {
          var model = v.getModel();
          model.clauses = v.getClauses();
          schema.properties[v.getName()] = model;
       });
-      
+
       return schema;
    }
 }
@@ -11841,7 +11842,7 @@ module.exports = SchemaBuilder;
 
 module.exports = {
    "nodes-list-view": "<div class=\"nodes-list-view\">\n   <header>\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   <div class=\"loading\">Loading...</div>\n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   <div class=\"list\"></div>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-id=\"<%= id %>\">\n\n   <div class=\"model\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
+   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"model\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>"
 };
 },{}],6:[function(require,module,exports){
@@ -11897,6 +11898,7 @@ class NodeView {
       this._clauses = clauses;
       this._eventHub = eventHub;
       this._clausesView;
+      this._parentId;
    }
 
    getRootNode() {
@@ -11905,6 +11907,21 @@ class NodeView {
 
    getId() {
       return this._id;
+   }
+
+   getParentId() {
+      return this._parentId;
+   }
+
+   setParentId(parentId) {
+      var parentName = this._parentInput.find(`option[value=${parentId}]`).text();
+      if (parentName !== "-") {
+         parentId = parseInt(parentId);
+         this._model._iub_parent = parentName;
+      } else {
+         delete this._model._iub_parent;
+      }
+      this._parentId = parentId;
    }
 
    getName() {
@@ -11953,9 +11970,13 @@ class NodeView {
       return this._root;
    }
 
+   setParentSelectValue(id) {
+      this._parentInput.val(id);
+   }
+
    updateParentSelect(nodes) {
 
-      var i, option, name, id, parentId, parentsIds = [];
+      var i, option, name, id;
 
       this._parentInput.empty();
       this._parentInput.append("<option value='-'>-</option>");
@@ -11963,32 +11984,20 @@ class NodeView {
 
       for (var i = 0; i < nodes.length; i++) {
 
-         name = nodes[i].name;
          id = nodes[i].id;
-
-         if (name === this._model._iub_parent) {
-            parentId = id;
-         }
+         name = nodes[i].name;
 
          if (id === this.getId()) {
             continue;
          }
 
-         parentsIds.push(id);
-
          if (!name) {
             name = "...";
          }
+
          option = $("<option>" + name + "</option>");
          option.attr("value", id);
          this._parentInput.append(option);
-      }
-
-      if (this._model._iub_parent && parentsIds.indexOf(parentId) > -1) {
-         this._parentInput.val(parentId);
-      } else {
-         this._parentInput.val("-");
-         this._model._iub_parent = null;
       }
    }
 
@@ -12008,7 +12017,7 @@ class NodeView {
 
       this._nameInput.on("keyup", () => {
          this._name = this._nameInput.val();
-         this._eventHub.trigger("node-name-updated", this.getData());
+         this._eventHub.trigger("node-name-updated");
       });
 
       this._titleInput_IT.on("keyup", () => {
@@ -12025,11 +12034,11 @@ class NodeView {
       });
 
       this._typeInput.on("change", () => {
-         this._model.type = this._typeInput.val();
+         this._model.type = this._getModelTypeFromSelect(this._typeInput.val());
       });
 
       this._parentInput.on("change", () => {
-         this._model._iub_parent = parseInt(this._parentInput.val());
+         this.setParentId(this._parentInput.val());
       });
 
       this._deleteButton.click((e) => {
@@ -12047,6 +12056,15 @@ class NodeView {
    }
 
    _loadModelData() {
+
+      this._nameInput.val(this._name);
+      this._titleInput_IT.val(this._model.title_it);
+      this._titleInput_EN.val(this._model.title);
+      this._titleInput_DE.val(this._model.title_de);
+      this._typeInput.val(this._getOptionTypeFromModel() || "-");
+   }
+
+   _getOptionTypeFromModel() {
       var type;
 
       if (this._model.type === "boolean") {
@@ -12059,11 +12077,23 @@ class NodeView {
          type = "number";
       }
 
-      this._nameInput.val(this._name);
-      this._titleInput_IT.val(this._model.title_it);
-      this._titleInput_EN.val(this._model.title);
-      this._titleInput_DE.val(this._model.title_de);
-      this._typeInput.val(type || "-");
+      return type;
+   }
+
+   _getModelTypeFromSelect(v) {
+      var type;
+
+      if (v === "checkbox") {
+         type = "boolean";
+      } else if (v === "text") {
+         type = "string";
+      } else if (v === "radio") {
+         type = "string";
+      } else if (v === "number") {
+         type = "number";
+      }
+
+      return type;
    }
 
    _sortByName(nodes) {
@@ -12110,18 +12140,20 @@ class NodesListView {
             setTimeout(() => {
                var nodes = schema[0].properties;
 
-               this._clausesModel = clauses[0];
                this._loader.hide();
+               this._clausesModel = clauses[0];
 
                for (var name in nodes) {
                   this._lastUsedId++;
                   this._renderNode(this._lastUsedId, name, nodes[name]);
                }
 
-               this._updateNodesParentSelect();
+               this._setNodesParentId();
+               this._drawNodesParentSelect();
+               this._setNodesParentSelectValue();
                this._handleNoNodesYetMessage();
                this._behaviour();
-            }, 500);
+            }, 300);
          });
 
       return this._root;
@@ -12139,7 +12171,8 @@ class NodesListView {
          e.preventDefault();
          this._lastUsedId++;
          this._renderNode(this._lastUsedId, "", {});
-         this._updateNodesParentSelect();
+         this._drawNodesParentSelect();
+         this._setNodesParentSelectValue();
          this._handleNoNodesYetMessage();
       });
 
@@ -12159,22 +12192,15 @@ class NodesListView {
             this._renderedNodeViews.splice(index, 1);
          }
 
-         this._updateNodesParentSelect();
+         this._drawNodesParentSelect();
+         this._setNodesParentSelectValue();
          this._handleNoNodesYetMessage();
       });
 
-      this._eventHub.on("node-name-updated", (e, model) => {
-         this._updateNodesParentSelect();
+      this._eventHub.on("node-name-updated", (e) => {
+         this._drawNodesParentSelect();
+         this._setNodesParentSelectValue();
       });
-   }
-
-   _updateNodesParentSelect() {
-      var data = this._renderedNodeViews.map((view) => {
-         return view.getData();
-      });
-      for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         this._renderedNodeViews[i].updateParentSelect(data);
-      }
    }
 
    _renderNode(id, name, nodeModel) {
@@ -12183,11 +12209,48 @@ class NodesListView {
       this._renderedNodeViews.push(nodeView);
    }
 
+   _drawNodesParentSelect() {
+      var data = this._renderedNodeViews.map((view) => {
+         return view.getData();
+      });
+      for (var i = 0; i < this._renderedNodeViews.length; i++) {
+         this._renderedNodeViews[i].updateParentSelect(data);
+      }
+   }
+
+   _setNodesParentSelectValue() {
+      var parentId, view, parentId, parentId;
+      for (var i = 0; i < this._renderedNodeViews.length; i++) {
+         view = this._renderedNodeViews[i];
+         parentId = view.getParentId() || "-";
+         view.setParentSelectValue(parentId);
+      }
+   }
+
    _handleNoNodesYetMessage() {
       if (this._renderedNodeViews.length === 0) {
          this._noNodesYet.show();
       } else {
          this._noNodesYet.hide();
+      }
+   }
+
+   _getViewByName(name) {
+      for (var i = 0; i < this._renderedNodeViews.length; i++) {
+         var view = this._renderedNodeViews[i];
+         if (view.getName() === name) {
+            return view;
+         }
+      }
+   }
+
+   _setNodesParentId() {
+      for (var i = 0; i < this._renderedNodeViews.length; i++) {
+         var view = this._renderedNodeViews[i];
+         var parentName = view.getModel()._iub_parent;
+         if (parentName) {
+            view.setParentId(this._getViewByName(parentName).getId());
+         }
       }
    }
 }

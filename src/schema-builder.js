@@ -13,12 +13,13 @@ class SchemaBuilder {
 
          }
       };
+
       this._views.forEach((v) => {
          var model = v.getModel();
          model.clauses = v.getClauses();
          schema.properties[v.getName()] = model;
       });
-      
+
       return schema;
    }
 }
