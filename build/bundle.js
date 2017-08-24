@@ -12188,6 +12188,7 @@ class NodesListView {
          this._drawNodesParentSelect();
          this._setNodesParentSelectValue();
          this._handleNoNodesYetMessage();
+         $("html, body").animate({scrollTop: $(document).height()}, "slow");
       });
 
       this._eventHub.on("node-removed", (e, id) => {
