@@ -35,7 +35,7 @@ class NodesListView {
                   this._renderNode(String(this._lastUsedId), name, nodes[name]);
                }
 
-               this._setNodeViewsParentId(); // only doneat startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
+               this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
                this._drawNodesParentSelect();
                this._setNodesParentSelectValue();
                this._handleNoNodesYetMessage();
@@ -57,7 +57,7 @@ class NodesListView {
       this._addButton.click((e) => {
          e.preventDefault();
          this._lastUsedId++;
-         this._renderNode(this._lastUsedId, "", {});
+         this._renderNode(String(this._lastUsedId), "", {});
          this._drawNodesParentSelect();
          this._setNodesParentSelectValue();
          this._handleNoNodesYetMessage();
@@ -109,7 +109,10 @@ class NodesListView {
       var parentId, view, parentId, parentId;
       for (var i = 0; i < this._renderedNodeViews.length; i++) {
          view = this._renderedNodeViews[i];
-         parentId = view.getParentId() || "-";
+         parentId = view.getParentId();
+         if (!this._doesViewExists(parentId)) {
+            parentId = "-";
+         }
          view.setParentId(parentId);
          view.updateParentName(parentId);
          view.setParentSelectValue(parentId);
@@ -133,13 +136,24 @@ class NodesListView {
       }
    }
 
+   _doesViewExists(id) {
+      for (var i = 0; i < this._renderedNodeViews.length; i++) {
+         var view = this._renderedNodeViews[i];
+         if (view.getId() === id) {
+            return view;
+         }
+      }
+   }
+
    _setNodeViewsParentId() {
       for (var i = 0; i < this._renderedNodeViews.length; i++) {
          var view = this._renderedNodeViews[i];
          var parentName = view.getParentName();
+         var parentId = "-";
          if (parentName) {
-            view.setParentId(this._getViewByName(parentName).getId());
+            parentId = this._getViewByName(parentName).getId();
          }
+         view.setParentId(parentId);
       }
    }
 }

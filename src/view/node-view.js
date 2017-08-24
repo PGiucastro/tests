@@ -57,9 +57,10 @@ class NodeView {
    }
 
    updateParentName(parentId) {
-      var parentName = this._parentInput.find(`option[value=${parentId}]`).text();
+      var parentName;
 
-      if (parentName !== "-") {
+      if (parentId !== "-") {
+         parentName = this._parentInput.find(`option[value=${parentId}]`).text();
          this._model._iub_parent = parentName;
       } else {
          delete this._model._iub_parent;
@@ -99,9 +100,9 @@ class NodeView {
 
       var i, option, name, id;
 
+      this._sortByName(nodes);
       this._parentInput.empty();
       this._parentInput.append("<option value='-'>-</option>");
-      this._sortByName(nodes);
 
       for (var i = 0; i < nodes.length; i++) {
 
@@ -126,7 +127,12 @@ class NodeView {
 
       // Uncomment for debugging
       setInterval(() => {
-         this._root.find(".model").text(JSON.stringify(this._model, null, "  "));
+         this._root.find(".model").text(JSON.stringify({
+            id: this._id,
+            name: this._name,
+            parentId: this._parentId,
+            model: this._model
+         }, null, "  "));
       }, 1000);
 
       // Comment out for debugging
