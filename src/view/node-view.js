@@ -27,15 +27,8 @@ class NodeView {
       return this._parentId;
    }
 
-   setParentId(parentId) {
-      var parentName = this._parentInput.find(`option[value=${parentId}]`).text();
-      if (parentName !== "-") {
-         parentId = parseInt(parentId);
-         this._model._iub_parent = parentName;
-      } else {
-         delete this._model._iub_parent;
-      }
-      this._parentId = parentId;
+   setParentId(id) {
+      this._parentId = id;
    }
 
    getName() {
@@ -84,8 +77,16 @@ class NodeView {
       return this._root;
    }
 
-   setParentSelectValue(id) {
-      this._parentInput.val(id);
+   setParentSelectValue(parentId) {
+      this._parentInput.val(parentId);
+      var parentName = this._parentInput.find(`option[value=${parentId}]`).text();
+      if (parentName !== "-") {
+         parentId = parseInt(parentId);
+         this._model._iub_parent = parentName;
+      } else {
+         delete this._model._iub_parent;
+      }
+      this.setParentId(parentId);
    }
 
    updateParentSelect(nodes) {
@@ -118,12 +119,12 @@ class NodeView {
    _behaviour() {
 
       // Uncomment for debugging
-      // setInterval(() => {
-      //   this._root.find(".model").text(JSON.stringify(this._model, null, "  "));
-      // }, 1000);
+      setInterval(() => {
+         this._root.find(".model").text(JSON.stringify(this._model, null, "  "));
+      }, 1000);
 
       // Comment out for debugging
-      this._root.find(".model").hide();
+      // this._root.find(".model").hide();
 
       this._clausesExpansionButton.click((e) => {
          this._clausesContainer.toggle();
