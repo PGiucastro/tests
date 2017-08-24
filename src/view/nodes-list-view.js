@@ -35,7 +35,7 @@ class NodesListView {
                   this._renderNode(this._lastUsedId, name, nodes[name]);
                }
 
-               this._setNodesParentId();
+               this._setNodeViewsParentId(); // only doneat startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
                this._drawNodesParentSelect();
                this._setNodesParentSelectValue();
                this._handleNoNodesYetMessage();
@@ -101,7 +101,7 @@ class NodesListView {
          return view.getData();
       });
       for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         this._renderedNodeViews[i].updateParentSelect(data);
+         this._renderedNodeViews[i].drawParentSelect(data);
       }
    }
 
@@ -131,10 +131,10 @@ class NodesListView {
       }
    }
 
-   _setNodesParentId() {
+   _setNodeViewsParentId() {
       for (var i = 0; i < this._renderedNodeViews.length; i++) {
          var view = this._renderedNodeViews[i];
-         var parentName = view.getModel()._iub_parent;
+         var parentName = view.getParentName();
          if (parentName) {
             view.setParentId(this._getViewByName(parentName).getId());
          }

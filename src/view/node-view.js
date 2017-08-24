@@ -35,6 +35,10 @@ class NodeView {
       return this._name;
    }
 
+   getParentName() {
+      return this.getModel()._iub_parent;
+   }
+
    getModel() {
       return this._model;
    }
@@ -89,7 +93,7 @@ class NodeView {
       this.setParentId(parentId);
    }
 
-   updateParentSelect(nodes) {
+   drawParentSelect(nodes) {
 
       var i, option, name, id;
 
@@ -153,7 +157,9 @@ class NodeView {
       });
 
       this._parentInput.on("change", () => {
-         this.setParentId(this._parentInput.val());
+         var parentId = this._parentInput.val();
+         this.setParentId(parentId);
+         this.setParentSelectValue(parentId);
       });
 
       this._deleteButton.click((e) => {
@@ -171,7 +177,6 @@ class NodeView {
    }
 
    _loadModelData() {
-
       this._nameInput.val(this._name);
       this._titleInput_IT.val(this._model.title_it);
       this._titleInput_EN.val(this._model.title);
