@@ -11841,7 +11841,7 @@ module.exports = SchemaBuilder;
 
 
 module.exports = {
-   "nodes-list-view": "<div class=\"nodes-list-view\">\n   <header>\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   <div class=\"loading\">Loading...</div>\n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   <div class=\"list\"></div>\n</div>",
+   "nodes-list-view": "<div class=\"nodes-list-view\">\n   \n   <header>\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
    "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>"
 };
@@ -12188,7 +12188,7 @@ class NodesListView {
          this._drawNodesParentSelect();
          this._setNodesParentSelectValue();
          this._handleNoNodesYetMessage();
-         $("html, body").animate({scrollTop: $(document).height()}, "slow");
+         this._slideDown();
       });
 
       this._eventHub.on("node-removed", (e, id) => {
@@ -12283,6 +12283,18 @@ class NodesListView {
          }
          view.setParentId(parentId);
       }
+   }
+
+   _slideUp() {
+      $("html, body").animate({
+         scrollTop: 0
+      }, "slow");
+   }
+
+   _slideDown() {
+      $("html, body").animate({
+         scrollTop: $(document).height()
+      }, "slow");
    }
 }
 

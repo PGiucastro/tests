@@ -30,3 +30,8 @@
 .nodes-list-view .list {
    margin: 0;
 }
+
+footer {
+   padding: 10px 0px;
+   font-size: 16px;
+}

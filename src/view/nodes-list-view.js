@@ -61,7 +61,7 @@ class NodesListView {
          this._drawNodesParentSelect();
          this._setNodesParentSelectValue();
          this._handleNoNodesYetMessage();
-         $("html, body").animate({scrollTop: $(document).height()}, "slow");
+         this._slideDown();
       });
 
       this._eventHub.on("node-removed", (e, id) => {
@@ -156,6 +156,18 @@ class NodesListView {
          }
          view.setParentId(parentId);
       }
+   }
+
+   _slideUp() {
+      $("html, body").animate({
+         scrollTop: 0
+      }, "slow");
+   }
+
+   _slideDown() {
+      $("html, body").animate({
+         scrollTop: $(document).height()
+      }, "slow");
    }
 }
 
