@@ -11809,7 +11809,7 @@ const NodesList = require('./view/nodes-list-view');
 
 var list = new NodesList($({})).render();
 $("body").append(list);
-},{"./view/nodes-list-view":8,"jquery":1}],4:[function(require,module,exports){
+},{"./view/nodes-list-view":10,"jquery":1}],4:[function(require,module,exports){
 class SchemaBuilder {
 
    constructor(nodeViews) {
@@ -11842,8 +11842,9 @@ module.exports = SchemaBuilder;
 
 module.exports = {
    "nodes-list-view": "<div class=\"nodes-list-view\">\n   \n   <header>\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
-   "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>"
+   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n      \n      <div class=\"config\"></div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
+   "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>",
+   "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   checkbox config\n</div>"
 };
 },{}],6:[function(require,module,exports){
 const $ = require('jquery');
@@ -11884,10 +11885,48 @@ class ClausesView {
 
 module.exports = ClausesView;
 },{"./../templates":5,"jquery":1,"underscore":2}],7:[function(require,module,exports){
+const $ = require('jquery');
+const CheckboxConfigView = require('./checkbox-config-view');
+
+module.exports = function(model) {
+
+   console.log(model);
+
+   if (model.type === "boolean") {
+      return new CheckboxConfigView({
+
+      });
+   }
+
+   return {
+      render: function() {
+         return $("<div>default</div>");
+      }
+   };
+};
+},{"./checkbox-config-view":8,"jquery":1}],8:[function(require,module,exports){
+const $ = require('jquery');
+const templates = require('./../../templates');
+
+class CheckboxConfigView {
+
+   constructor(model) {
+      this._model = model;
+   }
+
+   render() {
+      this._root = $(templates["checkbox-config-view"]);
+      return this._root;
+   }
+}
+
+module.exports = CheckboxConfigView;
+},{"./../../templates":5,"jquery":1}],9:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const templates = require('./../templates');
 const ClausesView = require('./clauses-view');
+const buildConfigView = require('./config/build-config-view');
 
 class NodeView {
 
@@ -11897,6 +11936,7 @@ class NodeView {
       this._model = model;
       this._clauses = clauses;
       this._eventHub = eventHub;
+      this._configView;
       this._clausesView;
       this._parentId;
    }
@@ -11973,6 +12013,7 @@ class NodeView {
 
       this._deleteButton = this._root.find("button");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
+      this._configContainer = this._root.find(".config");
       this._clausesContainer = this._root.find(".clauses .container");
 
       this._loadModelData();
@@ -12066,7 +12107,9 @@ class NodeView {
    }
 
    _renderSubViews() {
+      this._configView = new buildConfigView(this._model);
       this._clausesView = new ClausesView(this._clauses);
+      this._configContainer.append(this._configView.render());
       this._clausesContainer.append(this._clausesView.render());
    }
 
@@ -12124,7 +12167,7 @@ class NodeView {
 }
 
 module.exports = NodeView;
-},{"./../templates":5,"./clauses-view":6,"jquery":1,"underscore":2}],8:[function(require,module,exports){
+},{"./../templates":5,"./clauses-view":6,"./config/build-config-view":7,"jquery":1,"underscore":2}],10:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const NodeView = require('./node-view');
@@ -12303,4 +12346,4 @@ class NodesListView {
 }
 
 module.exports = NodesListView;
-},{"./../schema-builder":4,"./../templates":5,"./node-view":7,"jquery":1,"underscore":2}]},{},[3]);
+},{"./../schema-builder":4,"./../templates":5,"./node-view":9,"jquery":1,"underscore":2}]},{},[3]);

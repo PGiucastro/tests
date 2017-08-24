@@ -2,6 +2,7 @@ const _ = require('underscore');
 const $ = require('jquery');
 const templates = require('./../templates');
 const ClausesView = require('./clauses-view');
+const buildConfigView = require('./config/build-config-view');
 
 class NodeView {
 
@@ -11,6 +12,7 @@ class NodeView {
       this._model = model;
       this._clauses = clauses;
       this._eventHub = eventHub;
+      this._configView;
       this._clausesView;
       this._parentId;
    }
@@ -87,6 +89,7 @@ class NodeView {
 
       this._deleteButton = this._root.find("button");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
+      this._configContainer = this._root.find(".config");
       this._clausesContainer = this._root.find(".clauses .container");
 
       this._loadModelData();
@@ -180,7 +183,9 @@ class NodeView {
    }
 
    _renderSubViews() {
+      this._configView = new buildConfigView(this._model);
       this._clausesView = new ClausesView(this._clauses);
+      this._configContainer.append(this._configView.render());
       this._clausesContainer.append(this._clausesView.render());
    }
 
