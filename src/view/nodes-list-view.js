@@ -32,7 +32,7 @@ class NodesListView {
 
                for (var name in nodes) {
                   this._lastUsedId++;
-                  this._renderNode(this._lastUsedId, name, nodes[name]);
+                  this._renderNode(String(this._lastUsedId), name, nodes[name]);
                }
 
                this._setNodeViewsParentId(); // only doneat startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
@@ -110,6 +110,8 @@ class NodesListView {
       for (var i = 0; i < this._renderedNodeViews.length; i++) {
          view = this._renderedNodeViews[i];
          parentId = view.getParentId() || "-";
+         view.setParentId(parentId);
+         view.updateParentName(parentId);
          view.setParentSelectValue(parentId);
       }
    }

@@ -56,6 +56,20 @@ class NodeView {
       };
    }
 
+   updateParentName(parentId) {
+      var parentName = this._parentInput.find(`option[value=${parentId}]`).text();
+
+      if (parentName !== "-") {
+         this._model._iub_parent = parentName;
+      } else {
+         delete this._model._iub_parent;
+      }
+   }
+
+   setParentSelectValue(parentId) {
+      this._parentInput.val(parentId);
+   }
+
    render() {
 
       var tmpl = _.template(templates["node-view"]);
@@ -79,18 +93,6 @@ class NodeView {
       this._behaviour();
 
       return this._root;
-   }
-
-   setParentSelectValue(parentId) {
-      this._parentInput.val(parentId);
-      var parentName = this._parentInput.find(`option[value=${parentId}]`).text();
-      if (parentName !== "-") {
-         parentId = parseInt(parentId);
-         this._model._iub_parent = parentName;
-      } else {
-         delete this._model._iub_parent;
-      }
-      this.setParentId(parentId);
    }
 
    drawParentSelect(nodes) {
@@ -159,7 +161,7 @@ class NodeView {
       this._parentInput.on("change", () => {
          var parentId = this._parentInput.val();
          this.setParentId(parentId);
-         this.setParentSelectValue(parentId);
+         this.updateParentName(parentId);
       });
 
       this._deleteButton.click((e) => {

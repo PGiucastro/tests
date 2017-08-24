@@ -11942,6 +11942,20 @@ class NodeView {
       };
    }
 
+   updateParentName(parentId) {
+      var parentName = this._parentInput.find(`option[value=${parentId}]`).text();
+
+      if (parentName !== "-") {
+         this._model._iub_parent = parentName;
+      } else {
+         delete this._model._iub_parent;
+      }
+   }
+
+   setParentSelectValue(parentId) {
+      this._parentInput.val(parentId);
+   }
+
    render() {
 
       var tmpl = _.template(templates["node-view"]);
@@ -11965,18 +11979,6 @@ class NodeView {
       this._behaviour();
 
       return this._root;
-   }
-
-   setParentSelectValue(parentId) {
-      this._parentInput.val(parentId);
-      var parentName = this._parentInput.find(`option[value=${parentId}]`).text();
-      if (parentName !== "-") {
-         parentId = parseInt(parentId);
-         this._model._iub_parent = parentName;
-      } else {
-         delete this._model._iub_parent;
-      }
-      this.setParentId(parentId);
    }
 
    drawParentSelect(nodes) {
@@ -12045,7 +12047,7 @@ class NodeView {
       this._parentInput.on("change", () => {
          var parentId = this._parentInput.val();
          this.setParentId(parentId);
-         this.setParentSelectValue(parentId);
+         this.updateParentName(parentId);
       });
 
       this._deleteButton.click((e) => {
@@ -12151,7 +12153,7 @@ class NodesListView {
 
                for (var name in nodes) {
                   this._lastUsedId++;
-                  this._renderNode(this._lastUsedId, name, nodes[name]);
+                  this._renderNode(String(this._lastUsedId), name, nodes[name]);
                }
 
                this._setNodeViewsParentId(); // only doneat startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
@@ -12229,6 +12231,8 @@ class NodesListView {
       for (var i = 0; i < this._renderedNodeViews.length; i++) {
          view = this._renderedNodeViews[i];
          parentId = view.getParentId() || "-";
+         view.setParentId(parentId);
+         view.updateParentName(parentId);
          view.setParentSelectValue(parentId);
       }
    }
