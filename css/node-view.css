@@ -6,10 +6,11 @@
    position: relative;
 }
 
-.node-view .model {
+.node-view .debugger {
    background: black;
    color: lime;
-   width: 300px;
+   width: 33%;
+   box-sizing: border-box;
    white-space: pre;
    padding: 10px;
    color: lime;
@@ -17,6 +18,7 @@
    position: absolute;
    top:0;
    right: 0;
+   overflow-x: auto;
 }
 
 .node-view .input-wrapper {
@@ -30,13 +32,15 @@
 
 .node-view input,
 .node-view select {
-   width: 400px;
+   width: 100%;
    box-sizing: border-box;
 }
 
 .node-view .left {
    float: left;
-   padding-right: 50px
+   width: 33%;
+   padding-right: 50px;
+   box-sizing: border-box;
 }
 
 .node-view .clauses {
