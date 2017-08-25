@@ -11845,7 +11845,7 @@ module.exports = {
    "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n      \n      <div class=\"config\"></div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>",
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   checkbox config\n</div>",
-   "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header>configuration</header>\n\n   <div class=\"input-wrapper\">\n      <label>Default</label>\n      <input type='text' class='default' />\n   </div>\n\n   <div class=\"input-wrapper\">\n      <label>Min</label>\n      <input type='text' class='min' />\n   </div>\n\n   <div class=\"input-wrapper\">\n      <label>Max</label>\n      <input type='text' class='max' />\n   </div>\n</div>"
+   "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\">configuration [+]</header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>"
 };
 },{}],6:[function(require,module,exports){
 const $ = require('jquery');
@@ -11905,12 +11905,6 @@ module.exports = function(model) {
          max: model._iub_max
       });
    }
-
-   return {
-      render: function() {
-         return $("<div>default</div>");
-      }
-   };
 };
 },{"./checkbox-config-view":8,"./number-config-view":9,"jquery":1}],8:[function(require,module,exports){
 const $ = require('jquery');
@@ -12149,9 +12143,11 @@ class NodeView {
    }
 
    _renderSubViews() {
-      this._configView = new buildConfigView(this._model);
+      this._configView = buildConfigView(this._model);
       this._clausesView = new ClausesView(this._clauses);
-      this._configContainer.append(this._configView.render());
+      if (this._configView) {
+         this._configContainer.append(this._configView.render());
+      }
       this._clausesContainer.append(this._clausesView.render());
    }
 

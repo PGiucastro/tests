@@ -51,6 +51,8 @@
 
 .node-view .clauses .expand {
    cursor: pointer;
+   color: brown;
+   font-weight: bold;
 }
 
 .node-view .clauses .container {

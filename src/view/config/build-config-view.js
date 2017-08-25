@@ -17,10 +17,4 @@ module.exports = function(model) {
          max: model._iub_max
       });
    }
-
-   return {
-      render: function() {
-         return $("<div>default</div>");
-      }
-   };
 };

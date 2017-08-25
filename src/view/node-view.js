@@ -183,9 +183,11 @@ class NodeView {
    }
 
    _renderSubViews() {
-      this._configView = new buildConfigView(this._model);
+      this._configView = buildConfigView(this._model);
       this._clausesView = new ClausesView(this._clauses);
-      this._configContainer.append(this._configView.render());
+      if (this._configView) {
+         this._configContainer.append(this._configView.render());
+      }
       this._clausesContainer.append(this._clausesView.render());
    }
 
