@@ -11809,7 +11809,7 @@ const NodesList = require('./view/nodes-list-view');
 
 var list = new NodesList($({})).render();
 $("body").append(list);
-},{"./view/nodes-list-view":10,"jquery":1}],4:[function(require,module,exports){
+},{"./view/nodes-list-view":11,"jquery":1}],4:[function(require,module,exports){
 class SchemaBuilder {
 
    constructor(nodeViews) {
@@ -11841,10 +11841,11 @@ module.exports = SchemaBuilder;
 
 
 module.exports = {
-   "nodes-list-view": "<div class=\"nodes-list-view\">\n   \n   <header>\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
+   "nodes-list-view": "<div class=\"nodes-list-view\">\n   \n   <header class=\"main-header\">\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
    "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n      \n      <div class=\"config\"></div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>",
-   "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   checkbox config\n</div>"
+   "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   checkbox config\n</div>",
+   "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header>configuration</header>\n\n   <div class=\"input-wrapper\">\n      <label>Default</label>\n      <input type='text' class='default' />\n   </div>\n\n   <div class=\"input-wrapper\">\n      <label>Min</label>\n      <input type='text' class='min' />\n   </div>\n\n   <div class=\"input-wrapper\">\n      <label>Max</label>\n      <input type='text' class='max' />\n   </div>\n</div>"
 };
 },{}],6:[function(require,module,exports){
 const $ = require('jquery');
@@ -11887,6 +11888,7 @@ module.exports = ClausesView;
 },{"./../templates":5,"jquery":1,"underscore":2}],7:[function(require,module,exports){
 const $ = require('jquery');
 const CheckboxConfigView = require('./checkbox-config-view');
+const NumberConfigView = require('./number-config-view');
 
 module.exports = function(model) {
 
@@ -11896,6 +11898,12 @@ module.exports = function(model) {
       return new CheckboxConfigView({
 
       });
+   } else if (model.type === "number") {
+      return new NumberConfigView({
+         default: model.default,
+         min: model._iub_min,
+         max: model._iub_max
+      });
    }
 
    return {
@@ -11904,7 +11912,7 @@ module.exports = function(model) {
       }
    };
 };
-},{"./checkbox-config-view":8,"jquery":1}],8:[function(require,module,exports){
+},{"./checkbox-config-view":8,"./number-config-view":9,"jquery":1}],8:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
 
@@ -11922,6 +11930,40 @@ class CheckboxConfigView {
 
 module.exports = CheckboxConfigView;
 },{"./../../templates":5,"jquery":1}],9:[function(require,module,exports){
+const $ = require('jquery');
+const templates = require('./../../templates');
+
+class NumberConfigView {
+
+   constructor(model) {
+      this._model = model;
+   }
+
+   render() {
+      this._root = $(templates["number-config-view"]);
+      this._defaultInput = this._root.find(".default");
+      this._minInput = this._root.find(".min");
+      this._maxInput = this._root.find(".max");
+      this._populate();
+      return this._root;
+   }
+
+   getModel() {
+      this._model.default = this._defaultInput.val();
+      this._model.min = this._minInput.val();
+      this._model.max = this._maxInput.val();
+      return this._model;
+   }
+
+   _populate() {
+      this._defaultInput.val(this._model.default);
+      this._minInput.val(this._model.min);
+      this._maxInput.val(this._model.max);
+   }
+}
+
+module.exports = NumberConfigView;
+},{"./../../templates":5,"jquery":1}],10:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const templates = require('./../templates');
@@ -12167,7 +12209,7 @@ class NodeView {
 }
 
 module.exports = NodeView;
-},{"./../templates":5,"./clauses-view":6,"./config/build-config-view":7,"jquery":1,"underscore":2}],10:[function(require,module,exports){
+},{"./../templates":5,"./clauses-view":6,"./config/build-config-view":7,"jquery":1,"underscore":2}],11:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const NodeView = require('./node-view');
@@ -12346,4 +12388,4 @@ class NodesListView {
 }
 
 module.exports = NodesListView;
-},{"./../schema-builder":4,"./../templates":5,"./node-view":9,"jquery":1,"underscore":2}]},{},[3]);
+},{"./../schema-builder":4,"./../templates":5,"./node-view":10,"jquery":1,"underscore":2}]},{},[3]);
