@@ -1,10 +1,11 @@
 const $ = require('jquery');
 const templates = require('./../../templates');
+const ConfigView = require('./config-view');
 
-class CheckboxConfigView {
+class CheckboxConfigView extends ConfigView {
 
-   constructor(model) {
-      this._model = model;
+   constructor(nodeViewId, model, eventHub) {
+      super(nodeViewId, model, eventHub);
    }
 
    render() {

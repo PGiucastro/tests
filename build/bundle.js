@@ -11809,7 +11809,7 @@ const NodesList = require('./view/nodes-list-view');
 
 var list = new NodesList($({})).render();
 $("body").append(list);
-},{"./view/nodes-list-view":11,"jquery":1}],4:[function(require,module,exports){
+},{"./view/nodes-list-view":12,"jquery":1}],4:[function(require,module,exports){
 class SchemaBuilder {
 
    constructor(nodeViews) {
@@ -11890,30 +11890,27 @@ const $ = require('jquery');
 const CheckboxConfigView = require('./checkbox-config-view');
 const NumberConfigView = require('./number-config-view');
 
-module.exports = function(model) {
-
-   console.log(model);
+module.exports = function(nodeViewId, model, eventHub) {
 
    if (model.type === "boolean") {
-      return new CheckboxConfigView({
-
-      });
+      return new CheckboxConfigView(nodeViewId, {}, eventHub);
    } else if (model.type === "number") {
-      return new NumberConfigView({
+      return new NumberConfigView(nodeViewId, {
          default: model.default,
-         min: model._iub_min,
-         max: model._iub_max
-      });
+         _iub_min: model._iub_min,
+         _iub_max: model._iub_max
+      }, eventHub);
    }
 };
-},{"./checkbox-config-view":8,"./number-config-view":9,"jquery":1}],8:[function(require,module,exports){
+},{"./checkbox-config-view":8,"./number-config-view":10,"jquery":1}],8:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
+const ConfigView = require('./config-view');
 
-class CheckboxConfigView {
+class CheckboxConfigView extends ConfigView {
 
-   constructor(model) {
-      this._model = model;
+   constructor(nodeViewId, model, eventHub) {
+      super(nodeViewId, model, eventHub);
    }
 
    render() {
@@ -11923,14 +11920,34 @@ class CheckboxConfigView {
 }
 
 module.exports = CheckboxConfigView;
-},{"./../../templates":5,"jquery":1}],9:[function(require,module,exports){
+},{"./../../templates":5,"./config-view":9,"jquery":1}],9:[function(require,module,exports){
+const $ = require('jquery');
+
+class ConfigView {
+
+   constructor(nodeViewId, model, eventHub) {
+      this._nodeViewId = nodeViewId;
+      this._model = model;
+      this._eventHub = eventHub;
+   }
+
+   _behaviour() {
+      this._root.find("input").on("keyup", () => {
+         this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
+      });
+   }
+}
+
+module.exports = ConfigView;
+},{"jquery":1}],10:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
+const ConfigView = require('./config-view');
 
-class NumberConfigView {
+class NumberConfigView extends ConfigView {
 
-   constructor(model) {
-      this._model = model;
+   constructor(nodeViewId, model, eventHub) {
+      super(nodeViewId, model, eventHub);
    }
 
    render() {
@@ -11939,25 +11956,28 @@ class NumberConfigView {
       this._minInput = this._root.find(".min");
       this._maxInput = this._root.find(".max");
       this._populate();
+      this._behaviour();
       return this._root;
    }
 
    getModel() {
-      this._model.default = this._defaultInput.val();
-      this._model.min = this._minInput.val();
-      this._model.max = this._maxInput.val();
+      var min = this._minInput.val();
+      var max = this._maxInput.val();
+      this._model.default = parseInt(this._defaultInput.val());
+      this._model._iub_min = parseInt(min) ? parseInt(min) : min;
+      this._model._iub_max = parseInt(max) ? parseInt(max) : max;
       return this._model;
    }
 
    _populate() {
       this._defaultInput.val(this._model.default);
-      this._minInput.val(this._model.min);
-      this._maxInput.val(this._model.max);
+      this._minInput.val(this._model._iub_min);
+      this._maxInput.val(this._model._iub_max);
    }
 }
 
 module.exports = NumberConfigView;
-},{"./../../templates":5,"jquery":1}],10:[function(require,module,exports){
+},{"./../../templates":5,"./config-view":9,"jquery":1}],11:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const templates = require('./../templates');
@@ -12140,10 +12160,18 @@ class NodeView {
             this._eventHub.trigger("node-removed", this.getId());
          }
       });
+
+      this._eventHub.on("config-updated", (e, id, configModel) => {
+         if (id === this._id) {
+            for (var p in configModel) {
+               this._model[p] = configModel[p];
+            }
+         }
+      });
    }
 
    _renderSubViews() {
-      this._configView = buildConfigView(this._model);
+      this._configView = buildConfigView(this._id, this._model, this._eventHub);
       this._clausesView = new ClausesView(this._clauses);
       if (this._configView) {
          this._configContainer.append(this._configView.render());
@@ -12205,7 +12233,7 @@ class NodeView {
 }
 
 module.exports = NodeView;
-},{"./../templates":5,"./clauses-view":6,"./config/build-config-view":7,"jquery":1,"underscore":2}],11:[function(require,module,exports){
+},{"./../templates":5,"./clauses-view":6,"./config/build-config-view":7,"jquery":1,"underscore":2}],12:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const NodeView = require('./node-view');
@@ -12384,4 +12412,4 @@ class NodesListView {
 }
 
 module.exports = NodesListView;
-},{"./../schema-builder":4,"./../templates":5,"./node-view":10,"jquery":1,"underscore":2}]},{},[3]);
+},{"./../schema-builder":4,"./../templates":5,"./node-view":11,"jquery":1,"underscore":2}]},{},[3]);

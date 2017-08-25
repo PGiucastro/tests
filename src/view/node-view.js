@@ -180,10 +180,18 @@ class NodeView {
             this._eventHub.trigger("node-removed", this.getId());
          }
       });
+
+      this._eventHub.on("config-updated", (e, id, configModel) => {
+         if (id === this._id) {
+            for (var p in configModel) {
+               this._model[p] = configModel[p];
+            }
+         }
+      });
    }
 
    _renderSubViews() {
-      this._configView = buildConfigView(this._model);
+      this._configView = buildConfigView(this._id, this._model, this._eventHub);
       this._clausesView = new ClausesView(this._clauses);
       if (this._configView) {
          this._configContainer.append(this._configView.render());
