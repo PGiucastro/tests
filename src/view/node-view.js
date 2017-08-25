@@ -165,6 +165,7 @@ class NodeView {
 
       this._typeInput.on("change", () => {
          this._model.type = this._getModelTypeFromSelect(this._typeInput.val());
+         this._renderConfigView();
       });
 
       this._parentInput.on("change", () => {
@@ -191,12 +192,22 @@ class NodeView {
    }
 
    _renderSubViews() {
-      this._configView = buildConfigView(this._id, this._model, this._eventHub);
+      this._renderConfigView();
       this._clausesView = new ClausesView(this._clauses);
-      if (this._configView) {
-         this._configContainer.append(this._configView.render());
-      }
       this._clausesContainer.append(this._clausesView.render());
+   }
+
+   _renderConfigView() {
+      if (this._configView) {
+         var model = this._configView.getModel();
+         for (var p in model) {
+            delete this._model[p];
+         }
+      }
+      this._configView = buildConfigView(this._id, this._model, this._eventHub);
+      if (this._configView) {
+         this._configContainer.empty().append(this._configView.render());
+      }
    }
 
    _loadModelData() {
