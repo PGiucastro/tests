@@ -12190,6 +12190,7 @@ class NodeView {
    _renderConfigView() {
       var model;
       if (this._configView) {
+         // delete properties of previously chosen types
          model = this._configView.getModel();
          for (var p in model) {
             delete this._model[p];
