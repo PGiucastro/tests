@@ -1,4 +1,5 @@
 const $ = require('jquery');
+const Expander = require('./../expander');
 
 class ConfigView {
 
@@ -17,8 +18,10 @@ class ConfigView {
       this._root.find("input").on("keyup", () => {
          this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
       });
-   }
 
+      var expander = new Expander(this._root.find(".expand"), this._root.find("section"), "Configuration", true);
+      expander.init();
+   }
 }
 
 module.exports = ConfigView;

@@ -11809,7 +11809,7 @@ const NodesList = require('./view/nodes-list-view');
 
 var list = new NodesList($({})).render();
 $("body").append(list);
-},{"./view/nodes-list-view":12,"jquery":1}],4:[function(require,module,exports){
+},{"./view/nodes-list-view":13,"jquery":1}],4:[function(require,module,exports){
 class SchemaBuilder {
 
    constructor(nodeViews) {
@@ -11845,7 +11845,7 @@ module.exports = {
    "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n      \n      <div class=\"config\"></div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>",
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   checkbox config\n</div>",
-   "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\">configuration [+]</header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>"
+   "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>"
 };
 },{}],6:[function(require,module,exports){
 const $ = require('jquery');
@@ -11926,6 +11926,7 @@ class CheckboxConfigView extends ConfigView {
 module.exports = CheckboxConfigView;
 },{"./../../templates":5,"./config-view":9,"jquery":1}],9:[function(require,module,exports){
 const $ = require('jquery');
+const Expander = require('./../expander');
 
 class ConfigView {
 
@@ -11944,12 +11945,14 @@ class ConfigView {
       this._root.find("input").on("keyup", () => {
          this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
       });
-   }
 
+      var expander = new Expander(this._root.find(".expand"), this._root.find("section"), "Configuration", true);
+      expander.init();
+   }
 }
 
 module.exports = ConfigView;
-},{"jquery":1}],10:[function(require,module,exports){
+},{"./../expander":11,"jquery":1}],10:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
 const ConfigView = require('./config-view');
@@ -11988,11 +11991,43 @@ class NumberConfigView extends ConfigView {
 
 module.exports = NumberConfigView;
 },{"./../../templates":5,"./config-view":9,"jquery":1}],11:[function(require,module,exports){
+class Expander {
+
+   constructor(trigger, panel, label, initiallyExpanded) {
+      this._trigger = trigger;
+      this._panel = panel;
+      this._label = label;
+      this._initiallyExpanded = initiallyExpanded;
+   }
+
+   init() {
+
+      var label;
+      this._trigger.text(this._label + " " + (this._initiallyExpanded ? "[-]" : "[+]"));
+
+      this._trigger.click(() => {
+         label = this._trigger.text();
+
+         if (label.indexOf("[-]") > -1) {
+            label = this._label + " [+]";
+         } else {
+            label = this._label + " [-]";
+         }
+
+         this._trigger.text(label);
+         this._panel.slideToggle();
+      });
+   }
+}
+
+module.exports = Expander;
+},{}],12:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const templates = require('./../templates');
 const ClausesView = require('./clauses-view');
 const buildConfigView = require('./config/build-config-view');
+const Expander = require('./expander');
 
 class NodeView {
 
@@ -12131,9 +12166,7 @@ class NodeView {
       // Comment out for debugging
       // this._root.find(".model").hide();
 
-      this._clausesExpansionButton.click((e) => {
-         this._clausesContainer.toggle();
-      });
+      new Expander(this._clausesExpansionButton, this._clausesContainer, "Clauses", false).init();
 
       this._nameInput.on("keyup", () => {
          this._name = this._nameInput.val();
@@ -12254,7 +12287,7 @@ class NodeView {
 }
 
 module.exports = NodeView;
-},{"./../templates":5,"./clauses-view":6,"./config/build-config-view":7,"jquery":1,"underscore":2}],12:[function(require,module,exports){
+},{"./../templates":5,"./clauses-view":6,"./config/build-config-view":7,"./expander":11,"jquery":1,"underscore":2}],13:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const NodeView = require('./node-view');
@@ -12433,4 +12466,4 @@ class NodesListView {
 }
 
 module.exports = NodesListView;
-},{"./../schema-builder":4,"./../templates":5,"./node-view":11,"jquery":1,"underscore":2}]},{},[3]);
+},{"./../schema-builder":4,"./../templates":5,"./node-view":12,"jquery":1,"underscore":2}]},{},[3]);

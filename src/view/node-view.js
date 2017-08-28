@@ -3,6 +3,7 @@ const $ = require('jquery');
 const templates = require('./../templates');
 const ClausesView = require('./clauses-view');
 const buildConfigView = require('./config/build-config-view');
+const Expander = require('./expander');
 
 class NodeView {
 
@@ -141,9 +142,7 @@ class NodeView {
       // Comment out for debugging
       // this._root.find(".model").hide();
 
-      this._clausesExpansionButton.click((e) => {
-         this._clausesContainer.toggle();
-      });
+      new Expander(this._clausesExpansionButton, this._clausesContainer, "Clauses", false).init();
 
       this._nameInput.on("keyup", () => {
          this._name = this._nameInput.val();
