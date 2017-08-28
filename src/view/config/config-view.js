@@ -9,18 +9,15 @@ class ConfigView {
       this._eventHub = eventHub;
    }
 
-   render() {
-      this._root = $("<div class='config-view'></div>");
-      return this._root;
+   getModel() {
+      throw "Abstract";
    }
 
    _behaviour() {
+      new Expander(this._root.find(".expand"), this._root.find("section"), "Configuration", true).init();
       this._root.find("input").on("keyup", () => {
          this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
       });
-
-      var expander = new Expander(this._root.find(".expand"), this._root.find("section"), "Configuration", true);
-      expander.init();
    }
 }
 

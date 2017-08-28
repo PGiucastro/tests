@@ -11,5 +11,15 @@
 
 .config-view section {
    padding: 20px;
+   padding-bottom: 1px;
    background: #eee;
+}
+
+.config-view .description {
+   display: block;
+   margin-bottom: 6px;
+}
+
+.config-view input[type=radio] {
+   width: auto;
 }

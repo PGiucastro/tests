@@ -10,7 +10,14 @@ class CheckboxConfigView extends ConfigView {
 
    render() {
       this._root = $(templates["checkbox-config-view"]);
+      this._root.hide(); // no config for checkbox so far, so I just hide it.
       return this._root;
+   }
+
+   getModel() {
+      return {
+
+      };
    }
 }
 

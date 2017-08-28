@@ -12,7 +12,7 @@ class ClausesView {
       var tmpl = _.template(templates["clauses-view"]);
       this._root = $(tmpl({
          html: this._createCheckboxesHTML()
-      }));
+      }));      
       return this._root;
    }
 

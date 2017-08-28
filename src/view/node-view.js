@@ -142,8 +142,6 @@ class NodeView {
       // Comment out for debugging
       // this._root.find(".model").hide();
 
-      new Expander(this._clausesExpansionButton, this._clausesContainer, "Clauses", false).init();
-
       this._nameInput.on("keyup", () => {
          this._name = this._nameInput.val();
          this._eventHub.trigger("node-name-updated");
@@ -163,7 +161,13 @@ class NodeView {
       });
 
       this._typeInput.on("change", () => {
-         this._model.type = this._getModelTypeFromSelect(this._typeInput.val());
+         var val = this._typeInput.val();
+         this._model.type = this._getModelTypeFromSelect(val);
+         if (val === "radio") {
+            this._model.enum = [];
+         } else {
+            delete this._model.enum;
+         }
          this._renderConfigView();
       });
 
@@ -188,6 +192,8 @@ class NodeView {
             }
          }
       });
+
+      new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
    }
 
    _renderSubViews() {
@@ -206,7 +212,9 @@ class NodeView {
          }
       }
       this._configView = buildConfigView(this._id, this._model, this._eventHub);
-      this._configContainer.empty().append(this._configView.render());
+      if (this._configView) { // newly created nodes have empty model so the created config view undefined
+         this._configContainer.empty().append(this._configView.render());
+      }
    }
 
    _loadModelData() {

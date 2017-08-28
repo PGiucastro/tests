@@ -11809,7 +11809,7 @@ const NodesList = require('./view/nodes-list-view');
 
 var list = new NodesList($({})).render();
 $("body").append(list);
-},{"./view/nodes-list-view":13,"jquery":1}],4:[function(require,module,exports){
+},{"./view/nodes-list-view":15,"jquery":1}],4:[function(require,module,exports){
 class SchemaBuilder {
 
    constructor(nodeViews) {
@@ -11842,10 +11842,12 @@ module.exports = SchemaBuilder;
 
 module.exports = {
    "nodes-list-view": "<div class=\"nodes-list-view\">\n   \n   <header class=\"main-header\">\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n      \n      <div class=\"config\"></div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\">clauses [+]</span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
+   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n      \n      <div class=\"config\"></div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>",
-   "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   checkbox config\n</div>",
-   "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>"
+   "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
+   "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
+   "text-config-view": "<div class=\"config-view text-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n   </section>\n\n</div>",
+   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n\n      </div>\n   </section>\n\n</div>"
 };
 },{}],6:[function(require,module,exports){
 const $ = require('jquery');
@@ -11862,7 +11864,7 @@ class ClausesView {
       var tmpl = _.template(templates["clauses-view"]);
       this._root = $(tmpl({
          html: this._createCheckboxesHTML()
-      }));
+      }));      
       return this._root;
    }
 
@@ -11890,9 +11892,10 @@ const $ = require('jquery');
 const ConfigView = require('./config-view');
 const CheckboxConfigView = require('./checkbox-config-view');
 const NumberConfigView = require('./number-config-view');
+const RadioConfigView = require('./radio-config-view');
+const TextConfigView = require('./text-config-view');
 
 module.exports = function(nodeViewId, model, eventHub) {
-
    if (model.type === "boolean") {
       return new CheckboxConfigView(nodeViewId, {}, eventHub);
    } else if (model.type === "number") {
@@ -11901,12 +11904,17 @@ module.exports = function(nodeViewId, model, eventHub) {
          _iub_min: model._iub_min,
          _iub_max: model._iub_max
       }, eventHub);
-   } else {
-      console.warn("no congig view found for model", model);
-      return new ConfigView();
+   } else if (model.type === "string" && model.enum) {
+      return new RadioConfigView(nodeViewId, {
+
+      }, eventHub);
+   } else if (model.type === "string" && !model.enum) {
+      return new TextConfigView(nodeViewId, {
+         default: model.default
+      }, eventHub);
    }
 };
-},{"./checkbox-config-view":8,"./config-view":9,"./number-config-view":10,"jquery":1}],8:[function(require,module,exports){
+},{"./checkbox-config-view":8,"./config-view":9,"./number-config-view":10,"./radio-config-view":11,"./text-config-view":12,"jquery":1}],8:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
 const ConfigView = require('./config-view');
@@ -11919,7 +11927,14 @@ class CheckboxConfigView extends ConfigView {
 
    render() {
       this._root = $(templates["checkbox-config-view"]);
+      this._root.hide(); // no config for checkbox so far, so I just hide it.
       return this._root;
+   }
+
+   getModel() {
+      return {
+
+      };
    }
 }
 
@@ -11936,23 +11951,20 @@ class ConfigView {
       this._eventHub = eventHub;
    }
 
-   render() {
-      this._root = $("<div class='config-view'></div>");
-      return this._root;
+   getModel() {
+      throw "Abstract";
    }
 
    _behaviour() {
+      new Expander(this._root.find(".expand"), this._root.find("section"), "Configuration", true).init();
       this._root.find("input").on("keyup", () => {
          this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
       });
-
-      var expander = new Expander(this._root.find(".expand"), this._root.find("section"), "Configuration", true);
-      expander.init();
    }
 }
 
 module.exports = ConfigView;
-},{"./../expander":11,"jquery":1}],10:[function(require,module,exports){
+},{"./../expander":13,"jquery":1}],10:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
 const ConfigView = require('./config-view');
@@ -11991,6 +12003,59 @@ class NumberConfigView extends ConfigView {
 
 module.exports = NumberConfigView;
 },{"./../../templates":5,"./config-view":9,"jquery":1}],11:[function(require,module,exports){
+const $ = require('jquery');
+const templates = require('./../../templates');
+const ConfigView = require('./config-view');
+
+class RadioConfigView extends ConfigView {
+
+   constructor(nodeViewId, model, eventHub) {
+      super(nodeViewId, model, eventHub);
+   }
+
+   render() {
+      this._root = $(templates["radio-config-view"]);
+      this._behaviour();
+      return this._root;
+   }
+
+   getModel() {
+      this._model;
+   }
+}
+
+module.exports = RadioConfigView;
+},{"./../../templates":5,"./config-view":9,"jquery":1}],12:[function(require,module,exports){
+const $ = require('jquery');
+const templates = require('./../../templates');
+const ConfigView = require('./config-view');
+
+class TextConfigView extends ConfigView {
+
+   constructor(nodeViewId, model, eventHub) {
+      super(nodeViewId, model, eventHub);
+   }
+
+   render() {
+      this._root = $(templates["text-config-view"]);
+      this._defaultInput = this._root.find(".default");
+      this._populate();
+      this._behaviour();
+      return this._root;
+   }
+
+   getModel() {
+      this._model.default = this._defaultInput.val();
+      return this._model;
+   }
+
+   _populate() {
+      this._defaultInput.val(this._model.default);
+   }
+}
+
+module.exports = TextConfigView;
+},{"./../../templates":5,"./config-view":9,"jquery":1}],13:[function(require,module,exports){
 class Expander {
 
    constructor(trigger, panel, label, initiallyExpanded) {
@@ -12021,7 +12086,7 @@ class Expander {
 }
 
 module.exports = Expander;
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const templates = require('./../templates');
@@ -12166,8 +12231,6 @@ class NodeView {
       // Comment out for debugging
       // this._root.find(".model").hide();
 
-      new Expander(this._clausesExpansionButton, this._clausesContainer, "Clauses", false).init();
-
       this._nameInput.on("keyup", () => {
          this._name = this._nameInput.val();
          this._eventHub.trigger("node-name-updated");
@@ -12187,7 +12250,13 @@ class NodeView {
       });
 
       this._typeInput.on("change", () => {
-         this._model.type = this._getModelTypeFromSelect(this._typeInput.val());
+         var val = this._typeInput.val();
+         this._model.type = this._getModelTypeFromSelect(val);
+         if (val === "radio") {
+            this._model.enum = [];
+         } else {
+            delete this._model.enum;
+         }
          this._renderConfigView();
       });
 
@@ -12212,6 +12281,8 @@ class NodeView {
             }
          }
       });
+
+      new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
    }
 
    _renderSubViews() {
@@ -12230,7 +12301,9 @@ class NodeView {
          }
       }
       this._configView = buildConfigView(this._id, this._model, this._eventHub);
-      this._configContainer.empty().append(this._configView.render());
+      if (this._configView) { // newly created nodes have empty model so the created config view undefined
+         this._configContainer.empty().append(this._configView.render());
+      }
    }
 
    _loadModelData() {
@@ -12287,7 +12360,7 @@ class NodeView {
 }
 
 module.exports = NodeView;
-},{"./../templates":5,"./clauses-view":6,"./config/build-config-view":7,"./expander":11,"jquery":1,"underscore":2}],13:[function(require,module,exports){
+},{"./../templates":5,"./clauses-view":6,"./config/build-config-view":7,"./expander":13,"jquery":1,"underscore":2}],15:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const NodeView = require('./node-view');
@@ -12466,4 +12539,4 @@ class NodesListView {
 }
 
 module.exports = NodesListView;
-},{"./../schema-builder":4,"./../templates":5,"./node-view":12,"jquery":1,"underscore":2}]},{},[3]);
+},{"./../schema-builder":4,"./../templates":5,"./node-view":14,"jquery":1,"underscore":2}]},{},[3]);
