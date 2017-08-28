@@ -14,6 +14,10 @@ class RadioConfigView extends ConfigView {
       return this._root;
    }
 
+   _behaviour() {
+      super._behaviour();
+   }
+
    getModel() {
       this._model;
    }

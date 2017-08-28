@@ -135,7 +135,8 @@ class NodeView {
             id: this._id,
             name: this._name,
             parentId: this._parentId,
-            model: this._model
+            model: this._model,
+            clauses: this.getClauses()
          }, null, "  "));
       }, 1000);
 

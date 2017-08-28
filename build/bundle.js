@@ -12019,6 +12019,10 @@ class RadioConfigView extends ConfigView {
       return this._root;
    }
 
+   _behaviour() {
+      super._behaviour();
+   }
+
    getModel() {
       this._model;
    }
@@ -12224,7 +12228,8 @@ class NodeView {
             id: this._id,
             name: this._name,
             parentId: this._parentId,
-            model: this._model
+            model: this._model,
+            clauses: this.getClauses()
          }, null, "  "));
       }, 1000);
 
