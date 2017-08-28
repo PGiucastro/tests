@@ -198,16 +198,15 @@ class NodeView {
    }
 
    _renderConfigView() {
+      var model;
       if (this._configView) {
-         var model = this._configView.getModel();
+         model = this._configView.getModel();
          for (var p in model) {
             delete this._model[p];
          }
       }
       this._configView = buildConfigView(this._id, this._model, this._eventHub);
-      if (this._configView) {
-         this._configContainer.empty().append(this._configView.render());
-      }
+      this._configContainer.empty().append(this._configView.render());
    }
 
    _loadModelData() {
