@@ -131,13 +131,10 @@ class NodeView {
 
       // Uncomment for debugging
       setInterval(() => {
-         this._root.find(".debugger").text(JSON.stringify({
-            id: this._id,
-            name: this._name,
-            parentId: this._parentId,
-            model: this._model,
-            clauses: this.getClauses()
-         }, null, "  "));
+         var data = this.getData();
+         data.parentId = this._parentId;
+         this._root.find(".debugger")
+            .text(JSON.stringify(data, null, "  "));
       }, 1000);
 
       // Comment out for debugging
