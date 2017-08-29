@@ -1,0 +1,13 @@
+.radio-config-view .add-choice {
+   padding-bottom: 20px;
+   display: block;
+}
+
+.radio-config-view .add-choice, 
+.radio-config-view .remove-choice {
+   cursor: pointer;
+}
+
+.radio-config-view .radios input {
+   margin-bottom: 6px;
+}

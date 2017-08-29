@@ -11847,7 +11847,7 @@ module.exports = {
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
    "text-config-view": "<div class=\"config-view text-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n   </section>\n\n</div>",
-   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n\n      </div>\n   </section>\n\n</div>"
+   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <div class=\"input-wrapper prototype\" style=\"display: none\">\n      <input type=\"text\" class=\"label\" placeholder=\"label\" />\n      <input type=\"text\" class=\"value\" placeholder=\"value\" />\n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type=\"text\" class=\"dafault\" />\n      </div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n      <div class=\"radios\"></div>\n\n   </section>\n\n\n\n</div>"
 };
 },{}],6:[function(require,module,exports){
 const $ = require('jquery');
@@ -12016,15 +12016,42 @@ class RadioConfigView extends ConfigView {
    render() {
       this._root = $(templates["radio-config-view"]);
       this._behaviour();
+      this._proto = this._root.find(".prototype");
+      this._radios = this._root.find(".radios");
       return this._root;
-   }
-
-   _behaviour() {
-      super._behaviour();
    }
 
    getModel() {
       this._model;
+   }
+
+   _behaviour() {
+      super._behaviour();
+      this._root.click((e) => {
+         var trg = $(e.target);
+         if (trg.is(".add-choice")) {
+            this._appendRadio();
+         } else if (trg.is(".remove-choice")) {
+            this._removeRadio(trg.parents(".input-wrapper"));
+         }
+      });
+   }
+
+   _appendRadio(data) {
+      var radio = this._proto.clone();
+      radio.show();
+      radio.removeClass("prototype");
+      this._radios.append(radio);
+      if (data) {
+         radio.find("label", data.label);
+         radio.find("value", data.value);
+      }
+   }
+
+   _removeRadio(el) {
+      el.slideUp(() => {
+         el.remove();
+      });
    }
 }
 
