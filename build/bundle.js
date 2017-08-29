@@ -11906,7 +11906,8 @@ module.exports = function(nodeViewId, model, eventHub) {
       }, eventHub);
    } else if (model.type === "string" && model.enum) {
       return new RadioConfigView(nodeViewId, {
-
+         enum: model.enum,
+         _iub_labels: model._iub_labels
       }, eventHub);
    } else if (model.type === "string" && !model.enum) {
       return new TextConfigView(nodeViewId, {
@@ -12018,6 +12019,12 @@ class RadioConfigView extends ConfigView {
       this._behaviour();
       this._proto = this._root.find(".prototype");
       this._radios = this._root.find(".radios");
+      for (var i = 0; i < this._model.enum.length; i++) {
+         this._appendRadio({
+            label: this._model.enum[i],
+            value: this._model._iub_labels[i]
+         });
+      }
       return this._root;
    }
 
@@ -12043,8 +12050,8 @@ class RadioConfigView extends ConfigView {
       radio.removeClass("prototype");
       this._radios.append(radio);
       if (data) {
-         radio.find("label", data.label);
-         radio.find("value", data.value);
+         radio.find(".label").val(data.label);
+         radio.find(".value").val(data.value);
       }
    }
 
