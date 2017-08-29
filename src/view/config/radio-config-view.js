@@ -10,24 +10,32 @@ class RadioConfigView extends ConfigView {
 
    render() {
       this._root = $(templates["radio-config-view"]);
-      this._behaviour();
       this._proto = this._root.find(".prototype");
+      this._defaultInput = this._root.find("input.default");
       this._radios = this._root.find(".radios");
-      for (var i = 0; i < this._model.enum.length; i++) {
-         this._appendRadio({
-            label: this._model.enum[i],
-            value: this._model._iub_labels[i]
-         });
-      }
+      this._loadData();
+      this._behaviour();
       return this._root;
    }
 
    getModel() {
-      this._model;
+      this._model.default = this._defaultInput.val();
+      this._model.enum = [];
+      this._model._iub_labels = [];
+
+      var radios = this._radios.find(".input-wrapper");
+
+      for (var i = 0; i < radios.length; i++) {
+         var radio = $(radios[i]);
+         this._model.enum.push(radio.find(".value").val());
+         this._model._iub_labels.push(radio.find(".label").val());
+      }
+
+      return this._model;
    }
 
    _behaviour() {
-      super._behaviour();
+
       this._root.click((e) => {
          var trg = $(e.target);
          if (trg.is(".add-choice")) {
@@ -35,6 +43,10 @@ class RadioConfigView extends ConfigView {
          } else if (trg.is(".remove-choice")) {
             this._removeRadio(trg.parents(".input-wrapper"));
          }
+      });
+
+      this._root.on("keyup", (e) => {
+         this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
       });
    }
 
@@ -52,7 +64,18 @@ class RadioConfigView extends ConfigView {
    _removeRadio(el) {
       el.slideUp(() => {
          el.remove();
+         this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
       });
+   }
+
+   _loadData() {
+      this._defaultInput.val(this._model.default);
+      for (var i = 0; i < this._model.enum.length; i++) {
+         this._appendRadio({
+            label: this._model._iub_labels[i],
+            value: this._model.enum[i]
+         });
+      }
    }
 }
 

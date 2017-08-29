@@ -11847,7 +11847,7 @@ module.exports = {
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
    "text-config-view": "<div class=\"config-view text-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n   </section>\n\n</div>",
-   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <div class=\"input-wrapper prototype\" style=\"display: none\">\n      <input type=\"text\" class=\"label\" placeholder=\"label\" />\n      <input type=\"text\" class=\"value\" placeholder=\"value\" />\n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type=\"text\" class=\"dafault\" />\n      </div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n      <div class=\"radios\"></div>\n\n   </section>\n\n\n\n</div>"
+   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <div class=\"input-wrapper prototype\" style=\"display: none\">\n      <input type=\"text\" class=\"label\" placeholder=\"label\" />\n      <input type=\"text\" class=\"value\" placeholder=\"value\" />\n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type=\"text\" class=\"default\" />\n      </div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n      <div class=\"radios\"></div>\n\n   </section>\n\n\n\n</div>"
 };
 },{}],6:[function(require,module,exports){
 const $ = require('jquery');
@@ -11907,6 +11907,7 @@ module.exports = function(nodeViewId, model, eventHub) {
    } else if (model.type === "string" && model.enum) {
       return new RadioConfigView(nodeViewId, {
          enum: model.enum,
+         default: model.default,
          _iub_labels: model._iub_labels
       }, eventHub);
    } else if (model.type === "string" && !model.enum) {
@@ -12016,24 +12017,32 @@ class RadioConfigView extends ConfigView {
 
    render() {
       this._root = $(templates["radio-config-view"]);
-      this._behaviour();
       this._proto = this._root.find(".prototype");
+      this._defaultInput = this._root.find("input.default");
       this._radios = this._root.find(".radios");
-      for (var i = 0; i < this._model.enum.length; i++) {
-         this._appendRadio({
-            label: this._model.enum[i],
-            value: this._model._iub_labels[i]
-         });
-      }
+      this._loadData();
+      this._behaviour();
       return this._root;
    }
 
    getModel() {
-      this._model;
+      this._model.default = this._defaultInput.val();
+      this._model.enum = [];
+      this._model._iub_labels = [];
+
+      var radios = this._radios.find(".input-wrapper");
+
+      for (var i = 0; i < radios.length; i++) {
+         var radio = $(radios[i]);
+         this._model.enum.push(radio.find(".value").val());
+         this._model._iub_labels.push(radio.find(".label").val());
+      }
+
+      return this._model;
    }
 
    _behaviour() {
-      super._behaviour();
+
       this._root.click((e) => {
          var trg = $(e.target);
          if (trg.is(".add-choice")) {
@@ -12041,6 +12050,10 @@ class RadioConfigView extends ConfigView {
          } else if (trg.is(".remove-choice")) {
             this._removeRadio(trg.parents(".input-wrapper"));
          }
+      });
+
+      this._root.on("keyup", (e) => {
+         this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
       });
    }
 
@@ -12058,7 +12071,18 @@ class RadioConfigView extends ConfigView {
    _removeRadio(el) {
       el.slideUp(() => {
          el.remove();
+         this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
       });
+   }
+
+   _loadData() {
+      this._defaultInput.val(this._model.default);
+      for (var i = 0; i < this._model.enum.length; i++) {
+         this._appendRadio({
+            label: this._model._iub_labels[i],
+            value: this._model.enum[i]
+         });
+      }
    }
 }
 
@@ -12309,18 +12333,22 @@ class NodeView {
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
             this._eventHub.trigger("node-removed", this.getId());
+            // TODO: unregister this._onConfigUpdated
          }
       });
 
-      this._eventHub.on("config-updated", (e, id, configModel) => {
-         if (id === this._id) {
-            for (var p in configModel) {
-               this._model[p] = configModel[p];
-            }
-         }
-      });
+      this._eventHub.on("config-updated", this._onConfigUpdated.bind(this));
 
       new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
+   }
+
+   _onConfigUpdated(e, id, configModel) {
+      if (id === this._id) {
+         console.log("config-updated", id, configModel);
+         for (var p in configModel) {
+            this._model[p] = configModel[p];
+         }
+      }
    }
 
    _renderSubViews() {

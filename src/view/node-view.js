@@ -182,18 +182,22 @@ class NodeView {
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
             this._eventHub.trigger("node-removed", this.getId());
+            // TODO: unregister this._onConfigUpdated
          }
       });
 
-      this._eventHub.on("config-updated", (e, id, configModel) => {
-         if (id === this._id) {
-            for (var p in configModel) {
-               this._model[p] = configModel[p];
-            }
-         }
-      });
+      this._eventHub.on("config-updated", this._onConfigUpdated.bind(this));
 
       new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
+   }
+
+   _onConfigUpdated(e, id, configModel) {
+      if (id === this._id) {
+         console.log("config-updated", id, configModel);
+         for (var p in configModel) {
+            this._model[p] = configModel[p];
+         }
+      }
    }
 
    _renderSubViews() {

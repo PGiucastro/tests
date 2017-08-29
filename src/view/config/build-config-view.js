@@ -17,6 +17,7 @@ module.exports = function(nodeViewId, model, eventHub) {
    } else if (model.type === "string" && model.enum) {
       return new RadioConfigView(nodeViewId, {
          enum: model.enum,
+         default: model.default,
          _iub_labels: model._iub_labels
       }, eventHub);
    } else if (model.type === "string" && !model.enum) {
