@@ -11846,8 +11846,8 @@ module.exports = {
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>",
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
-   "text-config-view": "<div class=\"config-view text-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n   </section>\n\n</div>",
-   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <div class=\"input-wrapper prototype\" style=\"display: none\">\n      <input type=\"text\" class=\"label\" placeholder=\"label\" />\n      <input type=\"text\" class=\"value\" placeholder=\"value\" />\n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type=\"text\" class=\"default\" />\n      </div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n      <div class=\"radios\"></div>\n\n   </section>\n\n\n\n</div>"
+   "text-config-view": "<div class=\"config-view text-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n   </section>\n\n</div>",
+   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <div class=\"input-wrapper prototype\" style=\"display: none\">\n      <input type=\"text\" class=\"label\" placeholder=\"label\" />\n      <input type=\"text\" class=\"value\" placeholder=\"value\" />\n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type=\"text\" class=\"default\" />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n      <div class=\"radios\"></div>\n\n   </section>\n\n\n\n</div>"
 };
 },{}],6:[function(require,module,exports){
 const $ = require('jquery');
@@ -11902,17 +11902,20 @@ module.exports = function(nodeViewId, model, eventHub) {
       return new NumberConfigView(nodeViewId, {
          default: model.default,
          _iub_min: model._iub_min,
-         _iub_max: model._iub_max
+         _iub_max: model._iub_max,
+         _iub_validation: model._iub_validation
       }, eventHub);
    } else if (model.type === "string" && model.enum) {
       return new RadioConfigView(nodeViewId, {
          enum: model.enum,
          default: model.default,
-         _iub_labels: model._iub_labels
+         _iub_labels: model._iub_labels,
+         _iub_validation: model._iub_validation
       }, eventHub);
    } else if (model.type === "string" && !model.enum) {
       return new TextConfigView(nodeViewId, {
-         default: model.default
+         default: model.default,
+         _iub_validation: model._iub_validation
       }, eventHub);
    }
 };
@@ -11958,10 +11961,23 @@ class ConfigView {
    }
 
    _behaviour() {
-      new Expander(this._root.find(".expand"), this._root.find("section"), "Configuration", true).init();
+      this._initExpander();
+
       this._root.find("input").on("keyup", () => {
-         this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
+         this._triggerConfigUpdate();
       });
+
+      this._root.find("select").on("change", () => {
+         this._triggerConfigUpdate();
+      });
+   }
+
+   _triggerConfigUpdate() {
+      this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
+   }
+
+   _initExpander() {
+      new Expander(this._root.find(".expand"), this._root.find("section"), "Configuration", true).init();
    }
 }
 
@@ -11982,7 +11998,7 @@ class NumberConfigView extends ConfigView {
       this._defaultInput = this._root.find(".default");
       this._minInput = this._root.find(".min");
       this._maxInput = this._root.find(".max");
-      this._populate();
+      this._loadData();
       this._behaviour();
       return this._root;
    }
@@ -11996,7 +12012,7 @@ class NumberConfigView extends ConfigView {
       return this._model;
    }
 
-   _populate() {
+   _loadData() {
       this._defaultInput.val(this._model.default);
       this._minInput.val(this._model._iub_min);
       this._maxInput.val(this._model._iub_max);
@@ -12019,6 +12035,7 @@ class RadioConfigView extends ConfigView {
       this._root = $(templates["radio-config-view"]);
       this._proto = this._root.find(".prototype");
       this._defaultInput = this._root.find("input.default");
+      this._validationSelect = this._root.find("select.validation");
       this._radios = this._root.find(".radios");
       this._loadData();
       this._behaviour();
@@ -12026,7 +12043,11 @@ class RadioConfigView extends ConfigView {
    }
 
    getModel() {
+
+      var validation = this._validationSelect.val();
+
       this._model.default = this._defaultInput.val();
+      this._model._iub_validation = validation;
       this._model.enum = [];
       this._model._iub_labels = [];
 
@@ -12043,6 +12064,8 @@ class RadioConfigView extends ConfigView {
 
    _behaviour() {
 
+      this._initExpander();
+
       this._root.click((e) => {
          var trg = $(e.target);
          if (trg.is(".add-choice")) {
@@ -12053,7 +12076,11 @@ class RadioConfigView extends ConfigView {
       });
 
       this._root.on("keyup", (e) => {
-         this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
+         this._triggerConfigUpdate();
+      });
+
+      this._root.find("select").on("change", () => {
+         this._triggerConfigUpdate();
       });
    }
 
@@ -12077,6 +12104,7 @@ class RadioConfigView extends ConfigView {
 
    _loadData() {
       this._defaultInput.val(this._model.default);
+      this._validationSelect.val(this._model._iub_validation);
       for (var i = 0; i < this._model.enum.length; i++) {
          this._appendRadio({
             label: this._model._iub_labels[i],
@@ -12100,19 +12128,23 @@ class TextConfigView extends ConfigView {
 
    render() {
       this._root = $(templates["text-config-view"]);
-      this._defaultInput = this._root.find(".default");
-      this._populate();
+      this._defaultInput = this._root.find("input.default");
+      this._validationSelect = this._root.find("select.validation");
+      this._loadData();
       this._behaviour();
       return this._root;
    }
 
    getModel() {
+      var validation = this._validationSelect.val();
       this._model.default = this._defaultInput.val();
+      this._model._iub_validation = validation;
       return this._model;
    }
 
-   _populate() {
+   _loadData() {
       this._defaultInput.val(this._model.default);
+      this._validationSelect.val(this._model._iub_validation || "-");
    }
 }
 
@@ -12358,17 +12390,21 @@ class NodeView {
    }
 
    _renderConfigView() {
-      var model;
       if (this._configView) {
-         // delete properties of previously chosen types
-         model = this._configView.getModel();
-         for (var p in model) {
-            delete this._model[p];
-         }
+         this._deleteCurrentConfigDataFromModel();
       }
+
       this._configView = buildConfigView(this._id, this._model, this._eventHub);
+
       if (this._configView) { // newly created nodes have empty model so the created config view undefined
          this._configContainer.empty().append(this._configView.render());
+      }
+   }
+
+   _deleteCurrentConfigDataFromModel() {
+      var model = this._configView.getModel();      
+      for (var p in model) {
+         delete this._model[p];
       }
    }
 
@@ -12587,6 +12623,7 @@ class NodesListView {
          if (parentName) {
             parentId = this._getViewByName(parentName).getId();
          }
+         debugger
          view.setParentId(parentId);
       }
    }

@@ -12,17 +12,20 @@ module.exports = function(nodeViewId, model, eventHub) {
       return new NumberConfigView(nodeViewId, {
          default: model.default,
          _iub_min: model._iub_min,
-         _iub_max: model._iub_max
+         _iub_max: model._iub_max,
+         _iub_validation: model._iub_validation
       }, eventHub);
    } else if (model.type === "string" && model.enum) {
       return new RadioConfigView(nodeViewId, {
          enum: model.enum,
          default: model.default,
-         _iub_labels: model._iub_labels
+         _iub_labels: model._iub_labels,
+         _iub_validation: model._iub_validation
       }, eventHub);
    } else if (model.type === "string" && !model.enum) {
       return new TextConfigView(nodeViewId, {
-         default: model.default
+         default: model.default,
+         _iub_validation: model._iub_validation
       }, eventHub);
    }
 };

@@ -207,17 +207,21 @@ class NodeView {
    }
 
    _renderConfigView() {
-      var model;
       if (this._configView) {
-         // delete properties of previously chosen types
-         model = this._configView.getModel();
-         for (var p in model) {
-            delete this._model[p];
-         }
+         this._deleteCurrentConfigDataFromModel();
       }
+
       this._configView = buildConfigView(this._id, this._model, this._eventHub);
+
       if (this._configView) { // newly created nodes have empty model so the created config view undefined
          this._configContainer.empty().append(this._configView.render());
+      }
+   }
+
+   _deleteCurrentConfigDataFromModel() {
+      var model = this._configView.getModel();      
+      for (var p in model) {
+         delete this._model[p];
       }
    }
 

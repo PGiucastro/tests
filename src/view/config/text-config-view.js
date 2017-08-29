@@ -10,19 +10,23 @@ class TextConfigView extends ConfigView {
 
    render() {
       this._root = $(templates["text-config-view"]);
-      this._defaultInput = this._root.find(".default");
-      this._populate();
+      this._defaultInput = this._root.find("input.default");
+      this._validationSelect = this._root.find("select.validation");
+      this._loadData();
       this._behaviour();
       return this._root;
    }
 
    getModel() {
+      var validation = this._validationSelect.val();
       this._model.default = this._defaultInput.val();
+      this._model._iub_validation = validation;
       return this._model;
    }
 
-   _populate() {
+   _loadData() {
       this._defaultInput.val(this._model.default);
+      this._validationSelect.val(this._model._iub_validation || "-");
    }
 }
 

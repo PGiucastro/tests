@@ -158,6 +158,7 @@ class NodesListView {
          if (parentName) {
             parentId = this._getViewByName(parentName).getId();
          }
+         debugger
          view.setParentId(parentId);
       }
    }

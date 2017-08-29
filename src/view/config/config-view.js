@@ -14,10 +14,23 @@ class ConfigView {
    }
 
    _behaviour() {
-      new Expander(this._root.find(".expand"), this._root.find("section"), "Configuration", true).init();
+      this._initExpander();
+
       this._root.find("input").on("keyup", () => {
-         this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
+         this._triggerConfigUpdate();
       });
+
+      this._root.find("select").on("change", () => {
+         this._triggerConfigUpdate();
+      });
+   }
+
+   _triggerConfigUpdate() {
+      this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
+   }
+
+   _initExpander() {
+      new Expander(this._root.find(".expand"), this._root.find("section"), "Configuration", true).init();
    }
 }
 

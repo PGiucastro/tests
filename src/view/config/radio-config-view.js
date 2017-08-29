@@ -12,6 +12,7 @@ class RadioConfigView extends ConfigView {
       this._root = $(templates["radio-config-view"]);
       this._proto = this._root.find(".prototype");
       this._defaultInput = this._root.find("input.default");
+      this._validationSelect = this._root.find("select.validation");
       this._radios = this._root.find(".radios");
       this._loadData();
       this._behaviour();
@@ -19,7 +20,11 @@ class RadioConfigView extends ConfigView {
    }
 
    getModel() {
+
+      var validation = this._validationSelect.val();
+
       this._model.default = this._defaultInput.val();
+      this._model._iub_validation = validation;
       this._model.enum = [];
       this._model._iub_labels = [];
 
@@ -36,6 +41,8 @@ class RadioConfigView extends ConfigView {
 
    _behaviour() {
 
+      this._initExpander();
+
       this._root.click((e) => {
          var trg = $(e.target);
          if (trg.is(".add-choice")) {
@@ -46,7 +53,11 @@ class RadioConfigView extends ConfigView {
       });
 
       this._root.on("keyup", (e) => {
-         this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
+         this._triggerConfigUpdate();
+      });
+
+      this._root.find("select").on("change", () => {
+         this._triggerConfigUpdate();
       });
    }
 
@@ -70,6 +81,7 @@ class RadioConfigView extends ConfigView {
 
    _loadData() {
       this._defaultInput.val(this._model.default);
+      this._validationSelect.val(this._model._iub_validation);
       for (var i = 0; i < this._model.enum.length; i++) {
          this._appendRadio({
             label: this._model._iub_labels[i],
