@@ -12315,10 +12315,10 @@ class NodeView {
       this._titleInput_IT.val(this._model.title_it);
       this._titleInput_EN.val(this._model.title);
       this._titleInput_DE.val(this._model.title_de);
-      this._typeInput.val(this._getOptionTypeFromModel() || "-");
+      this._typeInput.val(this._getSelectTypeFromModel() || "-");
    }
 
-   _getOptionTypeFromModel() {
+   _getSelectTypeFromModel() {
       var type;
 
       if (this._model.type === "boolean") {
