@@ -5,27 +5,32 @@ const NumberConfigView = require('./number-config-view');
 const RadioConfigView = require('./radio-config-view');
 const TextConfigView = require('./text-config-view');
 
-module.exports = function(nodeViewId, model, eventHub) {
-   if (model.type === "boolean") {
-      return new CheckboxConfigView(nodeViewId, {}, eventHub);
-   } else if (model.type === "number") {
-      return new NumberConfigView(nodeViewId, {
-         default: model.default,
-         _iub_min: model._iub_min,
-         _iub_max: model._iub_max,
-         _iub_validation: model._iub_validation
+module.exports = function(configType, nodeViewId, nodeModel, eventHub) {
+
+   var view;
+
+   if (configType === "checkbox") {
+      view = new CheckboxConfigView(nodeViewId, {}, eventHub);
+   } else if (configType === "number") {
+      view = new NumberConfigView(nodeViewId, {
+         default: nodeModel.default,
+         _iub_min: nodeModel._iub_min,
+         _iub_max: nodeModel._iub_max,
+         _iub_validation: nodeModel._iub_validation
       }, eventHub);
-   } else if (model.type === "string" && model.enum) {
-      return new RadioConfigView(nodeViewId, {
-         enum: model.enum,
-         default: model.default,
-         _iub_labels: model._iub_labels,
-         _iub_validation: model._iub_validation
+   } else if (configType === "radio") {
+      view = new RadioConfigView(nodeViewId, {
+         enum: nodeModel.enum,
+         default: nodeModel.default,
+         _iub_labels: nodeModel._iub_labels,
+         _iub_validation: nodeModel._iub_validation
       }, eventHub);
-   } else if (model.type === "string" && !model.enum) {
-      return new TextConfigView(nodeViewId, {
-         default: model.default,
-         _iub_validation: model._iub_validation
+   } else if (configType === "text") {
+      view = new TextConfigView(nodeViewId, {
+         default: nodeModel.default,
+         _iub_validation: nodeModel._iub_validation
       }, eventHub);
    }
+
+   return view;
 };

@@ -11895,29 +11895,34 @@ const NumberConfigView = require('./number-config-view');
 const RadioConfigView = require('./radio-config-view');
 const TextConfigView = require('./text-config-view');
 
-module.exports = function(nodeViewId, model, eventHub) {
-   if (model.type === "boolean") {
-      return new CheckboxConfigView(nodeViewId, {}, eventHub);
-   } else if (model.type === "number") {
-      return new NumberConfigView(nodeViewId, {
-         default: model.default,
-         _iub_min: model._iub_min,
-         _iub_max: model._iub_max,
-         _iub_validation: model._iub_validation
+module.exports = function(configType, nodeViewId, nodeModel, eventHub) {
+
+   var view;
+
+   if (configType === "checkbox") {
+      view = new CheckboxConfigView(nodeViewId, {}, eventHub);
+   } else if (configType === "number") {
+      view = new NumberConfigView(nodeViewId, {
+         default: nodeModel.default,
+         _iub_min: nodeModel._iub_min,
+         _iub_max: nodeModel._iub_max,
+         _iub_validation: nodeModel._iub_validation
       }, eventHub);
-   } else if (model.type === "string" && model.enum) {
-      return new RadioConfigView(nodeViewId, {
-         enum: model.enum,
-         default: model.default,
-         _iub_labels: model._iub_labels,
-         _iub_validation: model._iub_validation
+   } else if (configType === "radio") {
+      view = new RadioConfigView(nodeViewId, {
+         enum: nodeModel.enum,
+         default: nodeModel.default,
+         _iub_labels: nodeModel._iub_labels,
+         _iub_validation: nodeModel._iub_validation
       }, eventHub);
-   } else if (model.type === "string" && !model.enum) {
-      return new TextConfigView(nodeViewId, {
-         default: model.default,
-         _iub_validation: model._iub_validation
+   } else if (configType === "text") {
+      view = new TextConfigView(nodeViewId, {
+         default: nodeModel.default,
+         _iub_validation: nodeModel._iub_validation
       }, eventHub);
    }
+
+   return view;
 };
 },{"./checkbox-config-view":8,"./config-view":9,"./number-config-view":10,"./radio-config-view":11,"./text-config-view":12,"jquery":1}],8:[function(require,module,exports){
 const $ = require('jquery');
@@ -12105,11 +12110,14 @@ class RadioConfigView extends ConfigView {
    _loadData() {
       this._defaultInput.val(this._model.default);
       this._validationSelect.val(this._model._iub_validation || "-");
-      for (var i = 0; i < this._model.enum.length; i++) {
-         this._appendRadio({
-            label: this._model._iub_labels[i],
-            value: this._model.enum[i]
-         });
+      // when a new config view is created there is no `enum` attribute yet, so I need to make the following check
+      if (this._model.enum) {
+         for (var i = 0; i < this._model.enum.length; i++) {
+            this._appendRadio({
+               label: this._model._iub_labels[i],
+               value: this._model.enum[i]
+            });
+         }
       }
    }
 }
@@ -12342,9 +12350,9 @@ class NodeView {
       });
 
       this._typeInput.on("change", () => {
-         var val = this._typeInput.val();
-         this._model.type = this._getModelTypeFromSelect(val);
-         this._renderConfigView();
+         var configType = this._typeInput.val();
+         this._model.type = this._getModelTypeFromSelect(configType);
+         this._renderConfigView(configType);
       });
 
       this._parentInput.on("change", () => {
@@ -12377,17 +12385,19 @@ class NodeView {
    }
 
    _renderSubViews() {
-      this._renderConfigView();
+      var configType = this._typeInput.val();
+      this._renderConfigView(configType);
       this._clausesView = new ClausesView(this._clauses);
       this._clausesContainer.append(this._clausesView.render());
    }
 
-   _renderConfigView() {
+   _renderConfigView(type) {
+      console.warn("config type", type);
       if (this._configView) {
          this._deleteCurrentConfigDataFromModel();
       }
 
-      this._configView = buildConfigView(this._id, this._model, this._eventHub);
+      this._configView = buildConfigView(type, this._id, this._model, this._eventHub);
 
       if (this._configView) { // newly created nodes have empty model so the created config view undefined
          this._configContainer.empty().append(this._configView.render());

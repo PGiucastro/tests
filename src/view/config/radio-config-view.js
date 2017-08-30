@@ -82,11 +82,14 @@ class RadioConfigView extends ConfigView {
    _loadData() {
       this._defaultInput.val(this._model.default);
       this._validationSelect.val(this._model._iub_validation || "-");
-      for (var i = 0; i < this._model.enum.length; i++) {
-         this._appendRadio({
-            label: this._model._iub_labels[i],
-            value: this._model.enum[i]
-         });
+      // when a new config view is created there is no `enum` attribute yet, so I need to make the following check
+      if (this._model.enum) {
+         for (var i = 0; i < this._model.enum.length; i++) {
+            this._appendRadio({
+               label: this._model._iub_labels[i],
+               value: this._model.enum[i]
+            });
+         }
       }
    }
 }

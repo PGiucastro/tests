@@ -159,9 +159,9 @@ class NodeView {
       });
 
       this._typeInput.on("change", () => {
-         var val = this._typeInput.val();
-         this._model.type = this._getModelTypeFromSelect(val);
-         this._renderConfigView();
+         var configType = this._typeInput.val();
+         this._model.type = this._getModelTypeFromSelect(configType);
+         this._renderConfigView(configType);
       });
 
       this._parentInput.on("change", () => {
@@ -194,17 +194,19 @@ class NodeView {
    }
 
    _renderSubViews() {
-      this._renderConfigView();
+      var configType = this._typeInput.val();
+      this._renderConfigView(configType);
       this._clausesView = new ClausesView(this._clauses);
       this._clausesContainer.append(this._clausesView.render());
    }
 
-   _renderConfigView() {
+   _renderConfigView(type) {
+      console.warn("config type", type);
       if (this._configView) {
          this._deleteCurrentConfigDataFromModel();
       }
 
-      this._configView = buildConfigView(this._id, this._model, this._eventHub);
+      this._configView = buildConfigView(type, this._id, this._model, this._eventHub);
 
       if (this._configView) { // newly created nodes have empty model so the created config view undefined
          this._configContainer.empty().append(this._configView.render());
