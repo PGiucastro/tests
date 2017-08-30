@@ -12365,8 +12365,8 @@ class NodeView {
          e.preventDefault();
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
-            this._eventHub.trigger("node-removed", this.getId());
             this._eventHub.off("config-updated", this._onConfigUpdatedBound);
+            this._eventHub.trigger("node-removed", this.getId());
          }
       });
 
