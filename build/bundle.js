@@ -12366,16 +12366,18 @@ class NodeView {
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
             this._eventHub.trigger("node-removed", this.getId());
-            // TODO: unregister this._onConfigUpdated
+            this._eventHub.off("config-updated", this._onConfigUpdatedBound);
          }
       });
 
-      this._eventHub.on("config-updated", this._onConfigUpdated.bind(this));
+      this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);
+      this._eventHub.on("config-updated", this._onConfigUpdatedBound);
 
       new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
    }
 
    _onConfigUpdated(e, id, configModel) {
+      console.log("up")
       if (id === this._id) {
          for (var p in configModel) {
             this._model[p] = configModel[p];
