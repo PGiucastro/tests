@@ -186,7 +186,6 @@ class NodeView {
 
    _onConfigUpdated(e, id, configModel) {
       if (id === this._id) {
-         console.log("config-updated", id, configModel);
          for (var p in configModel) {
             this._model[p] = configModel[p];
          }
@@ -201,7 +200,6 @@ class NodeView {
    }
 
    _renderConfigView(type) {
-      console.warn("config type", type);
       if (this._configView) {
          this._deleteCurrentConfigDataFromModel();
       }
