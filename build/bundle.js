@@ -12344,13 +12344,6 @@ class NodeView {
       this._typeInput.on("change", () => {
          var val = this._typeInput.val();
          this._model.type = this._getModelTypeFromSelect(val);
-         // TODO: remove this when radio config is implemented
-         // properties deletion shouldbe done properly in this._renderConfigView
-         if (val === "radio") {
-            this._model.enum = [];
-         } else {
-            delete this._model.enum;
-         }
          this._renderConfigView();
       });
 
@@ -12402,7 +12395,7 @@ class NodeView {
    }
 
    _deleteCurrentConfigDataFromModel() {
-      var model = this._configView.getModel();      
+      var model = this._configView.getModel();
       for (var p in model) {
          delete this._model[p];
       }
