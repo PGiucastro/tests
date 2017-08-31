@@ -26,7 +26,7 @@ class ConfigView {
    }
 
    _triggerConfigUpdate() {
-      this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
+      this._eventHub.trigger("config-has-been-updated", [this._nodeViewId, this.getModel()]);
    }
 
    _initExpander() {

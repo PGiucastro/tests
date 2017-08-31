@@ -11842,7 +11842,7 @@ module.exports = SchemaBuilder;
 
 module.exports = {
    "nodes-list-view": "<div class=\"nodes-list-view\">\n   \n   <header class=\"main-header\">\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent' disabled>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"children\">\n      <h2>Child nodes</h2>\n      <div class=\"container\"></div>\n   </div>\n\n</div>",
+   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"children\">\n      <h2>Child nodes</h2>\n      <div class=\"container\"></div>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>",
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
@@ -11978,7 +11978,7 @@ class ConfigView {
    }
 
    _triggerConfigUpdate() {
-      this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
+      this._eventHub.trigger("config-has-been-updated", [this._nodeViewId, this.getModel()]);
    }
 
    _initExpander() {
@@ -12103,7 +12103,7 @@ class RadioConfigView extends ConfigView {
    _removeRadio(el) {
       el.slideUp(() => {
          el.remove();
-         this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
+         this._eventHub.trigger("config-has-been-updated", [this._nodeViewId, this.getModel()]);
       });
    }
 
@@ -12222,12 +12222,12 @@ class NodeView {
       return this._parentId;
    }
 
-   getName() {
-      return this._name;
-   }
-
    getParentName() {
       return this.getModel()._iub_parent;
+   }
+
+   getName() {
+      return this._name;
    }
 
    getModel() {
@@ -12255,19 +12255,8 @@ class NodeView {
       this._parentId = id;
    }
 
-   setParentSelectValue(parentId) {
-      this._parentInput.val(parentId);
-   }
-
-   updateParentName(parentId) {
-      var parentName;
-
-      if (parentId !== "-") {
-         parentName = this._parentInput.find(`option[value=${parentId}]`).text();
-         this._model._iub_parent = parentName;
-      } else {
-         delete this._model._iub_parent;
-      }
+   setParentName(name) {
+      this._model._iub_parent = name;
    }
 
    render() {
@@ -12282,7 +12271,6 @@ class NodeView {
       this._titleInput_EN = this._root.find(".title_en");
       this._titleInput_DE = this._root.find(".title_de");
       this._typeInput = this._root.find(".type");
-      this._parentInput = this._root.find(".parent");
 
       this._deleteButton = this._root.find("button");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
@@ -12302,33 +12290,6 @@ class NodeView {
       this._childNodeViews.push(node);
       this._childrenContainer.append(node.render());
       this._childrenSection.show();
-   }
-
-   drawParentSelect(nodes) {
-
-      var i, option, name, id;
-
-      this._sortByName(nodes);
-      this._parentInput.empty();
-      this._parentInput.append("<option value='-'>-</option>");
-
-      for (var i = 0; i < nodes.length; i++) {
-
-         id = nodes[i].id;
-         name = nodes[i].name;
-
-         if (id === this.getId()) {
-            continue;
-         }
-
-         if (!name) {
-            name = "...";
-         }
-
-         option = $("<option>" + name + "</option>");
-         option.attr("value", id);
-         this._parentInput.append(option);
-      }
    }
 
    _behaviour() {
@@ -12369,29 +12330,22 @@ class NodeView {
          this._renderConfigView(configType);
       });
 
-      this._parentInput.on("change", () => {
-         var parentId = this._parentInput.val();
-         this.setParentId(parentId);
-         this.updateParentName(parentId);
-      });
-
       this._deleteButton.click((e) => {
          e.preventDefault();
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
-            this._eventHub.off("config-updated", this._onConfigUpdatedBound);
-            this._eventHub.trigger("node-removed", this.getId());
+            this._eventHub.off("config-has-been-updated", this._onConfigUpdatedBound);
+            this._eventHub.trigger("please-remove-node", this.getId());
          }
       });
 
       this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);
-      this._eventHub.on("config-updated", this._onConfigUpdatedBound);
+      this._eventHub.on("config-has-been-updated", this._onConfigUpdatedBound);
 
       new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
    }
 
    _onConfigUpdated(e, id, configModel) {
-      console.log("up")
       if (id === this._id) {
          for (var p in configModel) {
             this._model[p] = configModel[p];
@@ -12528,8 +12482,6 @@ class NodesListView {
                }
 
                this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
-               this._drawNodesParentSelect();
-               this._setNodesParentSelectValue();
                this._handleNoNodesYetMessage();
                this._behaviour();
             }, 300);
@@ -12550,27 +12502,22 @@ class NodesListView {
          e.preventDefault();
          this._lastUsedId++;
          this._buildNode(String(this._lastUsedId), "", {});
-         this._drawNodesParentSelect();
-         this._setNodesParentSelectValue();
          this._handleNoNodesYetMessage();
          this._slideDown();
       });
 
-      this._eventHub.on("node-removed", (e, id) => {
-         this._removeNodeView(id);
-         this._drawNodesParentSelect();
-         this._setNodesParentSelectValue();
+      this._eventHub.on("please-remove-node", (e, id) => {
+         this._removeNode(id);
          this._handleNoNodesYetMessage();
-         console.log(this._nodeViews.length);
+         console.log("Remaining nodes", this._nodeViews.length);
       });
 
       this._eventHub.on("node-name-updated", (e) => {
-         this._drawNodesParentSelect();
-         this._setNodesParentSelectValue();
+         throw  "update subnodes parent name";
       });
    }
 
-   _removeNodeView(id) {
+   _removeNode(id) {
       var index = -1;
       var node, dom;
       var childNodeViews;
@@ -12594,7 +12541,7 @@ class NodesListView {
       childNodeViews = node.getChildNodeViews();
 
       for (var j = 0; j < childNodeViews.length; j++) {
-         this._removeNodeView(childNodeViews[j].getId());
+         this._removeNode(childNodeViews[j].getId());
       }
    }
 
@@ -12610,29 +12557,6 @@ class NodesListView {
          this._getViewByName(parentName).appendChildNode(nodeView);
       } else {
          this._list.append(nodeView.render());
-      }
-   }
-
-   _drawNodesParentSelect() {
-      var data = this._nodeViews.map((view) => {
-         return view.getData();
-      });
-      for (var i = 0; i < this._nodeViews.length; i++) {
-         this._nodeViews[i].drawParentSelect(data);
-      }
-   }
-
-   _setNodesParentSelectValue() {
-      var parentId, view, parentId, parentId;
-      for (var i = 0; i < this._nodeViews.length; i++) {
-         view = this._nodeViews[i];
-         parentId = view.getParentId();
-         if (!this._doesViewExists(parentId)) {
-            parentId = "-";
-         }
-         view.setParentId(parentId);
-         view.updateParentName(parentId);
-         view.setParentSelectValue(parentId);
       }
    }
 

@@ -75,7 +75,7 @@ class RadioConfigView extends ConfigView {
    _removeRadio(el) {
       el.slideUp(() => {
          el.remove();
-         this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
+         this._eventHub.trigger("config-has-been-updated", [this._nodeViewId, this.getModel()]);
       });
    }
 

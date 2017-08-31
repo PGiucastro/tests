@@ -31,12 +31,12 @@ class NodeView {
       return this._parentId;
    }
 
-   getName() {
-      return this._name;
-   }
-
    getParentName() {
       return this.getModel()._iub_parent;
+   }
+
+   getName() {
+      return this._name;
    }
 
    getModel() {
@@ -64,19 +64,8 @@ class NodeView {
       this._parentId = id;
    }
 
-   setParentSelectValue(parentId) {
-      this._parentInput.val(parentId);
-   }
-
-   updateParentName(parentId) {
-      var parentName;
-
-      if (parentId !== "-") {
-         parentName = this._parentInput.find(`option[value=${parentId}]`).text();
-         this._model._iub_parent = parentName;
-      } else {
-         delete this._model._iub_parent;
-      }
+   setParentName(name) {
+      this._model._iub_parent = name;
    }
 
    render() {
@@ -91,7 +80,6 @@ class NodeView {
       this._titleInput_EN = this._root.find(".title_en");
       this._titleInput_DE = this._root.find(".title_de");
       this._typeInput = this._root.find(".type");
-      this._parentInput = this._root.find(".parent");
 
       this._deleteButton = this._root.find("button");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
@@ -111,33 +99,6 @@ class NodeView {
       this._childNodeViews.push(node);
       this._childrenContainer.append(node.render());
       this._childrenSection.show();
-   }
-
-   drawParentSelect(nodes) {
-
-      var i, option, name, id;
-
-      this._sortByName(nodes);
-      this._parentInput.empty();
-      this._parentInput.append("<option value='-'>-</option>");
-
-      for (var i = 0; i < nodes.length; i++) {
-
-         id = nodes[i].id;
-         name = nodes[i].name;
-
-         if (id === this.getId()) {
-            continue;
-         }
-
-         if (!name) {
-            name = "...";
-         }
-
-         option = $("<option>" + name + "</option>");
-         option.attr("value", id);
-         this._parentInput.append(option);
-      }
    }
 
    _behaviour() {
@@ -178,29 +139,22 @@ class NodeView {
          this._renderConfigView(configType);
       });
 
-      this._parentInput.on("change", () => {
-         var parentId = this._parentInput.val();
-         this.setParentId(parentId);
-         this.updateParentName(parentId);
-      });
-
       this._deleteButton.click((e) => {
          e.preventDefault();
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
-            this._eventHub.off("config-updated", this._onConfigUpdatedBound);
-            this._eventHub.trigger("node-removed", this.getId());
+            this._eventHub.off("config-has-been-updated", this._onConfigUpdatedBound);
+            this._eventHub.trigger("please-remove-node", this.getId());
          }
       });
 
       this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);
-      this._eventHub.on("config-updated", this._onConfigUpdatedBound);
+      this._eventHub.on("config-has-been-updated", this._onConfigUpdatedBound);
 
       new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
    }
 
    _onConfigUpdated(e, id, configModel) {
-      console.log("up")
       if (id === this._id) {
          for (var p in configModel) {
             this._model[p] = configModel[p];

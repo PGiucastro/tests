@@ -36,10 +36,10 @@
    color: lime;
    font-family: monospace;
    position: absolute;
-   top:0;
+   top: 70px;
    right: 0;
    overflow-x: auto;
-   height: 215px;
+   height: 245px;
 }
 
 .node-view .input-wrapper {

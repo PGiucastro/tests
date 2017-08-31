@@ -41,8 +41,6 @@ class NodesListView {
                }
 
                this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
-               this._drawNodesParentSelect();
-               this._setNodesParentSelectValue();
                this._handleNoNodesYetMessage();
                this._behaviour();
             }, 300);
@@ -63,27 +61,22 @@ class NodesListView {
          e.preventDefault();
          this._lastUsedId++;
          this._buildNode(String(this._lastUsedId), "", {});
-         this._drawNodesParentSelect();
-         this._setNodesParentSelectValue();
          this._handleNoNodesYetMessage();
          this._slideDown();
       });
 
-      this._eventHub.on("node-removed", (e, id) => {
-         this._removeNodeView(id);
-         this._drawNodesParentSelect();
-         this._setNodesParentSelectValue();
+      this._eventHub.on("please-remove-node", (e, id) => {
+         this._removeNode(id);
          this._handleNoNodesYetMessage();
-         console.log(this._nodeViews.length);
+         console.log("Remaining nodes", this._nodeViews.length);
       });
 
       this._eventHub.on("node-name-updated", (e) => {
-         this._drawNodesParentSelect();
-         this._setNodesParentSelectValue();
+         throw  "update subnodes parent name";
       });
    }
 
-   _removeNodeView(id) {
+   _removeNode(id) {
       var index = -1;
       var node, dom;
       var childNodeViews;
@@ -107,7 +100,7 @@ class NodesListView {
       childNodeViews = node.getChildNodeViews();
 
       for (var j = 0; j < childNodeViews.length; j++) {
-         this._removeNodeView(childNodeViews[j].getId());
+         this._removeNode(childNodeViews[j].getId());
       }
    }
 
@@ -123,29 +116,6 @@ class NodesListView {
          this._getViewByName(parentName).appendChildNode(nodeView);
       } else {
          this._list.append(nodeView.render());
-      }
-   }
-
-   _drawNodesParentSelect() {
-      var data = this._nodeViews.map((view) => {
-         return view.getData();
-      });
-      for (var i = 0; i < this._nodeViews.length; i++) {
-         this._nodeViews[i].drawParentSelect(data);
-      }
-   }
-
-   _setNodesParentSelectValue() {
-      var parentId, view, parentId, parentId;
-      for (var i = 0; i < this._nodeViews.length; i++) {
-         view = this._nodeViews[i];
-         parentId = view.getParentId();
-         if (!this._doesViewExists(parentId)) {
-            parentId = "-";
-         }
-         view.setParentId(parentId);
-         view.updateParentName(parentId);
-         view.setParentSelectValue(parentId);
       }
    }
 
