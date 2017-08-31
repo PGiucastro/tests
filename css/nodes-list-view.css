@@ -1,3 +1,7 @@
+.nodes-list-view {
+   padding-top: 50px;
+}
+
 .nodes-list-view header.main-header {
    background: deepskyblue;
    position: fixed;
@@ -19,17 +23,18 @@
 .nodes-list-view .loading {
    background: yellow;
    text-align: center;
-   padding: 5px;
-   margin-bottom: 20px;
+   padding: 10px;
 }
 
 .nodes-list-view .no-nodes-yet {
    display: none;
+   text-align: center;
+   padding: 10px;
 }
 
 .nodes-list-view .list {
    margin: 0;
-   padding: 85px 30px 0px 30px;
+   padding: 30px 30px 0px 30px;
 }
 
 footer {

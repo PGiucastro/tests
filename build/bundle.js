@@ -12557,7 +12557,7 @@ class NodesListView {
       });
 
       this._eventHub.on("node-removed", (e, id) => {
-         this._removeNodeview(id);
+         this._removeNodeView(id);
          this._drawNodesParentSelect();
          this._setNodesParentSelectValue();
          this._handleNoNodesYetMessage();
@@ -12570,7 +12570,7 @@ class NodesListView {
       });
    }
 
-   _removeNodeview(id) {
+   _removeNodeView(id) {
       var index = -1;
       var node, dom;
       var childNodeViews;
@@ -12594,7 +12594,7 @@ class NodesListView {
       childNodeViews = node.getChildNodeViews();
 
       for (var j = 0; j < childNodeViews.length; j++) {
-         this._removeNodeview(childNodeViews[j].getId());
+         this._removeNodeView(childNodeViews[j].getId());
       }
    }
 
