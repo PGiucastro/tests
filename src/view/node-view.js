@@ -103,21 +103,27 @@ class NodeView {
 
    _behaviour() {
 
-      if (window.location.href.indexOf("debugger") > -1) {
-         setInterval(() => {
-            var data = this.getData();
-            data.parentId = this._parentId;
-            this._root.find(".debugger")
-               .text(JSON.stringify(data, null, "  "));
-         }, 1000);
-
-      } else {
-         this._root.find(".debugger").hide();
-      }
+      (() => {
+         let debuggerBox = this._root.find(".debugger");
+         let data;
+         if (window.location.href.indexOf("debugger") > -1) {
+            setInterval(() => {
+               data = this.getData();
+               data.parentId = this._parentId;
+               let oldJSON = debuggerBox.text();
+               let newJSON = JSON.stringify(data, null, "  ");
+               if (oldJSON !== newJSON) {
+                  debuggerBox.text(newJSON);
+               }
+            }, 1000);
+         } else {
+            debuggerBox.hide();
+         }
+      })();
 
       this._nameInput.on("keyup", () => {
          this._name = this._nameInput.val();
-         this._eventHub.trigger("node-name-updated");
+         this._eventHub.trigger("node-name-has-been-updated", [this._id, this._name]);
       });
 
       this._titleInput_IT.on("keyup", () => {
@@ -144,7 +150,7 @@ class NodeView {
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
             this._eventHub.off("config-has-been-updated", this._onConfigUpdatedBound);
-            this._eventHub.trigger("please-remove-node", this.getId());
+            this._eventHub.trigger("please-remove-node", [this.getId()]);
          }
       });
 

@@ -12294,21 +12294,27 @@ class NodeView {
 
    _behaviour() {
 
-      if (window.location.href.indexOf("debugger") > -1) {
-         setInterval(() => {
-            var data = this.getData();
-            data.parentId = this._parentId;
-            this._root.find(".debugger")
-               .text(JSON.stringify(data, null, "  "));
-         }, 1000);
-
-      } else {
-         this._root.find(".debugger").hide();
-      }
+      (() => {
+         let debuggerBox = this._root.find(".debugger");
+         let data;
+         if (window.location.href.indexOf("debugger") > -1) {
+            setInterval(() => {
+               data = this.getData();
+               data.parentId = this._parentId;
+               let oldJSON = debuggerBox.text();
+               let newJSON = JSON.stringify(data, null, "  ");
+               if (oldJSON !== newJSON) {
+                  debuggerBox.text(newJSON);
+               }
+            }, 1000);
+         } else {
+            debuggerBox.hide();
+         }
+      })();
 
       this._nameInput.on("keyup", () => {
          this._name = this._nameInput.val();
-         this._eventHub.trigger("node-name-updated");
+         this._eventHub.trigger("node-name-has-been-updated", [this._id, this._name]);
       });
 
       this._titleInput_IT.on("keyup", () => {
@@ -12335,7 +12341,7 @@ class NodeView {
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
             this._eventHub.off("config-has-been-updated", this._onConfigUpdatedBound);
-            this._eventHub.trigger("please-remove-node", this.getId());
+            this._eventHub.trigger("please-remove-node", [this.getId()]);
          }
       });
 
@@ -12499,9 +12505,11 @@ class NodesListView {
       });
 
       this._addButton.click((e) => {
+         var newNode;
          e.preventDefault();
          this._lastUsedId++;
-         this._buildNode(String(this._lastUsedId), "", {});
+         newNode = this._buildNode(String(this._lastUsedId), "", {});
+         this._renderNode(newNode);
          this._handleNoNodesYetMessage();
          this._slideDown();
       });
@@ -12512,9 +12520,31 @@ class NodesListView {
          console.log("Remaining nodes", this._nodeViews.length);
       });
 
-      this._eventHub.on("node-name-updated", (e) => {
-         throw  "update subnodes parent name";
+      this._eventHub.on("node-name-has-been-updated", (e, id, newName) => {
+         var node;
+         for (var i = 0; i < this._nodeViews.length; i++) {
+            node = this._nodeViews[i];
+            if (node.getParentId() === id) {
+               node.setParentName(newName);
+            }
+         }
       });
+   }
+
+   _buildNode(id, name, nodeModel) {
+      var nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
+      this._nodeViews.push(nodeView);
+      return nodeView;
+   }
+
+   _renderNode(nodeView) {
+      var model = nodeView.getModel();
+      var parentName = model._iub_parent;
+      if (parentName) {
+         this._getViewByName(parentName).appendChildNode(nodeView);
+      } else {
+         this._list.append(nodeView.render());
+      }
    }
 
    _removeNode(id) {
@@ -12542,21 +12572,6 @@ class NodesListView {
 
       for (var j = 0; j < childNodeViews.length; j++) {
          this._removeNode(childNodeViews[j].getId());
-      }
-   }
-
-   _buildNode(id, name, nodeModel) {
-      var nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
-      this._nodeViews.push(nodeView);
-   }
-
-   _renderNode(nodeView) {
-      var model = nodeView.getModel();
-      var parentName = model._iub_parent;
-      if (parentName) {
-         this._getViewByName(parentName).appendChildNode(nodeView);
-      } else {
-         this._list.append(nodeView.render());
       }
    }
 
@@ -12590,7 +12605,7 @@ class NodesListView {
       for (var i = 0; i < this._nodeViews.length; i++) {
          var view = this._nodeViews[i];
          var parentName = view.getParentName();
-         var parentId = "-";
+         var parentId;
          if (parentName) {
             parentId = this._getViewByName(parentName).getId();
          }
