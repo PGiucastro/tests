@@ -9,7 +9,7 @@ class NodesListView {
    constructor(eventHub) {
       this._lastUsedId = 0;
       this._eventHub = eventHub;
-      this._renderedNodeViews = [];
+      this._nodeViews = [];
       this._clausesModel = null;
 
       this._root = $(templates["nodes-list-view"]);
@@ -24,7 +24,7 @@ class NodesListView {
 
       $.when($.get("/mock-data/schema.json"), $.get("/mock-data/clauses.json"))
          .then((schema, clauses) => {
-            setTimeout(() => {
+            setTimeout(() => { //TODO: remove timeout
                var nodes = schema[0].properties;
 
                this._loader.hide();
@@ -32,7 +32,12 @@ class NodesListView {
 
                for (var name in nodes) {
                   this._lastUsedId++;
-                  this._renderNode(String(this._lastUsedId), name, nodes[name]);
+                  this._buildNode(String(this._lastUsedId), name, nodes[name]);
+               }
+
+               for (var i = 0; i < this._nodeViews.length; i++) {
+                  var nodeView = this._nodeViews[i];
+                  this._renderNode(nodeView);
                }
 
                this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
@@ -49,7 +54,7 @@ class NodesListView {
    _behaviour() {
 
       this._saveButton.click((e) => {
-         var sb = new SchemaBuilder(this._renderedNodeViews);
+         var sb = new SchemaBuilder(this._nodeViews);
          var json = sb.build();
          console.log(JSON.stringify(json, null, "   "));
       });
@@ -57,7 +62,7 @@ class NodesListView {
       this._addButton.click((e) => {
          e.preventDefault();
          this._lastUsedId++;
-         this._renderNode(String(this._lastUsedId), "", {});
+         this._buildNode(String(this._lastUsedId), "", {});
          this._drawNodesParentSelect();
          this._setNodesParentSelectValue();
          this._handleNoNodesYetMessage();
@@ -68,8 +73,8 @@ class NodesListView {
          var index = -1;
          var node, dom;
 
-         for (var i = 0; i < this._renderedNodeViews.length; i++) {
-            node = this._renderedNodeViews[i];
+         for (var i = 0; i < this._nodeViews.length; i++) {
+            node = this._nodeViews[i];
             if (node.getId() === id) {
                dom = node.getRootNode();
                dom.slideUp(() => {
@@ -81,7 +86,7 @@ class NodesListView {
          }
 
          if (index !== -1) {
-            this._renderedNodeViews.splice(index, 1);
+            this._nodeViews.splice(index, 1);
          }
 
          this._drawNodesParentSelect();
@@ -95,25 +100,40 @@ class NodesListView {
       });
    }
 
-   _renderNode(id, name, nodeModel) {
+   _renderNode_XXX(id, name, nodeModel) {
       var nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
       this._list.append(nodeView.render());
-      this._renderedNodeViews.push(nodeView);
+      this._nodeViews.push(nodeView);
+   }
+
+   _buildNode(id, name, nodeModel) {
+      var nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
+      this._nodeViews.push(nodeView);
+   }
+
+   _renderNode(nodeView) {
+      var model = nodeView.getModel();
+      var parentName = model._iub_parent;
+      if (parentName) {
+         this._getViewByName(parentName).appendChildNode(nodeView);
+      } else {
+         this._list.append(nodeView.render());
+      }
    }
 
    _drawNodesParentSelect() {
-      var data = this._renderedNodeViews.map((view) => {
+      var data = this._nodeViews.map((view) => {
          return view.getData();
       });
-      for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         this._renderedNodeViews[i].drawParentSelect(data);
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         this._nodeViews[i].drawParentSelect(data);
       }
    }
 
    _setNodesParentSelectValue() {
       var parentId, view, parentId, parentId;
-      for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         view = this._renderedNodeViews[i];
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         view = this._nodeViews[i];
          parentId = view.getParentId();
          if (!this._doesViewExists(parentId)) {
             parentId = "-";
@@ -125,7 +145,7 @@ class NodesListView {
    }
 
    _handleNoNodesYetMessage() {
-      if (this._renderedNodeViews.length === 0) {
+      if (this._nodeViews.length === 0) {
          this._noNodesYet.show();
       } else {
          this._noNodesYet.hide();
@@ -133,8 +153,8 @@ class NodesListView {
    }
 
    _getViewByName(name) {
-      for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         var view = this._renderedNodeViews[i];
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         var view = this._nodeViews[i];
          if (view.getName() === name) {
             return view;
          }
@@ -142,8 +162,8 @@ class NodesListView {
    }
 
    _doesViewExists(id) {
-      for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         var view = this._renderedNodeViews[i];
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         var view = this._nodeViews[i];
          if (view.getId() === id) {
             return view;
          }
@@ -151,8 +171,8 @@ class NodesListView {
    }
 
    _setNodeViewsParentId() {
-      for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         var view = this._renderedNodeViews[i];
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         var view = this._nodeViews[i];
          var parentName = view.getParentName();
          var parentId = "-";
          if (parentName) {

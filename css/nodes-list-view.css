@@ -29,8 +29,10 @@
 
 .nodes-list-view .list {
    margin: 0;
+   padding: 85px 30px 0px 30px;
 }
 
 footer {
-   padding: 10px 0px;
+   padding: 30px 30px;
+   padding-top: 0;
 }

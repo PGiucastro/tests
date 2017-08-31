@@ -11842,7 +11842,7 @@ module.exports = SchemaBuilder;
 
 module.exports = {
    "nodes-list-view": "<div class=\"nodes-list-view\">\n   \n   <header class=\"main-header\">\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n      \n      <div class=\"config\"></div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
+   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"children\">\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>",
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
@@ -12283,12 +12283,17 @@ class NodeView {
       this._clausesExpansionButton = this._root.find(".clauses .expand");
       this._configContainer = this._root.find(".config");
       this._clausesContainer = this._root.find(".clauses .container");
+      this._childrenContainer = this._root.find(".children");
 
       this._loadModelData();
       this._renderSubViews();
       this._behaviour();
 
       return this._root;
+   }
+
+   appendChildNode(node) {
+      this._childrenContainer.append(node.render());
    }
 
    drawParentSelect(nodes) {
@@ -12320,16 +12325,17 @@ class NodeView {
 
    _behaviour() {
 
-      // Uncomment for debugging
-      setInterval(() => {
-         var data = this.getData();
-         data.parentId = this._parentId;
-         this._root.find(".debugger")
-            .text(JSON.stringify(data, null, "  "));
-      }, 1000);
+      if (window.location.href.indexOf("debugger") > -1) {
+         setInterval(() => {
+            var data = this.getData();
+            data.parentId = this._parentId;
+            this._root.find(".debugger")
+               .text(JSON.stringify(data, null, "  "));
+         }, 1000);
 
-      // Comment out for debugging
-      // this._root.find(".model").hide();
+      } else {
+         this._root.find(".debugger").hide();
+      }
 
       this._nameInput.on("keyup", () => {
          this._name = this._nameInput.val();
@@ -12477,7 +12483,7 @@ class NodesListView {
    constructor(eventHub) {
       this._lastUsedId = 0;
       this._eventHub = eventHub;
-      this._renderedNodeViews = [];
+      this._nodeViews = [];
       this._clausesModel = null;
 
       this._root = $(templates["nodes-list-view"]);
@@ -12492,7 +12498,7 @@ class NodesListView {
 
       $.when($.get("/mock-data/schema.json"), $.get("/mock-data/clauses.json"))
          .then((schema, clauses) => {
-            setTimeout(() => {
+            setTimeout(() => { //TODO: remove timeout
                var nodes = schema[0].properties;
 
                this._loader.hide();
@@ -12500,7 +12506,12 @@ class NodesListView {
 
                for (var name in nodes) {
                   this._lastUsedId++;
-                  this._renderNode(String(this._lastUsedId), name, nodes[name]);
+                  this._buildNode(String(this._lastUsedId), name, nodes[name]);
+               }
+
+               for (var i = 0; i < this._nodeViews.length; i++) {
+                  var nodeView = this._nodeViews[i];
+                  this._renderNode(nodeView);
                }
 
                this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
@@ -12517,7 +12528,7 @@ class NodesListView {
    _behaviour() {
 
       this._saveButton.click((e) => {
-         var sb = new SchemaBuilder(this._renderedNodeViews);
+         var sb = new SchemaBuilder(this._nodeViews);
          var json = sb.build();
          console.log(JSON.stringify(json, null, "   "));
       });
@@ -12525,7 +12536,7 @@ class NodesListView {
       this._addButton.click((e) => {
          e.preventDefault();
          this._lastUsedId++;
-         this._renderNode(String(this._lastUsedId), "", {});
+         this._buildNode(String(this._lastUsedId), "", {});
          this._drawNodesParentSelect();
          this._setNodesParentSelectValue();
          this._handleNoNodesYetMessage();
@@ -12536,8 +12547,8 @@ class NodesListView {
          var index = -1;
          var node, dom;
 
-         for (var i = 0; i < this._renderedNodeViews.length; i++) {
-            node = this._renderedNodeViews[i];
+         for (var i = 0; i < this._nodeViews.length; i++) {
+            node = this._nodeViews[i];
             if (node.getId() === id) {
                dom = node.getRootNode();
                dom.slideUp(() => {
@@ -12549,7 +12560,7 @@ class NodesListView {
          }
 
          if (index !== -1) {
-            this._renderedNodeViews.splice(index, 1);
+            this._nodeViews.splice(index, 1);
          }
 
          this._drawNodesParentSelect();
@@ -12563,25 +12574,40 @@ class NodesListView {
       });
    }
 
-   _renderNode(id, name, nodeModel) {
+   _renderNode_XXX(id, name, nodeModel) {
       var nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
       this._list.append(nodeView.render());
-      this._renderedNodeViews.push(nodeView);
+      this._nodeViews.push(nodeView);
+   }
+
+   _buildNode(id, name, nodeModel) {
+      var nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
+      this._nodeViews.push(nodeView);
+   }
+
+   _renderNode(nodeView) {
+      var model = nodeView.getModel();
+      var parentName = model._iub_parent;
+      if (parentName) {
+         this._getViewByName(parentName).appendChildNode(nodeView);
+      } else {
+         this._list.append(nodeView.render());
+      }
    }
 
    _drawNodesParentSelect() {
-      var data = this._renderedNodeViews.map((view) => {
+      var data = this._nodeViews.map((view) => {
          return view.getData();
       });
-      for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         this._renderedNodeViews[i].drawParentSelect(data);
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         this._nodeViews[i].drawParentSelect(data);
       }
    }
 
    _setNodesParentSelectValue() {
       var parentId, view, parentId, parentId;
-      for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         view = this._renderedNodeViews[i];
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         view = this._nodeViews[i];
          parentId = view.getParentId();
          if (!this._doesViewExists(parentId)) {
             parentId = "-";
@@ -12593,7 +12619,7 @@ class NodesListView {
    }
 
    _handleNoNodesYetMessage() {
-      if (this._renderedNodeViews.length === 0) {
+      if (this._nodeViews.length === 0) {
          this._noNodesYet.show();
       } else {
          this._noNodesYet.hide();
@@ -12601,8 +12627,8 @@ class NodesListView {
    }
 
    _getViewByName(name) {
-      for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         var view = this._renderedNodeViews[i];
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         var view = this._nodeViews[i];
          if (view.getName() === name) {
             return view;
          }
@@ -12610,8 +12636,8 @@ class NodesListView {
    }
 
    _doesViewExists(id) {
-      for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         var view = this._renderedNodeViews[i];
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         var view = this._nodeViews[i];
          if (view.getId() === id) {
             return view;
          }
@@ -12619,8 +12645,8 @@ class NodesListView {
    }
 
    _setNodeViewsParentId() {
-      for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         var view = this._renderedNodeViews[i];
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         var view = this._nodeViews[i];
          var parentName = view.getParentName();
          var parentId = "-";
          if (parentName) {

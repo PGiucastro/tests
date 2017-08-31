@@ -92,12 +92,17 @@ class NodeView {
       this._clausesExpansionButton = this._root.find(".clauses .expand");
       this._configContainer = this._root.find(".config");
       this._clausesContainer = this._root.find(".clauses .container");
+      this._childrenContainer = this._root.find(".children");
 
       this._loadModelData();
       this._renderSubViews();
       this._behaviour();
 
       return this._root;
+   }
+
+   appendChildNode(node) {
+      this._childrenContainer.append(node.render());
    }
 
    drawParentSelect(nodes) {
@@ -129,16 +134,17 @@ class NodeView {
 
    _behaviour() {
 
-      // Uncomment for debugging
-      setInterval(() => {
-         var data = this.getData();
-         data.parentId = this._parentId;
-         this._root.find(".debugger")
-            .text(JSON.stringify(data, null, "  "));
-      }, 1000);
+      if (window.location.href.indexOf("debugger") > -1) {
+         setInterval(() => {
+            var data = this.getData();
+            data.parentId = this._parentId;
+            this._root.find(".debugger")
+               .text(JSON.stringify(data, null, "  "));
+         }, 1000);
 
-      // Comment out for debugging
-      // this._root.find(".model").hide();
+      } else {
+         this._root.find(".debugger").hide();
+      }
 
       this._nameInput.on("keyup", () => {
          this._name = this._nameInput.val();
