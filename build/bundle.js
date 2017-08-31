@@ -11842,7 +11842,7 @@ module.exports = SchemaBuilder;
 
 module.exports = {
    "nodes-list-view": "<div class=\"nodes-list-view\">\n   \n   <header class=\"main-header\">\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"buttons\">\n      <button>Add child node</button>\n      <button>Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"children\">\n      <h2>Child nodes</h2>\n      <div class=\"container\"></div>\n   </div>\n\n</div>",
+   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"buttons\">\n      <button class=\"add\">Add child node</button>\n      <button class=\"delete\">Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"children\">\n      <h2>Child nodes</h2>\n      <div class=\"container\"></div>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>",
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
@@ -12272,7 +12272,8 @@ class NodeView {
       this._titleInput_DE = this._root.find(".title_de");
       this._typeInput = this._root.find(".type");
 
-      this._deleteButton = this._root.find("button");
+      this._deleteButton = this._root.find("button.delete");
+      this._addButton = this._root.find("button.add");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
       this._configContainer = this._root.find(".config");
       this._clausesContainer = this._root.find(".clauses .container");
@@ -12336,8 +12337,11 @@ class NodeView {
          this._renderConfigView(configType);
       });
 
+      this._addButton.click((e) => {
+         this._eventHub.trigger("please-create-child-node", [this.getId(), this.getName()]);
+      });
+
       this._deleteButton.click((e) => {
-         e.preventDefault();
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
             this._eventHub.off("config-has-been-updated", this._onConfigUpdatedBound);
@@ -12478,16 +12482,15 @@ class NodesListView {
                this._clausesModel = clauses[0];
 
                for (var name in nodes) {
-                  this._lastUsedId++;
-                  this._buildNode(String(this._lastUsedId), name, nodes[name]);
-               }
-
-               for (var i = 0; i < this._nodeViews.length; i++) {
-                  var nodeView = this._nodeViews[i];
-                  this._renderNode(nodeView);
+                  this._buildNode(String(this._getNextId()), name, nodes[name]);
                }
 
                this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
+
+               for (var i = 0; i < this._nodeViews.length; i++) {
+                  this._renderNode(this._nodeViews[i]);
+               }
+
                this._handleNoNodesYetMessage();
                this._behaviour();
             }, 300);
@@ -12506,9 +12509,7 @@ class NodesListView {
 
       this._addButton.click((e) => {
          var newNode;
-         e.preventDefault();
-         this._lastUsedId++;
-         newNode = this._buildNode(String(this._lastUsedId), "", {});
+         newNode = this._buildNode(String(this._getNextId()), "", {});
          this._renderNode(newNode);
          this._handleNoNodesYetMessage();
          this._slideDown();
@@ -12529,6 +12530,14 @@ class NodesListView {
             }
          }
       });
+
+      this._eventHub.on("please-create-child-node", (e, parentNodeId, parentNodeName) => {
+         var newNode;
+         newNode = this._buildNode(String(this._getNextId()), "", {});
+         newNode.setParentId(parentNodeId);
+         newNode.setParentName(parentNodeName);
+         this._renderNode(newNode);
+      });
    }
 
    _buildNode(id, name, nodeModel) {
@@ -12538,10 +12547,9 @@ class NodesListView {
    }
 
    _renderNode(nodeView) {
-      var model = nodeView.getModel();
-      var parentName = model._iub_parent;
-      if (parentName) {
-         this._getViewByName(parentName).appendChildNode(nodeView);
+      var parentId = nodeView.getParentId();
+      if (parentId) {
+         this._getViewById(parentId).appendChildNode(nodeView);
       } else {
          this._list.append(nodeView.render());
       }
@@ -12592,6 +12600,15 @@ class NodesListView {
       }
    }
 
+   _getViewById(id) {
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         var view = this._nodeViews[i];
+         if (view.getId() === id) {
+            return view;
+         }
+      }
+   }
+
    _doesViewExists(id) {
       for (var i = 0; i < this._nodeViews.length; i++) {
          var view = this._nodeViews[i];
@@ -12623,6 +12640,11 @@ class NodesListView {
       $("html, body").animate({
          scrollTop: $(document).height()
       }, "slow");
+   }
+
+   _getNextId() {
+      this._lastUsedId++;
+      return this._lastUsedId;
    }
 }
 

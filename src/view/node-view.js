@@ -81,7 +81,8 @@ class NodeView {
       this._titleInput_DE = this._root.find(".title_de");
       this._typeInput = this._root.find(".type");
 
-      this._deleteButton = this._root.find("button");
+      this._deleteButton = this._root.find("button.delete");
+      this._addButton = this._root.find("button.add");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
       this._configContainer = this._root.find(".config");
       this._clausesContainer = this._root.find(".clauses .container");
@@ -145,8 +146,11 @@ class NodeView {
          this._renderConfigView(configType);
       });
 
+      this._addButton.click((e) => {
+         this._eventHub.trigger("please-create-child-node", [this.getId(), this.getName()]);
+      });
+
       this._deleteButton.click((e) => {
-         e.preventDefault();
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
             this._eventHub.off("config-has-been-updated", this._onConfigUpdatedBound);

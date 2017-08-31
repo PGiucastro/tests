@@ -18,6 +18,14 @@
    background: #f9f99d;
 }
 
+.node-view .node-view .node-view .node-view {
+   background: #f9f978;
+}
+
+.node-view .node-view .node-view .node-view .node-view {
+   background: #ffff58;
+}
+
 .node-view .buttons {
    text-align: right;
    background: #eee;

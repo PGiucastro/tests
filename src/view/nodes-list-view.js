@@ -31,16 +31,15 @@ class NodesListView {
                this._clausesModel = clauses[0];
 
                for (var name in nodes) {
-                  this._lastUsedId++;
-                  this._buildNode(String(this._lastUsedId), name, nodes[name]);
-               }
-
-               for (var i = 0; i < this._nodeViews.length; i++) {
-                  var nodeView = this._nodeViews[i];
-                  this._renderNode(nodeView);
+                  this._buildNode(String(this._getNextId()), name, nodes[name]);
                }
 
                this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
+
+               for (var i = 0; i < this._nodeViews.length; i++) {
+                  this._renderNode(this._nodeViews[i]);
+               }
+
                this._handleNoNodesYetMessage();
                this._behaviour();
             }, 300);
@@ -59,9 +58,7 @@ class NodesListView {
 
       this._addButton.click((e) => {
          var newNode;
-         e.preventDefault();
-         this._lastUsedId++;
-         newNode = this._buildNode(String(this._lastUsedId), "", {});
+         newNode = this._buildNode(String(this._getNextId()), "", {});
          this._renderNode(newNode);
          this._handleNoNodesYetMessage();
          this._slideDown();
@@ -82,6 +79,14 @@ class NodesListView {
             }
          }
       });
+
+      this._eventHub.on("please-create-child-node", (e, parentNodeId, parentNodeName) => {
+         var newNode;
+         newNode = this._buildNode(String(this._getNextId()), "", {});
+         newNode.setParentId(parentNodeId);
+         newNode.setParentName(parentNodeName);
+         this._renderNode(newNode);
+      });
    }
 
    _buildNode(id, name, nodeModel) {
@@ -91,10 +96,9 @@ class NodesListView {
    }
 
    _renderNode(nodeView) {
-      var model = nodeView.getModel();
-      var parentName = model._iub_parent;
-      if (parentName) {
-         this._getViewByName(parentName).appendChildNode(nodeView);
+      var parentId = nodeView.getParentId();
+      if (parentId) {
+         this._getViewById(parentId).appendChildNode(nodeView);
       } else {
          this._list.append(nodeView.render());
       }
@@ -145,6 +149,15 @@ class NodesListView {
       }
    }
 
+   _getViewById(id) {
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         var view = this._nodeViews[i];
+         if (view.getId() === id) {
+            return view;
+         }
+      }
+   }
+
    _doesViewExists(id) {
       for (var i = 0; i < this._nodeViews.length; i++) {
          var view = this._nodeViews[i];
@@ -176,6 +189,11 @@ class NodesListView {
       $("html, body").animate({
          scrollTop: $(document).height()
       }, "slow");
+   }
+
+   _getNextId() {
+      this._lastUsedId++;
+      return this._lastUsedId;
    }
 }
 
