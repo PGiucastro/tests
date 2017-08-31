@@ -11842,7 +11842,7 @@ module.exports = SchemaBuilder;
 
 module.exports = {
    "nodes-list-view": "<div class=\"nodes-list-view\">\n   \n   <header class=\"main-header\">\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"children\">\n   </div>\n\n</div>",
+   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"children\">\n      <h2>Child nodes</h2>\n      <div class=\"container\"></div>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>",
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
@@ -12207,6 +12207,7 @@ class NodeView {
       this._configView;
       this._clausesView;
       this._parentId;
+      this._childNodeViews = [];
    }
 
    getRootNode() {
@@ -12234,7 +12235,7 @@ class NodeView {
    }
 
    getClauses() {
-      return this._clausesView.getChosenClausues();
+      return this._clausesView && this._clausesView.getChosenClausues();
    }
 
    getData() {
@@ -12244,6 +12245,10 @@ class NodeView {
          model: this._model,
          clauses: this.getClauses()
       };
+   }
+
+   getChildNodeViews() {
+      return this._childNodeViews;
    }
 
    setParentId(id) {
@@ -12283,7 +12288,8 @@ class NodeView {
       this._clausesExpansionButton = this._root.find(".clauses .expand");
       this._configContainer = this._root.find(".config");
       this._clausesContainer = this._root.find(".clauses .container");
-      this._childrenContainer = this._root.find(".children");
+      this._childrenSection = this._root.find(".children");
+      this._childrenContainer = this._childrenSection.find(".container");
 
       this._loadModelData();
       this._renderSubViews();
@@ -12293,7 +12299,9 @@ class NodeView {
    }
 
    appendChildNode(node) {
+      this._childNodeViews.push(node);
       this._childrenContainer.append(node.render());
+      this._childrenSection.show();
    }
 
    drawParentSelect(nodes) {
@@ -12392,10 +12400,15 @@ class NodeView {
    }
 
    _renderSubViews() {
+      var nodeType = this._getSelectTypeFromModel();
       var configType = this._typeInput.val();
       this._renderConfigView(configType);
-      this._clausesView = new ClausesView(this._clauses);
-      this._clausesContainer.append(this._clausesView.render());
+      if (nodeType === "checkbox" || nodeType === "radio") {
+         this._clausesView = new ClausesView(this._clauses);
+         this._clausesContainer.append(this._clausesView.render());
+      } else {
+         this._clausesExpansionButton.hide();
+      }
    }
 
    _renderConfigView(type) {
@@ -12498,7 +12511,7 @@ class NodesListView {
 
       $.when($.get("/mock-data/schema.json"), $.get("/mock-data/clauses.json"))
          .then((schema, clauses) => {
-            setTimeout(() => { //TODO: remove timeout
+            setTimeout(() => { // TODO: remove timeout
                var nodes = schema[0].properties;
 
                this._loader.hide();
@@ -12544,28 +12557,11 @@ class NodesListView {
       });
 
       this._eventHub.on("node-removed", (e, id) => {
-         var index = -1;
-         var node, dom;
-
-         for (var i = 0; i < this._nodeViews.length; i++) {
-            node = this._nodeViews[i];
-            if (node.getId() === id) {
-               dom = node.getRootNode();
-               dom.slideUp(() => {
-                  dom.remove();
-               });
-               index = i;
-               break;
-            }
-         }
-
-         if (index !== -1) {
-            this._nodeViews.splice(index, 1);
-         }
-
+         this._removeNodeview(id);
          this._drawNodesParentSelect();
          this._setNodesParentSelectValue();
          this._handleNoNodesYetMessage();
+         console.log(this._nodeViews.length);
       });
 
       this._eventHub.on("node-name-updated", (e) => {
@@ -12574,10 +12570,32 @@ class NodesListView {
       });
    }
 
-   _renderNode_XXX(id, name, nodeModel) {
-      var nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
-      this._list.append(nodeView.render());
-      this._nodeViews.push(nodeView);
+   _removeNodeview(id) {
+      var index = -1;
+      var node, dom;
+      var childNodeViews;
+
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         node = this._nodeViews[i];
+         if (node.getId() === id) {
+            dom = node.getRootNode();
+            dom.slideUp(() => {
+               dom.remove();
+            });
+            index = i;
+            break;
+         }
+      }
+
+      if (index !== -1) {
+         this._nodeViews.splice(index, 1);
+      }
+
+      childNodeViews = node.getChildNodeViews();
+
+      for (var j = 0; j < childNodeViews.length; j++) {
+         this._removeNodeview(childNodeViews[j].getId());
+      }
    }
 
    _buildNode(id, name, nodeModel) {

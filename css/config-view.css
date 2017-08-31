@@ -13,6 +13,9 @@
    padding: 20px;
    padding-bottom: 0px;
    background: #eee;
+   background: #333;
+   color: white;
+   border-radius: 5px;
 }
 
 .config-view input[type=radio] {

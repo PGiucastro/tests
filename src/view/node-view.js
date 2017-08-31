@@ -16,6 +16,7 @@ class NodeView {
       this._configView;
       this._clausesView;
       this._parentId;
+      this._childNodeViews = [];
    }
 
    getRootNode() {
@@ -43,7 +44,7 @@ class NodeView {
    }
 
    getClauses() {
-      return this._clausesView.getChosenClausues();
+      return this._clausesView && this._clausesView.getChosenClausues();
    }
 
    getData() {
@@ -53,6 +54,10 @@ class NodeView {
          model: this._model,
          clauses: this.getClauses()
       };
+   }
+
+   getChildNodeViews() {
+      return this._childNodeViews;
    }
 
    setParentId(id) {
@@ -92,7 +97,8 @@ class NodeView {
       this._clausesExpansionButton = this._root.find(".clauses .expand");
       this._configContainer = this._root.find(".config");
       this._clausesContainer = this._root.find(".clauses .container");
-      this._childrenContainer = this._root.find(".children");
+      this._childrenSection = this._root.find(".children");
+      this._childrenContainer = this._childrenSection.find(".container");
 
       this._loadModelData();
       this._renderSubViews();
@@ -102,7 +108,9 @@ class NodeView {
    }
 
    appendChildNode(node) {
+      this._childNodeViews.push(node);
       this._childrenContainer.append(node.render());
+      this._childrenSection.show();
    }
 
    drawParentSelect(nodes) {
@@ -201,10 +209,15 @@ class NodeView {
    }
 
    _renderSubViews() {
+      var nodeType = this._getSelectTypeFromModel();
       var configType = this._typeInput.val();
       this._renderConfigView(configType);
-      this._clausesView = new ClausesView(this._clauses);
-      this._clausesContainer.append(this._clausesView.render());
+      if (nodeType === "checkbox" || nodeType === "radio") {
+         this._clausesView = new ClausesView(this._clauses);
+         this._clausesContainer.append(this._clausesView.render());
+      } else {
+         this._clausesExpansionButton.hide();
+      }
    }
 
    _renderConfigView(type) {

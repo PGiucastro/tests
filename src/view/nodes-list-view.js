@@ -24,7 +24,7 @@ class NodesListView {
 
       $.when($.get("/mock-data/schema.json"), $.get("/mock-data/clauses.json"))
          .then((schema, clauses) => {
-            setTimeout(() => { //TODO: remove timeout
+            setTimeout(() => { // TODO: remove timeout
                var nodes = schema[0].properties;
 
                this._loader.hide();
@@ -70,28 +70,11 @@ class NodesListView {
       });
 
       this._eventHub.on("node-removed", (e, id) => {
-         var index = -1;
-         var node, dom;
-
-         for (var i = 0; i < this._nodeViews.length; i++) {
-            node = this._nodeViews[i];
-            if (node.getId() === id) {
-               dom = node.getRootNode();
-               dom.slideUp(() => {
-                  dom.remove();
-               });
-               index = i;
-               break;
-            }
-         }
-
-         if (index !== -1) {
-            this._nodeViews.splice(index, 1);
-         }
-
+         this._removeNodeview(id);
          this._drawNodesParentSelect();
          this._setNodesParentSelectValue();
          this._handleNoNodesYetMessage();
+         console.log(this._nodeViews.length);
       });
 
       this._eventHub.on("node-name-updated", (e) => {
@@ -100,10 +83,32 @@ class NodesListView {
       });
    }
 
-   _renderNode_XXX(id, name, nodeModel) {
-      var nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
-      this._list.append(nodeView.render());
-      this._nodeViews.push(nodeView);
+   _removeNodeview(id) {
+      var index = -1;
+      var node, dom;
+      var childNodeViews;
+
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         node = this._nodeViews[i];
+         if (node.getId() === id) {
+            dom = node.getRootNode();
+            dom.slideUp(() => {
+               dom.remove();
+            });
+            index = i;
+            break;
+         }
+      }
+
+      if (index !== -1) {
+         this._nodeViews.splice(index, 1);
+      }
+
+      childNodeViews = node.getChildNodeViews();
+
+      for (var j = 0; j < childNodeViews.length; j++) {
+         this._removeNodeview(childNodeViews[j].getId());
+      }
    }
 
    _buildNode(id, name, nodeModel) {
