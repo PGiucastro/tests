@@ -95,6 +95,7 @@
 .node-view .children {
    margin-top: 30px;
    display: none;
+   clear: both;
 }
 
 .node-view .children h2 {
