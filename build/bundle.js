@@ -11864,8 +11864,12 @@ class ClausesView {
       var tmpl = _.template(templates["clauses-view"]);
       this._root = $(tmpl({
          html: this._createCheckboxesHTML()
-      }));      
+      }));
       return this._root;
+   }
+
+   reset() {
+      this._root.find("input").prop("checked", false);
    }
 
    getChosenClausues() {
@@ -12214,6 +12218,10 @@ class NodeView {
       return this._root;
    }
 
+   geOffsetTop() {
+      return this._root.offset().top;
+   }
+
    getId() {
       return this._id;
    }
@@ -12275,8 +12283,9 @@ class NodeView {
       this._deleteButton = this._root.find("button.delete");
       this._addButton = this._root.find("button.add");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
-      this._configContainer = this._root.find(".config");
-      this._clausesContainer = this._root.find(".clauses .container");
+      this._configSection = this._root.find(".config");
+      this._clausesSection = this._root.find(".clauses");
+      this._clausesContainer = this._clausesSection.find(".container");
       this._childrenSection = this._root.find(".children");
       this._childrenContainer = this._childrenSection.find(".container");
 
@@ -12333,8 +12342,9 @@ class NodeView {
 
       this._typeInput.on("change", () => {
          var configType = this._typeInput.val();
-         this._model.type = this._getModelTypeFromSelect(configType);
+         this._setModelTypeFromSelect(configType);
          this._renderConfigView(configType);
+         this._handleClausesVisibility();
       });
 
       this._addButton.click((e) => {
@@ -12364,14 +12374,20 @@ class NodeView {
    }
 
    _renderSubViews() {
-      var nodeType = this._getSelectTypeFromModel();
       var configType = this._typeInput.val();
       this._renderConfigView(configType);
+      this._clausesView = new ClausesView(this._clauses);
+      this._clausesContainer.append(this._clausesView.render());
+      this._handleClausesVisibility();
+   }
+
+   _handleClausesVisibility() {
+      var nodeType = this._getSelectTypeFromModel();
       if (nodeType === "checkbox" || nodeType === "radio") {
-         this._clausesView = new ClausesView(this._clauses);
-         this._clausesContainer.append(this._clausesView.render());
+         this._clausesSection.show();
       } else {
-         this._clausesExpansionButton.hide();
+         this._clausesSection.hide();
+         this._clausesView.reset();
       }
    }
 
@@ -12383,7 +12399,7 @@ class NodeView {
       this._configView = buildConfigView(type, this._id, this._model, this._eventHub);
 
       if (this._configView) { // newly created nodes have empty model so the created config view undefined
-         this._configContainer.empty().append(this._configView.render());
+         this._configSection.empty().append(this._configView.render());
       }
    }
 
@@ -12418,7 +12434,7 @@ class NodeView {
       return type;
    }
 
-   _getModelTypeFromSelect(v) {
+   _setModelTypeFromSelect(v) {
       var type;
 
       if (v === "checkbox") {
@@ -12431,7 +12447,11 @@ class NodeView {
          type = "number";
       }
 
-      return type;
+      this._model.type = type;
+
+      if (v === "radio") {
+         this._model.enum = [];
+      }
    }
 
    _sortByName(nodes) {
@@ -12512,7 +12532,7 @@ class NodesListView {
          newNode = this._buildNode(String(this._getNextId()), "", {});
          this._renderNode(newNode);
          this._handleNoNodesYetMessage();
-         this._slideDown();
+         this._scrollToBottom();
       });
 
       this._eventHub.on("please-remove-node", (e, id) => {
@@ -12537,6 +12557,7 @@ class NodesListView {
          newNode.setParentId(parentNodeId);
          newNode.setParentName(parentNodeName);
          this._renderNode(newNode);
+         this._scrollTo(newNode.geOffsetTop() - 100);
       });
    }
 
@@ -12630,15 +12651,21 @@ class NodesListView {
       }
    }
 
-   _slideUp() {
+   _scrollToTop() {
       $("html, body").animate({
          scrollTop: 0
       }, "slow");
    }
 
-   _slideDown() {
+   _scrollToBottom() {
       $("html, body").animate({
          scrollTop: $(document).height()
+      }, "slow");
+   }
+
+   _scrollTo(px) {
+      $("html, body").animate({
+         scrollTop: px
       }, "slow");
    }
 

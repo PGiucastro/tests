@@ -61,7 +61,7 @@ class NodesListView {
          newNode = this._buildNode(String(this._getNextId()), "", {});
          this._renderNode(newNode);
          this._handleNoNodesYetMessage();
-         this._slideDown();
+         this._scrollToBottom();
       });
 
       this._eventHub.on("please-remove-node", (e, id) => {
@@ -86,6 +86,7 @@ class NodesListView {
          newNode.setParentId(parentNodeId);
          newNode.setParentName(parentNodeName);
          this._renderNode(newNode);
+         this._scrollTo(newNode.geOffsetTop() - 100);
       });
    }
 
@@ -179,15 +180,21 @@ class NodesListView {
       }
    }
 
-   _slideUp() {
+   _scrollToTop() {
       $("html, body").animate({
          scrollTop: 0
       }, "slow");
    }
 
-   _slideDown() {
+   _scrollToBottom() {
       $("html, body").animate({
          scrollTop: $(document).height()
+      }, "slow");
+   }
+
+   _scrollTo(px) {
+      $("html, body").animate({
+         scrollTop: px
       }, "slow");
    }
 
