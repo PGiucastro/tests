@@ -12286,13 +12286,21 @@ class NodeView {
     * @param {NodeView} nodeToRemove
     */
    removeChildNode(nodeToRemove) {
+      
+      var index = -1;
+
       for (var i = 0; i < this._childNodeViews.length; i++) {
          let node = this._childNodeViews[i];
          if (node.getId() === nodeToRemove.getId()) {
-            this._childNodeViews.splice(i, 1);
+            index = i;
             break;
          }
       }
+
+      if (index !== -1) {
+         this._childNodeViews.splice(index, 1);
+      }
+
       if (this._childNodeViews.length === 0) {
          this._childrenSection.hide();
       }
@@ -12647,16 +12655,19 @@ class NodesListView {
                dom.remove();
             });
             index = i;
-            childNodeViews = node.getChildNodeViews();
-            for (var j = 0; j < childNodeViews.length; j++) {
-               this._removeNode(childNodeViews[j].getId());
-            }
+
             break;
          }
       }
 
       if (index !== -1) {
          this._nodeViews.splice(index, 1);
+      }
+
+      childNodeViews = node.getChildNodeViews();
+      
+      for (var j = 0; j < childNodeViews.length; j++) {
+         this._removeNode(childNodeViews[j].getId());
       }
    }
 
