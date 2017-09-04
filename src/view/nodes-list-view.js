@@ -3,6 +3,7 @@ const $ = require('jquery');
 const NodeView = require('./node-view');
 const templates = require('./../templates');
 const SchemaBuilder = require('./../schema-builder');
+const ReparentNodeView = require('./reparent-node-view');
 
 class NodesListView {
 
@@ -44,6 +45,10 @@ class NodesListView {
                this._behaviour();
             }, 300);
          });
+
+      this._reparentNodeview = new ReparentNodeView();
+      this._root.append(this._reparentNodeview.render());
+      this._reparentNodeview.hide();
 
       return this._root;
    }
@@ -87,6 +92,11 @@ class NodesListView {
          newNode.setParentName(parentNodeName);
          this._renderNode(newNode);
          this._scrollTo(newNode.geOffsetTop() - 100);
+      });
+
+      this._eventHub.on("please-reparent-node-view", (e, node) => {
+         this._reparentNodeview.setNodeToBeReparented(node);
+         this._reparentNodeview.show(this._nodeViews);
       });
    }
 

@@ -11847,7 +11847,8 @@ module.exports = {
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
    "text-config-view": "<div class=\"config-view text-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n   </section>\n\n</div>",
-   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <div class=\"input-wrapper prototype\" style=\"display: none\">\n      <input type=\"text\" class=\"label\" placeholder=\"label\" />\n      <input type=\"text\" class=\"value\" placeholder=\"value\" />\n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type=\"text\" class=\"default\" />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n      <div class=\"radios\"></div>\n\n   </section>\n\n\n\n</div>"
+   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <div class=\"input-wrapper prototype\" style=\"display: none\">\n      <input type=\"text\" class=\"label\" placeholder=\"label\" />\n      <input type=\"text\" class=\"value\" placeholder=\"value\" />\n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type=\"text\" class=\"default\" />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n      <div class=\"radios\"></div>\n\n   </section>\n\n\n\n</div>",
+   "reparent-node-view": "<div class=\"reparent-node-view\">\n\n   <select>\n      \n   </select>\n\n</div>"
 };
 },{}],6:[function(require,module,exports){
 const $ = require('jquery');
@@ -12292,7 +12293,7 @@ class NodeView {
       this._childrenContainer = this._childrenSection.find(".container");
 
       this._loadModelData();
-      this._handleReparentButtonVisibility();
+      this._initializeReparentButtonBehaviour();
       this._renderSubViews();
       this._behaviour();
 
@@ -12303,12 +12304,6 @@ class NodeView {
       this._childNodeViews.push(node);
       this._childrenContainer.append(node.render());
       this._childrenSection.show();
-   }
-
-   _handleReparentButtonVisibility() {
-      if (!this._model._iub_parent) {
-         this._reparentButton.hide();
-      }
    }
 
    _behaviour() {
@@ -12368,10 +12363,22 @@ class NodeView {
          }
       });
 
+
+
       this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);
       this._eventHub.on("config-has-been-updated", this._onConfigUpdatedBound);
 
       new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
+   }
+
+   _initializeReparentButtonBehaviour() {
+      if (!this._model._iub_parent) {
+         this._reparentButton.hide();
+      } else {
+         this._reparentButton.click(() => {
+            this._eventHub.trigger("please-reparent-node-view", [this]);
+         });
+      }
    }
 
    _onConfigUpdated(e, id, configModel) {
@@ -12483,6 +12490,7 @@ const $ = require('jquery');
 const NodeView = require('./node-view');
 const templates = require('./../templates');
 const SchemaBuilder = require('./../schema-builder');
+const ReparentNodeView = require('./reparent-node-view');
 
 class NodesListView {
 
@@ -12524,6 +12532,10 @@ class NodesListView {
                this._behaviour();
             }, 300);
          });
+
+      this._reparentNodeview = new ReparentNodeView();
+      this._root.append(this._reparentNodeview.render());
+      this._reparentNodeview.hide();
 
       return this._root;
    }
@@ -12567,6 +12579,11 @@ class NodesListView {
          newNode.setParentName(parentNodeName);
          this._renderNode(newNode);
          this._scrollTo(newNode.geOffsetTop() - 100);
+      });
+
+      this._eventHub.on("please-reparent-node-view", (e, node) => {
+         this._reparentNodeview.setNodeToBeReparented(node);
+         this._reparentNodeview.show(this._nodeViews);
       });
    }
 
@@ -12685,4 +12702,43 @@ class NodesListView {
 }
 
 module.exports = NodesListView;
-},{"./../schema-builder":4,"./../templates":5,"./node-view":14,"jquery":1,"underscore":2}]},{},[3]);
+},{"./../schema-builder":4,"./../templates":5,"./node-view":14,"./reparent-node-view":16,"jquery":1,"underscore":2}],16:[function(require,module,exports){
+const $ = require('jquery');
+const _ = require('underscore');
+const templates = require('./../templates');
+class ReparentNodeView {
+
+   render() {
+      var tmpl = _.template(templates["reparent-node-view"]);
+      this._root = $(tmpl());
+      this._select = this._root.find("select");
+      this._behaviour();
+      return this._root;
+   }
+
+   setNodeToBeReparented(node) {
+      this._node = node;
+   }
+
+   show(nodes) {
+      console.log(nodes);
+      this._root.show();
+   }
+
+   hide() {
+      this._root.hide();
+      this._node = null;
+      this._select.empty();
+   }
+
+   _behaviour() {
+      $(document).on("keyup", (e) => {
+         if (e.keyCode === 27) {
+            this.hide();
+         }
+      });
+   }
+}
+
+module.exports = ReparentNodeView;
+},{"./../templates":5,"jquery":1,"underscore":2}]},{},[3]);

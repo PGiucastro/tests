@@ -97,7 +97,7 @@ class NodeView {
       this._childrenContainer = this._childrenSection.find(".container");
 
       this._loadModelData();
-      this._handleReparentButtonVisibility();
+      this._initializeReparentButtonBehaviour();
       this._renderSubViews();
       this._behaviour();
 
@@ -108,12 +108,6 @@ class NodeView {
       this._childNodeViews.push(node);
       this._childrenContainer.append(node.render());
       this._childrenSection.show();
-   }
-
-   _handleReparentButtonVisibility() {
-      if (!this._model._iub_parent) {
-         this._reparentButton.hide();
-      }
    }
 
    _behaviour() {
@@ -173,10 +167,22 @@ class NodeView {
          }
       });
 
+
+
       this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);
       this._eventHub.on("config-has-been-updated", this._onConfigUpdatedBound);
 
       new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
+   }
+
+   _initializeReparentButtonBehaviour() {
+      if (!this._model._iub_parent) {
+         this._reparentButton.hide();
+      } else {
+         this._reparentButton.click(() => {
+            this._eventHub.trigger("please-reparent-node-view", [this]);
+         });
+      }
    }
 
    _onConfigUpdated(e, id, configModel) {

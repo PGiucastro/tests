@@ -7,5 +7,6 @@ module.exports = {
    "checkbox-config-view": fs.readFileSync(__dirname + "/../template/view/config/checkbox-config-view.html", "utf8"),
    "number-config-view": fs.readFileSync(__dirname + "/../template/view/config/number-config-view.html", "utf8"),
    "text-config-view": fs.readFileSync(__dirname + "/../template/view/config/text-config-view.html", "utf8"),
-   "radio-config-view": fs.readFileSync(__dirname + "/../template/view/config/radio-config-view.html", "utf8")
+   "radio-config-view": fs.readFileSync(__dirname + "/../template/view/config/radio-config-view.html", "utf8"),
+   "reparent-node-view": fs.readFileSync(__dirname + "/../template/view/reparent-node-view.html", "utf8")
 };

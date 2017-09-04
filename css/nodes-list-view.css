@@ -1,5 +1,6 @@
 .nodes-list-view {
    padding-top: 60px;
+   position: relative;
 }
 
 .nodes-list-view header.main-header {
