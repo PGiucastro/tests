@@ -12275,6 +12275,16 @@ class NodeView {
       this._childrenSection.show();
    }
 
+   /** 
+    * Removes a certain node from the list of child nodes.
+    * 
+    * Note how there is actually no dom removal performed here!
+    * This is because the dom operations performed inside `appendChildNode` already take care of this. 
+    * In fact appending a dom node automatically detaches it from its previous location.
+    * The browser does it by itself;
+    * 
+    * @param {NodeView} nodeToRemove
+    */
    removeChildNode(nodeToRemove) {
       for (var i = 0; i < this._childNodeViews.length; i++) {
          let node = this._childNodeViews[i];
@@ -12291,10 +12301,6 @@ class NodeView {
    canBeAParentNode() {
       var type = this._getSelectTypeFromModel();
       return type === "checkbox" || type === "radio";
-   }
-
-   detachChildNode() {
-
    }
 
    render() {
@@ -12641,18 +12647,16 @@ class NodesListView {
                dom.remove();
             });
             index = i;
+            childNodeViews = node.getChildNodeViews();
+            for (var j = 0; j < childNodeViews.length; j++) {
+               this._removeNode(childNodeViews[j].getId());
+            }
             break;
          }
       }
 
       if (index !== -1) {
          this._nodeViews.splice(index, 1);
-      }
-
-      childNodeViews = node.getChildNodeViews();
-
-      for (var j = 0; j < childNodeViews.length; j++) {
-         this._removeNode(childNodeViews[j].getId());
       }
    }
 

@@ -139,18 +139,16 @@ class NodesListView {
                dom.remove();
             });
             index = i;
+            childNodeViews = node.getChildNodeViews();
+            for (var j = 0; j < childNodeViews.length; j++) {
+               this._removeNode(childNodeViews[j].getId());
+            }
             break;
          }
       }
 
       if (index !== -1) {
          this._nodeViews.splice(index, 1);
-      }
-
-      childNodeViews = node.getChildNodeViews();
-
-      for (var j = 0; j < childNodeViews.length; j++) {
-         this._removeNode(childNodeViews[j].getId());
       }
    }
 
