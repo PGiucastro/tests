@@ -24,16 +24,19 @@ class ReparentNodeView {
    }
 
    show(nodes) {
-      console.log(this._node.getId());
+
       var view, option;
+      var names = this._getSortedListOfNodeNames(nodes);
+
       this._warning.empty().text("You are about to choose a new parent for the node [" + this._node.getName() + "]");
-      nodes = this._sortNodesByName(nodes);
-      for (var i = 0; i < nodes.length; i++) {
-         view = nodes[i];
+
+      for (var i = 0; i < names.length; i++) {
+         name = names[i];
+         view = this._getViewByName(nodes, name);
          if (view.canBeAParentNode() && view.getId() !== this._node.getId()) {
             option = $("<option />");
-            option.attr("value", view.getName());
-            option.text(view.getName());
+            option.attr("value", name);
+            option.text(name);
             this._select.append(option);
          }
       }
@@ -70,16 +73,31 @@ class ReparentNodeView {
       });
    }
 
-   _sortNodesByName(nodes) {
-      return nodes.sort((a, b) => {
-         if (a.getName() < b.getName()) {
+   _getSortedListOfNodeNames(nodes) {
+      var names = nodes.map((node) => {
+         return node.getName();
+      });
+
+      names.sort((a, b) => {
+         if (a < b) {
             return -1;
          }
-         if (a.getName() > b.getName()) {
+         if (a > b) {
             return 1;
          }
          return 0;
       });
+
+      return names;
+   }
+
+   _getViewByName(views, name) {
+      for (var i = 0; i < views.length; i++) {
+         let view = views[i];
+         if (view.getName() === name) {
+            return view;
+         }
+      }
    }
 }
 
