@@ -12,3 +12,22 @@
    border: 1px solid #ccc;
    border-radius: 6px;
 }
+
+.reparent-node-view .warning {
+   color: yellow;
+   margin-bottom: 20px;
+}
+
+.reparent-node-view label {
+   display: block;
+   margin-bottom: 6px;
+}
+
+.reparent-node-view select {
+   width: 100%;
+   box-sizing: border-box;
+}
+
+.reparent-node-view button {
+   margin-top: 20px;
+}

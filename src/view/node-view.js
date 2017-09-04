@@ -8,6 +8,7 @@ const Expander = require('./expander');
 class NodeView {
 
    constructor(id, name, model, clauses, eventHub) {
+      this._rendered = false;
       this._id = id;
       this._name = name;
       this._model = model;
@@ -19,7 +20,7 @@ class NodeView {
       this._childNodeViews = [];
    }
 
-   getRootNode() {
+   getDomNode() {
       return this._root;
    }
 
@@ -72,7 +73,26 @@ class NodeView {
       this._model._iub_parent = name;
    }
 
+   appendChildNode(node) {
+      this._childNodeViews.push(node);
+      this._childrenContainer.append(node.getDomNode());
+      this._childrenSection.show();
+   }
+
+   canBeAParentNode() {
+      var type = this._getSelectTypeFromModel();
+      return type === "checkbox" || type === "radio";
+   }
+
+   detachChildNode() {
+
+   }
+
    render() {
+
+      if (this._rendered) {
+         throw "Double rendering";
+      }
 
       var tmpl = _.template(templates["node-view"]);
       this._root = $(tmpl({
@@ -101,13 +121,9 @@ class NodeView {
       this._renderSubViews();
       this._behaviour();
 
-      return this._root;
-   }
+      this._rendered = true;
 
-   appendChildNode(node) {
-      this._childNodeViews.push(node);
-      this._childrenContainer.append(node.render());
-      this._childrenSection.show();
+      return this._root;
    }
 
    _behaviour() {
@@ -167,8 +183,6 @@ class NodeView {
          }
       });
 
-
-
       this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);
       this._eventHub.on("config-has-been-updated", this._onConfigUpdatedBound);
 
@@ -180,7 +194,7 @@ class NodeView {
          this._reparentButton.hide();
       } else {
          this._reparentButton.click(() => {
-            this._eventHub.trigger("please-reparent-node-view", [this]);
+            this._eventHub.trigger("please-show-reparent-node-view", [this]);
          });
       }
    }
@@ -272,18 +286,6 @@ class NodeView {
       if (v === "radio") {
          this._model.enum = [];
       }
-   }
-
-   _sortByName(nodes) {
-      return nodes.sort((a, b) => {
-         if (a.name < b.name) {
-            return -1;
-         }
-         if (a.name > b.name) {
-            return 1;
-         }
-         return 0;
-      });
    }
 }
 

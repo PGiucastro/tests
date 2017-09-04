@@ -11848,7 +11848,7 @@ module.exports = {
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
    "text-config-view": "<div class=\"config-view text-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n   </section>\n\n</div>",
    "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <div class=\"input-wrapper prototype\" style=\"display: none\">\n      <input type=\"text\" class=\"label\" placeholder=\"label\" />\n      <input type=\"text\" class=\"value\" placeholder=\"value\" />\n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type=\"text\" class=\"default\" />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n      <div class=\"radios\"></div>\n\n   </section>\n\n\n\n</div>",
-   "reparent-node-view": "<div class=\"reparent-node-view\">\n\n   <select>\n      \n   </select>\n\n</div>"
+   "reparent-node-view": "<div class=\"reparent-node-view\">\n\n   <div class=\"warning\"></div>\n\n   <label>Choose the new parent</label>\n   <select></select>\n\n   <button>Reparent</button>\n\n</div>"
 };
 },{}],6:[function(require,module,exports){
 const $ = require('jquery');
@@ -12204,6 +12204,7 @@ const Expander = require('./expander');
 class NodeView {
 
    constructor(id, name, model, clauses, eventHub) {
+      this._rendered = false;
       this._id = id;
       this._name = name;
       this._model = model;
@@ -12215,7 +12216,7 @@ class NodeView {
       this._childNodeViews = [];
    }
 
-   getRootNode() {
+   getDomNode() {
       return this._root;
    }
 
@@ -12268,7 +12269,26 @@ class NodeView {
       this._model._iub_parent = name;
    }
 
+   appendChildNode(node) {
+      this._childNodeViews.push(node);
+      this._childrenContainer.append(node.getDomNode());
+      this._childrenSection.show();
+   }
+
+   canBeAParentNode() {
+      var type = this._getSelectTypeFromModel();
+      return type === "checkbox" || type === "radio";
+   }
+
+   detachChildNode() {
+
+   }
+
    render() {
+
+      if (this._rendered) {
+         throw "Double rendering";
+      }
 
       var tmpl = _.template(templates["node-view"]);
       this._root = $(tmpl({
@@ -12297,13 +12317,9 @@ class NodeView {
       this._renderSubViews();
       this._behaviour();
 
-      return this._root;
-   }
+      this._rendered = true;
 
-   appendChildNode(node) {
-      this._childNodeViews.push(node);
-      this._childrenContainer.append(node.render());
-      this._childrenSection.show();
+      return this._root;
    }
 
    _behaviour() {
@@ -12363,8 +12379,6 @@ class NodeView {
          }
       });
 
-
-
       this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);
       this._eventHub.on("config-has-been-updated", this._onConfigUpdatedBound);
 
@@ -12376,7 +12390,7 @@ class NodeView {
          this._reparentButton.hide();
       } else {
          this._reparentButton.click(() => {
-            this._eventHub.trigger("please-reparent-node-view", [this]);
+            this._eventHub.trigger("please-show-reparent-node-view", [this]);
          });
       }
    }
@@ -12469,18 +12483,6 @@ class NodeView {
          this._model.enum = [];
       }
    }
-
-   _sortByName(nodes) {
-      return nodes.sort((a, b) => {
-         if (a.name < b.name) {
-            return -1;
-         }
-         if (a.name > b.name) {
-            return 1;
-         }
-         return 0;
-      });
-   }
 }
 
 module.exports = NodeView;
@@ -12533,7 +12535,7 @@ class NodesListView {
             }, 300);
          });
 
-      this._reparentNodeview = new ReparentNodeView();
+      this._reparentNodeview = new ReparentNodeView(this._eventHub);
       this._root.append(this._reparentNodeview.render());
       this._reparentNodeview.hide();
 
@@ -12581,9 +12583,13 @@ class NodesListView {
          this._scrollTo(newNode.geOffsetTop() - 100);
       });
 
-      this._eventHub.on("please-reparent-node-view", (e, node) => {
+      this._eventHub.on("please-show-reparent-node-view", (e, node) => {
          this._reparentNodeview.setNodeToBeReparented(node);
          this._reparentNodeview.show(this._nodeViews);
+      });
+
+      this._eventHub.on("please-reparent-node-view", (e, nameOfNodeToReparent, currentParentName, newParentName) => {
+         console.log(nameOfNodeToReparent, currentParentName, newParentName);
       });
    }
 
@@ -12595,10 +12601,11 @@ class NodesListView {
 
    _renderNode(nodeView) {
       var parentId = nodeView.getParentId();
+      nodeView.render();
       if (parentId) {
          this._getViewById(parentId).appendChildNode(nodeView);
       } else {
-         this._list.append(nodeView.render());
+         this._list.append(nodeView.getDomNode());
       }
    }
 
@@ -12610,7 +12617,7 @@ class NodesListView {
       for (var i = 0; i < this._nodeViews.length; i++) {
          node = this._nodeViews[i];
          if (node.getId() === id) {
-            dom = node.getRootNode();
+            dom = node.getDomNode();
             dom.slideUp(() => {
                dom.remove();
             });
@@ -12706,12 +12713,19 @@ module.exports = NodesListView;
 const $ = require('jquery');
 const _ = require('underscore');
 const templates = require('./../templates');
+
 class ReparentNodeView {
+
+   constructor(eventHub) {
+      this._eventHub = eventHub;
+   }
 
    render() {
       var tmpl = _.template(templates["reparent-node-view"]);
       this._root = $(tmpl());
+      this._warning = this._root.find(".warning");
       this._select = this._root.find("select");
+      this._button = this._root.find("button");
       this._behaviour();
       return this._root;
    }
@@ -12721,7 +12735,19 @@ class ReparentNodeView {
    }
 
    show(nodes) {
-      console.log(nodes);
+      console.log(this._node.getId());
+      var view, option;
+      this._warning.empty().text("You are about to choose a new parent for the node [" + this._node.getName() + "]");
+      nodes = this._sortNodesByName(nodes);
+      for (var i = 0; i < nodes.length; i++) {
+         view = nodes[i];
+         if (view.canBeAParentNode() && view.getId() !== this._node.getId()) {
+            option = $("<option />");
+            option.attr("value", view.getName());
+            option.text(view.getName());
+            this._select.append(option);
+         }
+      }
       this._root.show();
    }
 
@@ -12732,10 +12758,34 @@ class ReparentNodeView {
    }
 
    _behaviour() {
+
       $(document).on("keyup", (e) => {
          if (e.keyCode === 27) {
             this.hide();
          }
+      });
+
+      this._button.click((e) => {
+         let newParentName = this._select.val();
+         let currentParentName = this._node.getParentName();
+         if (newParentName !== currentParentName) {
+            this._eventHub.trigger("please-reparent-node-view", [this._node.getName(), currentParentName, newParentName]);
+            this.hide();
+         } else {
+            alert("Choosen a new parent");
+         }
+      });
+   }
+
+   _sortNodesByName(nodes) {
+      return nodes.sort((a, b) => {
+         if (a.getName() < b.getName()) {
+            return -1;
+         }
+         if (a.getName() > b.getName()) {
+            return 1;
+         }
+         return 0;
       });
    }
 }

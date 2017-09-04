@@ -46,7 +46,7 @@ class NodesListView {
             }, 300);
          });
 
-      this._reparentNodeview = new ReparentNodeView();
+      this._reparentNodeview = new ReparentNodeView(this._eventHub);
       this._root.append(this._reparentNodeview.render());
       this._reparentNodeview.hide();
 
@@ -94,9 +94,13 @@ class NodesListView {
          this._scrollTo(newNode.geOffsetTop() - 100);
       });
 
-      this._eventHub.on("please-reparent-node-view", (e, node) => {
+      this._eventHub.on("please-show-reparent-node-view", (e, node) => {
          this._reparentNodeview.setNodeToBeReparented(node);
          this._reparentNodeview.show(this._nodeViews);
+      });
+
+      this._eventHub.on("please-reparent-node-view", (e, nameOfNodeToReparent, currentParentName, newParentName) => {
+         console.log(nameOfNodeToReparent, currentParentName, newParentName);
       });
    }
 
@@ -108,10 +112,11 @@ class NodesListView {
 
    _renderNode(nodeView) {
       var parentId = nodeView.getParentId();
+      nodeView.render();
       if (parentId) {
          this._getViewById(parentId).appendChildNode(nodeView);
       } else {
-         this._list.append(nodeView.render());
+         this._list.append(nodeView.getDomNode());
       }
    }
 
@@ -123,7 +128,7 @@ class NodesListView {
       for (var i = 0; i < this._nodeViews.length; i++) {
          node = this._nodeViews[i];
          if (node.getId() === id) {
-            dom = node.getRootNode();
+            dom = node.getDomNode();
             dom.slideUp(() => {
                dom.remove();
             });
