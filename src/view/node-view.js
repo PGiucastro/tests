@@ -85,8 +85,10 @@ class NodeView {
       this._titleInput_DE = this._root.find(".title_de");
       this._typeInput = this._root.find(".type");
 
-      this._deleteButton = this._root.find("button.delete");
+
       this._addButton = this._root.find("button.add");
+      this._reparentButton = this._root.find("button.reparent");
+      this._deleteButton = this._root.find("button.delete");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
       this._configSection = this._root.find(".config");
       this._clausesSection = this._root.find(".clauses");
@@ -95,6 +97,7 @@ class NodeView {
       this._childrenContainer = this._childrenSection.find(".container");
 
       this._loadModelData();
+      this._handleReparentButtonVisibility();
       this._renderSubViews();
       this._behaviour();
 
@@ -105,6 +108,12 @@ class NodeView {
       this._childNodeViews.push(node);
       this._childrenContainer.append(node.render());
       this._childrenSection.show();
+   }
+
+   _handleReparentButtonVisibility() {
+      if (!this._model._iub_parent) {
+         this._reparentButton.hide();
+      }
    }
 
    _behaviour() {
