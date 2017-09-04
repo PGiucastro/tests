@@ -11848,7 +11848,7 @@ module.exports = {
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
    "text-config-view": "<div class=\"config-view text-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n   </section>\n\n</div>",
    "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <div class=\"input-wrapper prototype\" style=\"display: none\">\n      <input type=\"text\" class=\"label\" placeholder=\"label\" />\n      <input type=\"text\" class=\"value\" placeholder=\"value\" />\n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type=\"text\" class=\"default\" />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n      <div class=\"radios\"></div>\n\n   </section>\n\n\n\n</div>",
-   "reparent-node-view": "<div class=\"reparent-node-view\">\n\n   <div class=\"warning\"></div>\n\n   <label>Choose the new parent</label>\n   <select></select>\n\n   <button>Reparent</button>\n\n</div>"
+   "reparent-node-view": "<div class=\"reparent-node-view\">\n   \n   <span class=\"close\">Close (Esc)</span>\n\n   <div class=\"warning\"></div>\n\n   <label>Choose the new parent</label>\n   <select></select>\n\n   <button>Reparent</button>\n\n</div>"
 };
 },{}],6:[function(require,module,exports){
 const $ = require('jquery');
@@ -12275,6 +12275,19 @@ class NodeView {
       this._childrenSection.show();
    }
 
+   removeChildNode(nodeToRemove) {
+      for (var i = 0; i < this._childNodeViews.length; i++) {
+         let node = this._childNodeViews[i];
+         if (node.getId() === nodeToRemove.getId()) {
+            this._childNodeViews.splice(i, 1);
+            break;
+         }
+      }
+      if (this._childNodeViews.length === 0) {
+         this._childrenSection.hide();
+      }
+   }
+
    canBeAParentNode() {
       var type = this._getSelectTypeFromModel();
       return type === "checkbox" || type === "radio";
@@ -12588,8 +12601,14 @@ class NodesListView {
          this._reparentNodeview.show(this._nodeViews);
       });
 
-      this._eventHub.on("please-reparent-node-view", (e, nameOfNodeToReparent, currentParentName, newParentName) => {
-         console.log(nameOfNodeToReparent, currentParentName, newParentName);
+      this._eventHub.on("please-reparent-this-node-view", (e, nameOfNodeToReparent, currentParentName, newParentName) => {
+         let nodeToReparent = this._getViewByName(nameOfNodeToReparent);
+         let currentParentView = this._getViewByName(currentParentName);
+         let newParentView = this._getViewByName(newParentName);
+         currentParentView.removeChildNode(nodeToReparent);
+         newParentView.appendChildNode(nodeToReparent);
+         nodeToReparent.setParentName(newParentName);
+         this._scrollTo(newParentView.geOffsetTop() - 100);
       });
    }
 
@@ -12725,7 +12744,8 @@ class ReparentNodeView {
       this._root = $(tmpl());
       this._warning = this._root.find(".warning");
       this._select = this._root.find("select");
-      this._button = this._root.find("button");
+      this._closeButton = this._root.find(".close");
+      this._executeButton = this._root.find("button");
       this._behaviour();
       return this._root;
    }
@@ -12765,11 +12785,15 @@ class ReparentNodeView {
          }
       });
 
-      this._button.click((e) => {
+      this._closeButton.click((e) => {
+         this.hide();
+      });
+
+      this._executeButton.click((e) => {
          let newParentName = this._select.val();
          let currentParentName = this._node.getParentName();
          if (newParentName !== currentParentName) {
-            this._eventHub.trigger("please-reparent-node-view", [this._node.getName(), currentParentName, newParentName]);
+            this._eventHub.trigger("please-reparent-this-node-view", [this._node.getName(), currentParentName, newParentName]);
             this.hide();
          } else {
             alert("Choosen a new parent");

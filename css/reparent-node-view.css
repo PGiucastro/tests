@@ -13,9 +13,17 @@
    border-radius: 6px;
 }
 
+.reparent-node-view .close {
+   position: absolute;
+   top: 15px;
+   right: 15px;
+   cursor: pointer;
+}
+
 .reparent-node-view .warning {
    color: yellow;
    margin-bottom: 20px;
+   margin-right: 100px;
 }
 
 .reparent-node-view label {

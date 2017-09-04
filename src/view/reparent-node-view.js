@@ -13,7 +13,8 @@ class ReparentNodeView {
       this._root = $(tmpl());
       this._warning = this._root.find(".warning");
       this._select = this._root.find("select");
-      this._button = this._root.find("button");
+      this._closeButton = this._root.find(".close");
+      this._executeButton = this._root.find("button");
       this._behaviour();
       return this._root;
    }
@@ -53,11 +54,15 @@ class ReparentNodeView {
          }
       });
 
-      this._button.click((e) => {
+      this._closeButton.click((e) => {
+         this.hide();
+      });
+
+      this._executeButton.click((e) => {
          let newParentName = this._select.val();
          let currentParentName = this._node.getParentName();
          if (newParentName !== currentParentName) {
-            this._eventHub.trigger("please-reparent-node-view", [this._node.getName(), currentParentName, newParentName]);
+            this._eventHub.trigger("please-reparent-this-node-view", [this._node.getName(), currentParentName, newParentName]);
             this.hide();
          } else {
             alert("Choosen a new parent");

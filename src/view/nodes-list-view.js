@@ -99,8 +99,14 @@ class NodesListView {
          this._reparentNodeview.show(this._nodeViews);
       });
 
-      this._eventHub.on("please-reparent-node-view", (e, nameOfNodeToReparent, currentParentName, newParentName) => {
-         console.log(nameOfNodeToReparent, currentParentName, newParentName);
+      this._eventHub.on("please-reparent-this-node-view", (e, nameOfNodeToReparent, currentParentName, newParentName) => {
+         let nodeToReparent = this._getViewByName(nameOfNodeToReparent);
+         let currentParentView = this._getViewByName(currentParentName);
+         let newParentView = this._getViewByName(newParentName);
+         currentParentView.removeChildNode(nodeToReparent);
+         newParentView.appendChildNode(nodeToReparent);
+         nodeToReparent.setParentName(newParentName);
+         this._scrollTo(newParentView.geOffsetTop() - 100);
       });
    }
 
