@@ -12286,7 +12286,7 @@ class NodeView {
     * @param {NodeView} nodeToRemove
     */
    removeChildNode(nodeToRemove) {
-      
+
       var index = -1;
 
       for (var i = 0; i < this._childNodeViews.length; i++) {
@@ -12304,6 +12304,10 @@ class NodeView {
       if (this._childNodeViews.length === 0) {
          this._childrenSection.hide();
       }
+
+      console.log(this._name + " has now " + this._childNodeViews.length + " children", this._childNodeViews.map((n) => {
+         return n.getName();
+      }));
    }
 
    canBeAParentNode() {
@@ -12611,18 +12615,21 @@ class NodesListView {
       });
 
       this._eventHub.on("please-show-reparent-node-view", (e, node) => {
+         console.log("show reparent view for view " + node.getName());
          this._reparentNodeview.setNodeToBeReparented(node);
          this._reparentNodeview.show(this._nodeViews);
       });
 
       this._eventHub.on("please-reparent-this-node-view", (e, nameOfNodeToReparent, currentParentName, newParentName) => {
+         console.log("node to reparent", nameOfNodeToReparent);
+         console.log("from", currentParentName);
+         console.log("to", newParentName);
          let nodeToReparent = this._getViewByName(nameOfNodeToReparent);
          let currentParentView = this._getViewByName(currentParentName);
          let newParentView = this._getViewByName(newParentName);
          currentParentView.removeChildNode(nodeToReparent);
          newParentView.appendChildNode(nodeToReparent);
          nodeToReparent.setParentName(newParentName);
-         this._scrollTo(newParentView.geOffsetTop() - 100);
       });
    }
 
@@ -12665,7 +12672,7 @@ class NodesListView {
       }
 
       childNodeViews = node.getChildNodeViews();
-      
+
       for (var j = 0; j < childNodeViews.length; j++) {
          this._removeNode(childNodeViews[j].getId());
       }

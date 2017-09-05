@@ -90,7 +90,7 @@ class NodeView {
     * @param {NodeView} nodeToRemove
     */
    removeChildNode(nodeToRemove) {
-      
+
       var index = -1;
 
       for (var i = 0; i < this._childNodeViews.length; i++) {
@@ -108,6 +108,10 @@ class NodeView {
       if (this._childNodeViews.length === 0) {
          this._childrenSection.hide();
       }
+
+      console.log(this._name + " has now " + this._childNodeViews.length + " children", this._childNodeViews.map((n) => {
+         return n.getName();
+      }));
    }
 
    canBeAParentNode() {
