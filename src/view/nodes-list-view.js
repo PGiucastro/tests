@@ -110,8 +110,13 @@ class NodesListView {
          if (currentParentView) { // the node might be root one, in which case no current parent exists!
             currentParentView.removeChildNode(nodeToReparent);
          }
-         newParentView.appendChildNode(nodeToReparent);
-         nodeToReparent.setParentName(newParentName);
+         if (!newParentView) { // it has been asked to make it a root node            
+            nodeToReparent.setParentName(null);
+            this._list.append(nodeToReparent.getDomNode());
+         } else {
+            nodeToReparent.setParentName(newParentName);
+            newParentView.appendChildNode(nodeToReparent);
+         }
       });
    }
 

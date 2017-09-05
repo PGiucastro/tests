@@ -70,7 +70,11 @@ class NodeView {
    }
 
    setParentName(name) {
-      this._model._iub_parent = name;
+      if (!name) {
+         delete this._model._iub_parent;
+      } else {
+         this._model._iub_parent = name;
+      }
    }
 
    appendChildNode(node) {

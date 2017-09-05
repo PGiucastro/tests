@@ -30,6 +30,8 @@ class ReparentNodeView {
 
       this._warning.empty().text("You are about to choose a new parent for the node [" + this._node.getName() + "]");
 
+      this._select.append("<option value='-'>- no parent (make it a root node) -</option>");
+
       for (var i = 0; i < names.length; i++) {
          name = names[i];
          view = this._getViewByName(nodes, name);
@@ -40,6 +42,7 @@ class ReparentNodeView {
             this._select.append(option);
          }
       }
+
       this._root.show();
    }
 
@@ -64,11 +67,15 @@ class ReparentNodeView {
       this._executeButton.click((e) => {
          let newParentName = this._select.val();
          let currentParentName = this._node.getParentName();
-         if (newParentName !== currentParentName) {
-            this._eventHub.trigger("please-reparent-this-node-view", [this._node.getName(), currentParentName, newParentName]);
-            this.hide();
-         } else {
+         if (!currentParentName && newParentName === "-") {
             alert("Choosen a new parent");
+         } else {
+            if (newParentName !== currentParentName) {
+               this._eventHub.trigger("please-reparent-this-node-view", [this._node.getName(), currentParentName, newParentName]);
+               this.hide();
+            } else {
+               alert("Choosen a new parent");
+            }
          }
       });
    }
