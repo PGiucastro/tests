@@ -12348,8 +12348,7 @@ class NodeView {
       this._childrenSection = this._root.find(".children");
       this._childrenContainer = this._childrenSection.find(".container");
 
-      this._loadModelData();
-      this._initializeReparentButtonBehaviour();
+      this._loadModelData();      
       this._renderSubViews();
       this._behaviour();
 
@@ -12404,10 +12403,6 @@ class NodeView {
          this._handleClausesVisibility();
       });
 
-      this._addButton.click((e) => {
-         this._eventHub.trigger("please-create-child-node", [this.getId(), this.getName()]);
-      });
-
       this._deleteButton.click((e) => {
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
@@ -12418,8 +12413,21 @@ class NodeView {
 
       this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);
       this._eventHub.on("config-has-been-updated", this._onConfigUpdatedBound);
+      
+      this._initializeAddButtonBehaviour();
+      this._initializeReparentButtonBehaviour();
 
       new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
+   }
+
+   _initializeAddButtonBehaviour() {
+      if (this.canBeAParentNode()) {
+         this._addButton.click((e) => {
+            this._eventHub.trigger("please-create-child-node", [this.getId(), this.getName()]);
+         });
+      } else {
+         this._addButton.hide();
+      }
    }
 
    _initializeReparentButtonBehaviour() {
