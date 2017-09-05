@@ -130,6 +130,7 @@ class NodeView {
          id: this._id
       }));
 
+      this._nameLabel = this._root.find(".name-label");
       this._nameInput = this._root.find(".name");
       this._titleInput_IT = this._root.find(".title_it");
       this._titleInput_EN = this._root.find(".title_en");
@@ -179,6 +180,7 @@ class NodeView {
 
       this._nameInput.on("keyup", () => {
          this._name = this._nameInput.val();
+         this._nameLabel.text(this._name);
          this._eventHub.trigger("node-name-has-been-updated", [this._id, this._name]);
       });
 
@@ -276,6 +278,7 @@ class NodeView {
    }
 
    _loadModelData() {
+      this._nameLabel.text(this._name);
       this._nameInput.val(this._name);
       this._titleInput_IT.val(this._model.title_it);
       this._titleInput_EN.val(this._model.title);
