@@ -12419,13 +12419,9 @@ class NodeView {
    }
 
    _initializeReparentButtonBehaviour() {
-      if (!this._model._iub_parent) {
-         this._reparentButton.hide();
-      } else {
-         this._reparentButton.click(() => {
-            this._eventHub.trigger("please-show-reparent-node-view", [this]);
-         });
-      }
+      this._reparentButton.click(() => {
+         this._eventHub.trigger("please-show-reparent-node-view", [this]);
+      });
    }
 
    _onConfigUpdated(e, id, configModel) {
@@ -12630,7 +12626,9 @@ class NodesListView {
          let nodeToReparent = this._getViewByName(nameOfNodeToReparent);
          let currentParentView = this._getViewByName(currentParentName);
          let newParentView = this._getViewByName(newParentName);
-         currentParentView.removeChildNode(nodeToReparent);
+         if (currentParentView) { // the node might be root one, in which case no current parent exists!
+            currentParentView.removeChildNode(nodeToReparent);
+         }
          newParentView.appendChildNode(nodeToReparent);
          nodeToReparent.setParentName(newParentName);
       });

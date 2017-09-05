@@ -223,13 +223,9 @@ class NodeView {
    }
 
    _initializeReparentButtonBehaviour() {
-      if (!this._model._iub_parent) {
-         this._reparentButton.hide();
-      } else {
-         this._reparentButton.click(() => {
-            this._eventHub.trigger("please-show-reparent-node-view", [this]);
-         });
-      }
+      this._reparentButton.click(() => {
+         this._eventHub.trigger("please-show-reparent-node-view", [this]);
+      });
    }
 
    _onConfigUpdated(e, id, configModel) {

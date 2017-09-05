@@ -107,7 +107,9 @@ class NodesListView {
          let nodeToReparent = this._getViewByName(nameOfNodeToReparent);
          let currentParentView = this._getViewByName(currentParentName);
          let newParentView = this._getViewByName(newParentName);
-         currentParentView.removeChildNode(nodeToReparent);
+         if (currentParentView) { // the node might be root one, in which case no current parent exists!
+            currentParentView.removeChildNode(nodeToReparent);
+         }
          newParentView.appendChildNode(nodeToReparent);
          nodeToReparent.setParentName(newParentName);
       });
