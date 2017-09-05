@@ -12592,7 +12592,7 @@ class NodesListView {
       this._eventHub.on("please-remove-node", (e, id) => {
          this._removeNode(id);
          this._handleNoNodesYetMessage();
-         console.log("Remaining nodes", this._nodeViews.length);
+         console.log("remaining nodes in nodes-list-view", this._nodeViews.length);
       });
 
       this._eventHub.on("node-name-has-been-updated", (e, id, newName) => {
