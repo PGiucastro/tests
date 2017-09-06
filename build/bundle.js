@@ -12306,13 +12306,17 @@ class NodeView {
          this._childNodeViews.splice(index, 1);
       }
 
-      if (this._childNodeViews.length === 0) {
-         this._childrenSection.hide();
-      }
+      this.handleChildrenSectionVisibility();
 
       console.log(this._name + " has now " + this._childNodeViews.length + " children", this._childNodeViews.map((n) => {
          return n.getName();
       }));
+   }
+   
+   handleChildrenSectionVisibility() {
+      if (this._childNodeViews.length === 0) {
+         this._childrenSection.hide();
+      }
    }
 
    /**
