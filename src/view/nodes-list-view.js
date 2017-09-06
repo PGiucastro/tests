@@ -106,12 +106,15 @@ class NodesListView {
          console.log("node to reparent", nameOfNodeToReparent);
          console.log("from", currentParentName);
          console.log("to", newParentName);
+
          let nodeToReparent = this._getViewByName(nameOfNodeToReparent);
          let currentParentView = this._getViewByName(currentParentName);
          let newParentView = this._getViewByName(newParentName);
-         if (currentParentView) { // the node might be root one, in which case no current parent exists!
-            currentParentView.removeChildNode(nodeToReparent);
+
+         if (currentParentView) { // the node might be root one, in which case no current parent exists.
+            currentParentView.detachChildNode(nodeToReparent);
          }
+
          if (!newParentView) { // it has been asked to make it a root node            
             nodeToReparent.setParentName(null);
             this._list.append(nodeToReparent.getDomNode());

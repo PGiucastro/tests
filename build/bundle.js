@@ -12280,16 +12280,17 @@ class NodeView {
    }
 
    /** 
-    * Removes a certain node from the list of child nodes.
+    * Detach a certain node from the list of child nodes.
     * 
-    * Note how there is actually no dom removal performed here!
+    * Note: there is actually no dom removal performed here!!!
+    * 
     * This is because the dom operations performed inside `appendChildNode` already take care of this. 
     * In fact appending a dom node automatically detaches it from its previous location.
     * The browser does it by itself;
     * 
     * @param {NodeView} nodeToRemove
     */
-   removeChildNode(nodeToRemove) {
+   detachChildNode(nodeToRemove) {
 
       var index = -1;
 
@@ -12631,12 +12632,15 @@ class NodesListView {
          console.log("node to reparent", nameOfNodeToReparent);
          console.log("from", currentParentName);
          console.log("to", newParentName);
+
          let nodeToReparent = this._getViewByName(nameOfNodeToReparent);
          let currentParentView = this._getViewByName(currentParentName);
          let newParentView = this._getViewByName(newParentName);
-         if (currentParentView) { // the node might be root one, in which case no current parent exists!
-            currentParentView.removeChildNode(nodeToReparent);
+
+         if (currentParentView) { // the node might be root one, in which case no current parent exists.
+            currentParentView.detachChildNode(nodeToReparent);
          }
+
          if (!newParentView) { // it has been asked to make it a root node            
             nodeToReparent.setParentName(null);
             this._list.append(nodeToReparent.getDomNode());
