@@ -12890,7 +12890,7 @@ class ValueView extends NodeView {
 
    render() {
       super.render();
-      this.getDomNode().attr("class", null).addClass("value-view");
+      this.getDomNode().addClass("value-view");
       this._clausesSection.remove();
       this._addChildNodeButton.remove();
       this._addValueInputButton.remove();
