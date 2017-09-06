@@ -11842,7 +11842,7 @@ module.exports = SchemaBuilder;
 
 module.exports = {
    "nodes-list-view": "<div class=\"nodes-list-view\">\n   \n   <header class=\"main-header\">\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <span class=\"name-label\"></span>\n   \n   <div class=\"buttons\">\n      <button class=\"add-child-node\">Add child node</button>\n      <button class=\"add-value-input\">Add value input</button>\n      <button class=\"reparent\">Reparent</button>\n      <button class=\"delete\">Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"children\">\n      <h2>Child nodes</h2>\n      <div class=\"container\"></div>\n   </div>\n\n</div>",
+   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <span class=\"name-label\"></span>\n   \n   <div class=\"buttons\">\n      <button class=\"add-child-node\">Add child node</button>\n      <button class=\"add-value-input\">Add value input</button>\n      <button class=\"reparent\">Reparent</button>\n      <button class=\"delete\">Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"children\">\n      <h2>Children</h2>\n      <div class=\"container\"></div>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>",
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
@@ -12306,17 +12306,24 @@ class NodeView {
          this._childNodeViews.splice(index, 1);
       }
 
-      this.handleChildrenSectionVisibility();
+      this._handleChildrenSectionVisibility();
 
       console.log(this._name + " has now " + this._childNodeViews.length + " children", this._childNodeViews.map((n) => {
          return n.getName();
       }));
    }
-   
-   handleChildrenSectionVisibility() {
-      if (this._childNodeViews.length === 0) {
-         this._childrenSection.hide();
-      }
+
+   notifyOfChildrenDestruction(ids) {
+      ids.forEach((id) => {
+         for (var i = 0; i < this._childNodeViews.length; i++) {
+            if (this._childNodeViews[i].getId() === id) {
+               this._childNodeViews.splice(i, 1);
+               break;
+            }
+         }
+      });
+      
+      this._handleChildrenSectionVisibility();
    }
 
    /**
@@ -12460,6 +12467,12 @@ class NodeView {
       this._eventHub.on("config-has-been-updated", this._onConfigUpdatedBound);
 
       new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
+   }
+
+   _handleChildrenSectionVisibility() {
+      if (this._childNodeViews.length === 0) {
+         this._childrenSection.hide();
+      }
    }
 
    _removeTypeOptions() {
@@ -12628,19 +12641,26 @@ class NodesListView {
       });
 
       this._eventHub.on("please-delete-node", (e, id) => {
-         var ids = this._getViewById(id).destroy(true);
+         var viewToDestroy = this._getViewById(id);
+         var parentView = this._getViewByName(viewToDestroy.getParentName());
+         var ids = viewToDestroy.destroy(true);
          console.warn("removed ones", ids);
 
          ids.forEach((id) => {
             for (var i = 0; i < this._nodeViews.length; i++) {
-               if (ids.indexOf(this._nodeViews[i].getId()) > -1) {
+               if (this._nodeViews[i].getId() === id) {
                   this._nodeViews.splice(i, 1);
                   break;
                }
             }
          });
 
+         if (parentView) {
+            parentView.notifyOfChildrenDestruction(ids);
+         }
+
          this._handleNoNodesYetMessage();
+
          console.log("remaining nodes in nodes-list-view", this._nodeViews.length);
       });
 

@@ -72,19 +72,26 @@ class NodesListView {
       });
 
       this._eventHub.on("please-delete-node", (e, id) => {
-         var ids = this._getViewById(id).destroy(true);
+         var viewToDestroy = this._getViewById(id);
+         var parentView = this._getViewByName(viewToDestroy.getParentName());
+         var ids = viewToDestroy.destroy(true);
          console.warn("removed ones", ids);
 
          ids.forEach((id) => {
             for (var i = 0; i < this._nodeViews.length; i++) {
-               if (ids.indexOf(this._nodeViews[i].getId()) > -1) {
+               if (this._nodeViews[i].getId() === id) {
                   this._nodeViews.splice(i, 1);
                   break;
                }
             }
          });
 
+         if (parentView) {
+            parentView.notifyOfChildrenDestruction(ids);
+         }
+
          this._handleNoNodesYetMessage();
+
          console.log("remaining nodes in nodes-list-view", this._nodeViews.length);
       });
 

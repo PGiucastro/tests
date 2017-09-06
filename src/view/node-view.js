@@ -110,17 +110,24 @@ class NodeView {
          this._childNodeViews.splice(index, 1);
       }
 
-      this.handleChildrenSectionVisibility();
+      this._handleChildrenSectionVisibility();
 
       console.log(this._name + " has now " + this._childNodeViews.length + " children", this._childNodeViews.map((n) => {
          return n.getName();
       }));
    }
-   
-   handleChildrenSectionVisibility() {
-      if (this._childNodeViews.length === 0) {
-         this._childrenSection.hide();
-      }
+
+   notifyOfChildrenDestruction(ids) {
+      ids.forEach((id) => {
+         for (var i = 0; i < this._childNodeViews.length; i++) {
+            if (this._childNodeViews[i].getId() === id) {
+               this._childNodeViews.splice(i, 1);
+               break;
+            }
+         }
+      });
+      
+      this._handleChildrenSectionVisibility();
    }
 
    /**
@@ -264,6 +271,12 @@ class NodeView {
       this._eventHub.on("config-has-been-updated", this._onConfigUpdatedBound);
 
       new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
+   }
+
+   _handleChildrenSectionVisibility() {
+      if (this._childNodeViews.length === 0) {
+         this._childrenSection.hide();
+      }
    }
 
    _removeTypeOptions() {
