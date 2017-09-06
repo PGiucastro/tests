@@ -12315,6 +12315,32 @@ class NodeView {
       }));
    }
 
+   /**
+    * Recursively destroy a node and return all the destroyed ids.
+    * 
+    * @returns {Array}
+    */
+   destroy() {
+
+      var destroyedIds = [this._id];
+      var dom = this.getDomNode();
+
+      dom.slideUp(() => {
+         dom.remove();
+      });
+
+      for (var j = 0; j < this._childNodeViews.length; j++) {
+         let ids = this._childNodeViews[j].destroy();
+         ids.forEach((id) => {
+            destroyedIds.push(id);
+         });
+      }
+
+      this._childNodeViews = [];
+
+      return destroyedIds;
+   }
+
    canBeAParentNode() {
       var type = this._getSelectTypeFromModel();
       return type === "checkbox" || type === "radio";
@@ -12409,7 +12435,7 @@ class NodeView {
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
             this._eventHub.off("config-has-been-updated", this._onConfigUpdatedBound);
-            this._eventHub.trigger("please-remove-node", [this.getId()]);
+            this._eventHub.trigger("please-delete-node", [this.getId()]);
          }
       });
 
@@ -12597,8 +12623,19 @@ class NodesListView {
          this._scrollToBottom();
       });
 
-      this._eventHub.on("please-remove-node", (e, id) => {
-         this._removeNode(id);
+      this._eventHub.on("please-delete-node", (e, id) => {
+         var ids = this._getViewById(id).destroy(true);
+         console.warn("removed ones", ids);
+
+         ids.forEach((id) => {
+            for (var i = 0; i < this._nodeViews.length; i++) {
+               if (ids.indexOf(this._nodeViews[i].getId()) > -1) {
+                  this._nodeViews.splice(i, 1);
+                  break;
+               }
+            }
+         });
+
          this._handleNoNodesYetMessage();
          console.log("remaining nodes in nodes-list-view", this._nodeViews.length);
       });
@@ -12669,35 +12706,6 @@ class NodesListView {
          this._getViewById(parentId).appendChildNode(nodeView);
       } else {
          this._list.append(nodeView.getDomNode());
-      }
-   }
-
-   _removeNode(id) {
-      var index = -1;
-      var node, dom;
-      var childNodeViews;
-
-      for (var i = 0; i < this._nodeViews.length; i++) {
-         node = this._nodeViews[i];
-         if (node.getId() === id) {
-            dom = node.getDomNode();
-            dom.slideUp(() => {
-               dom.remove();
-            });
-            index = i;
-
-            break;
-         }
-      }
-
-      if (index !== -1) {
-         this._nodeViews.splice(index, 1);
-      }
-
-      childNodeViews = node.getChildNodeViews();
-
-      for (var j = 0; j < childNodeViews.length; j++) {
-         this._removeNode(childNodeViews[j].getId());
       }
    }
 

@@ -119,6 +119,32 @@ class NodeView {
       }));
    }
 
+   /**
+    * Recursively destroy a node and return all the destroyed ids.
+    * 
+    * @returns {Array}
+    */
+   destroy() {
+
+      var destroyedIds = [this._id];
+      var dom = this.getDomNode();
+
+      dom.slideUp(() => {
+         dom.remove();
+      });
+
+      for (var j = 0; j < this._childNodeViews.length; j++) {
+         let ids = this._childNodeViews[j].destroy();
+         ids.forEach((id) => {
+            destroyedIds.push(id);
+         });
+      }
+
+      this._childNodeViews = [];
+
+      return destroyedIds;
+   }
+
    canBeAParentNode() {
       var type = this._getSelectTypeFromModel();
       return type === "checkbox" || type === "radio";
@@ -213,7 +239,7 @@ class NodeView {
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
             this._eventHub.off("config-has-been-updated", this._onConfigUpdatedBound);
-            this._eventHub.trigger("please-remove-node", [this.getId()]);
+            this._eventHub.trigger("please-delete-node", [this.getId()]);
          }
       });
 
