@@ -142,7 +142,8 @@ class NodeView {
       this._typeInput = this._root.find(".type");
 
 
-      this._addButton = this._root.find("button.add");
+      this._addChildNodeButton = this._root.find("button.add-child-node");
+      this._addValueInputButton = this._root.find("button.add-value-input");
       this._reparentButton = this._root.find("button.reparent");
       this._deleteButton = this._root.find("button.delete");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
@@ -152,8 +153,9 @@ class NodeView {
       this._childrenSection = this._root.find(".children");
       this._childrenContainer = this._childrenSection.find(".container");
 
-      this._loadModelData();      
+      this._loadModelData();
       this._renderSubViews();
+      this._removeTypeOptions();
       this._behaviour();
 
       this._rendered = true;
@@ -204,7 +206,6 @@ class NodeView {
          var configType = this._typeInput.val();
          this._setModelTypeFromSelect(configType);
          this._renderConfigView(configType);
-         this._handleClausesVisibility();
       });
 
       this._deleteButton.click((e) => {
@@ -215,28 +216,28 @@ class NodeView {
          }
       });
 
+      this._reparentButton.click(() => {
+         this._eventHub.trigger("please-show-reparent-node-view", [this]);
+      });
+
+      this._addChildNodeButton.click((e) => {
+         this._eventHub.trigger("please-create-child-node", ["node", this.getId(), this.getName()]);
+      });
+
+      this._addValueInputButton.click((e) => {
+         this._eventHub.trigger("please-create-child-node", ["value-input", this.getId(), this.getName()]);
+      });
+
       this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);
+
       this._eventHub.on("config-has-been-updated", this._onConfigUpdatedBound);
-      
-      this._initializeAddButtonBehaviour();
-      this._initializeReparentButtonBehaviour();
 
       new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
    }
 
-   _initializeAddButtonBehaviour() {
-      if (this.canBeAParentNode()) {
-         this._addButton.click((e) => {
-            this._eventHub.trigger("please-create-child-node", [this.getId(), this.getName()]);
-         });
-      } else {
-         this._addButton.hide();
-      }
-   }
-
-   _initializeReparentButtonBehaviour() {
-      this._reparentButton.click(() => {
-         this._eventHub.trigger("please-show-reparent-node-view", [this]);
+   _removeTypeOptions() {
+      this._getTypeOptionsToRemove().forEach((value) => {
+         this._typeInput.find(`option[value=${value}]`).remove();
       });
    }
 
@@ -253,17 +254,6 @@ class NodeView {
       this._renderConfigView(configType);
       this._clausesView = new ClausesView(this._clauses);
       this._clausesContainer.append(this._clausesView.render());
-      this._handleClausesVisibility();
-   }
-
-   _handleClausesVisibility() {
-      var nodeType = this._getSelectTypeFromModel();
-      if (nodeType === "checkbox" || nodeType === "radio") {
-         this._clausesSection.show();
-      } else {
-         this._clausesSection.hide();
-         this._clausesView.reset();
-      }
    }
 
    _renderConfigView(type) {
@@ -328,6 +318,10 @@ class NodeView {
       if (v === "radio") {
          this._model.enum = [];
       }
+   }
+
+   _getTypeOptionsToRemove() {
+      return ["number", "text"];
    }
 }
 

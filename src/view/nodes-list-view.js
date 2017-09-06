@@ -1,6 +1,7 @@
 const _ = require('underscore');
 const $ = require('jquery');
 const NodeView = require('./node-view');
+const ValueView = require('./value-view');
 const templates = require('./../templates');
 const SchemaBuilder = require('./../schema-builder');
 const ReparentNodeView = require('./reparent-node-view');
@@ -32,7 +33,8 @@ class NodesListView {
                this._clausesModel = clauses[0];
 
                for (var name in nodes) {
-                  this._buildNode(String(this._getNextId()), name, nodes[name]);
+                  let type = nodes[name].type === "boolean" || nodes[name].type === "string" && nodes[name].enum ? "node" : "value-input"; // TODO: refactor
+                  this._buildNode(type, String(this._getNextId()), name, nodes[name]);
                }
 
                this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
@@ -63,7 +65,7 @@ class NodesListView {
 
       this._addButton.click((e) => {
          var newNode;
-         newNode = this._buildNode(String(this._getNextId()), "", {});
+         newNode = this._buildNode("node", String(this._getNextId()), "", {});
          this._renderNode(newNode);
          this._handleNoNodesYetMessage();
          this._scrollToBottom();
@@ -85,9 +87,9 @@ class NodesListView {
          }
       });
 
-      this._eventHub.on("please-create-child-node", (e, parentNodeId, parentNodeName) => {
+      this._eventHub.on("please-create-child-node", (e, type, parentNodeId, parentNodeName) => {
          var newNode;
-         newNode = this._buildNode(String(this._getNextId()), "", {});
+         newNode = this._buildNode(type, String(this._getNextId()), "", {});
          newNode.setParentId(parentNodeId);
          newNode.setParentName(parentNodeName);
          this._renderNode(newNode);
@@ -120,8 +122,13 @@ class NodesListView {
       });
    }
 
-   _buildNode(id, name, nodeModel) {
-      var nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
+   _buildNode(type, id, name, nodeModel) {
+      var nodeView;
+      if (type === "node") {
+         nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
+      } else if (type === "value-input") {
+         nodeView = new ValueView(id, name, nodeModel, this._clausesModel, this._eventHub);
+      }
       this._nodeViews.push(nodeView);
       return nodeView;
    }

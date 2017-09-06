@@ -11842,7 +11842,7 @@ module.exports = SchemaBuilder;
 
 module.exports = {
    "nodes-list-view": "<div class=\"nodes-list-view\">\n   \n   <header class=\"main-header\">\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <span class=\"name-label\"></span>\n   \n   <div class=\"buttons\">\n      <button class=\"add\">Add child node</button>\n      <button class=\"reparent\">Reparent</button>\n      <button class=\"delete\">Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"children\">\n      <h2>Child nodes</h2>\n      <div class=\"container\"></div>\n   </div>\n\n</div>",
+   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <span class=\"name-label\"></span>\n   \n   <div class=\"buttons\">\n      <button class=\"add-child-node\">Add child node</button>\n      <button class=\"add-value-input\">Add value input</button>\n      <button class=\"reparent\">Reparent</button>\n      <button class=\"delete\">Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"children\">\n      <h2>Child nodes</h2>\n      <div class=\"container\"></div>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>",
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
@@ -12338,7 +12338,8 @@ class NodeView {
       this._typeInput = this._root.find(".type");
 
 
-      this._addButton = this._root.find("button.add");
+      this._addChildNodeButton = this._root.find("button.add-child-node");
+      this._addValueInputButton = this._root.find("button.add-value-input");
       this._reparentButton = this._root.find("button.reparent");
       this._deleteButton = this._root.find("button.delete");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
@@ -12348,8 +12349,9 @@ class NodeView {
       this._childrenSection = this._root.find(".children");
       this._childrenContainer = this._childrenSection.find(".container");
 
-      this._loadModelData();      
+      this._loadModelData();
       this._renderSubViews();
+      this._removeTypeOptions();
       this._behaviour();
 
       this._rendered = true;
@@ -12400,7 +12402,6 @@ class NodeView {
          var configType = this._typeInput.val();
          this._setModelTypeFromSelect(configType);
          this._renderConfigView(configType);
-         this._handleClausesVisibility();
       });
 
       this._deleteButton.click((e) => {
@@ -12411,28 +12412,28 @@ class NodeView {
          }
       });
 
+      this._reparentButton.click(() => {
+         this._eventHub.trigger("please-show-reparent-node-view", [this]);
+      });
+
+      this._addChildNodeButton.click((e) => {
+         this._eventHub.trigger("please-create-child-node", ["node", this.getId(), this.getName()]);
+      });
+
+      this._addValueInputButton.click((e) => {
+         this._eventHub.trigger("please-create-child-node", ["value-input", this.getId(), this.getName()]);
+      });
+
       this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);
+
       this._eventHub.on("config-has-been-updated", this._onConfigUpdatedBound);
-      
-      this._initializeAddButtonBehaviour();
-      this._initializeReparentButtonBehaviour();
 
       new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
    }
 
-   _initializeAddButtonBehaviour() {
-      if (this.canBeAParentNode()) {
-         this._addButton.click((e) => {
-            this._eventHub.trigger("please-create-child-node", [this.getId(), this.getName()]);
-         });
-      } else {
-         this._addButton.hide();
-      }
-   }
-
-   _initializeReparentButtonBehaviour() {
-      this._reparentButton.click(() => {
-         this._eventHub.trigger("please-show-reparent-node-view", [this]);
+   _removeTypeOptions() {
+      this._getTypeOptionsToRemove().forEach((value) => {
+         this._typeInput.find(`option[value=${value}]`).remove();
       });
    }
 
@@ -12449,17 +12450,6 @@ class NodeView {
       this._renderConfigView(configType);
       this._clausesView = new ClausesView(this._clauses);
       this._clausesContainer.append(this._clausesView.render());
-      this._handleClausesVisibility();
-   }
-
-   _handleClausesVisibility() {
-      var nodeType = this._getSelectTypeFromModel();
-      if (nodeType === "checkbox" || nodeType === "radio") {
-         this._clausesSection.show();
-      } else {
-         this._clausesSection.hide();
-         this._clausesView.reset();
-      }
    }
 
    _renderConfigView(type) {
@@ -12525,6 +12515,10 @@ class NodeView {
          this._model.enum = [];
       }
    }
+
+   _getTypeOptionsToRemove() {
+      return ["number", "text"];
+   }
 }
 
 module.exports = NodeView;
@@ -12532,6 +12526,7 @@ module.exports = NodeView;
 const _ = require('underscore');
 const $ = require('jquery');
 const NodeView = require('./node-view');
+const ValueView = require('./value-view');
 const templates = require('./../templates');
 const SchemaBuilder = require('./../schema-builder');
 const ReparentNodeView = require('./reparent-node-view');
@@ -12563,7 +12558,8 @@ class NodesListView {
                this._clausesModel = clauses[0];
 
                for (var name in nodes) {
-                  this._buildNode(String(this._getNextId()), name, nodes[name]);
+                  let type = nodes[name].type === "boolean" || nodes[name].type === "string" && nodes[name].enum ? "node" : "value-input"; // TODO: refactor
+                  this._buildNode(type, String(this._getNextId()), name, nodes[name]);
                }
 
                this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
@@ -12594,7 +12590,7 @@ class NodesListView {
 
       this._addButton.click((e) => {
          var newNode;
-         newNode = this._buildNode(String(this._getNextId()), "", {});
+         newNode = this._buildNode("node", String(this._getNextId()), "", {});
          this._renderNode(newNode);
          this._handleNoNodesYetMessage();
          this._scrollToBottom();
@@ -12616,9 +12612,9 @@ class NodesListView {
          }
       });
 
-      this._eventHub.on("please-create-child-node", (e, parentNodeId, parentNodeName) => {
+      this._eventHub.on("please-create-child-node", (e, type, parentNodeId, parentNodeName) => {
          var newNode;
-         newNode = this._buildNode(String(this._getNextId()), "", {});
+         newNode = this._buildNode(type, String(this._getNextId()), "", {});
          newNode.setParentId(parentNodeId);
          newNode.setParentName(parentNodeName);
          this._renderNode(newNode);
@@ -12651,8 +12647,13 @@ class NodesListView {
       });
    }
 
-   _buildNode(id, name, nodeModel) {
-      var nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
+   _buildNode(type, id, name, nodeModel) {
+      var nodeView;
+      if (type === "node") {
+         nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
+      } else if (type === "value-input") {
+         nodeView = new ValueView(id, name, nodeModel, this._clausesModel, this._eventHub);
+      }
       this._nodeViews.push(nodeView);
       return nodeView;
    }
@@ -12768,7 +12769,7 @@ class NodesListView {
 }
 
 module.exports = NodesListView;
-},{"./../schema-builder":4,"./../templates":5,"./node-view":14,"./reparent-node-view":16,"jquery":1,"underscore":2}],16:[function(require,module,exports){
+},{"./../schema-builder":4,"./../templates":5,"./node-view":14,"./reparent-node-view":16,"./value-view":17,"jquery":1,"underscore":2}],16:[function(require,module,exports){
 const $ = require('jquery');
 const _ = require('underscore');
 const templates = require('./../templates');
@@ -12880,4 +12881,28 @@ class ReparentNodeView {
 }
 
 module.exports = ReparentNodeView;
-},{"./../templates":5,"jquery":1,"underscore":2}]},{},[3]);
+},{"./../templates":5,"jquery":1,"underscore":2}],17:[function(require,module,exports){
+const _ = require('underscore');
+const $ = require('jquery');
+const NodeView = require('./node-view');
+
+class ValueView extends NodeView {
+
+   render() {
+      super.render();
+      this.getDomNode().attr("class", null).addClass("value-view");
+      this._clausesSection.remove();
+      this._addChildNodeButton.remove();
+      this._addValueInputButton.remove();
+      this._reparentButton.remove();
+      this._clausesSection.remove();
+      this._childrenSection.remove();
+   }
+
+   _getTypeOptionsToRemove() {
+      return ["checkbox", "radio"];
+   }
+}
+
+module.exports = ValueView;
+},{"./node-view":14,"jquery":1,"underscore":2}]},{},[3]);
