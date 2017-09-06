@@ -11829,7 +11829,7 @@ class SchemaBuilder {
       this._views.forEach((v) => {
          var model = v.getModel();
          model.clauses = v.getClauses();
-         schema.properties[v.getName()] = model;
+         schema.properties[v.getSchemaName()] = model;
       });
 
       return schema;
@@ -12206,7 +12206,7 @@ class NodeView {
    constructor(id, name, model, clauses, eventHub) {
       this._rendered = false;
       this._id = id;
-      this._name = name;
+      this._name = this._parseName(name);
       this._model = model;
       this._clauses = clauses;
       this._eventHub = eventHub;
@@ -12238,6 +12238,10 @@ class NodeView {
 
    getName() {
       return this._name;
+   }
+
+   getSchemaName() {
+      return this.getName();
    }
 
    getModel() {
@@ -12322,7 +12326,7 @@ class NodeView {
             }
          }
       });
-      
+
       this._handleChildrenSectionVisibility();
    }
 
@@ -12562,6 +12566,10 @@ class NodeView {
 
    _getTypeOptionsToRemove() {
       return ["number", "text"];
+   }
+
+   _parseName(name) {
+      return name;
    }
 }
 
@@ -12935,8 +12943,16 @@ class ValueView extends NodeView {
       this._childrenSection.remove();
    }
 
+   getSchemaName() {
+      return this.getParentName() + "." + this.getName();
+   }
+
    _getTypeOptionsToRemove() {
       return ["checkbox", "radio"];
+   }
+
+   _parseName(name) {
+      return name.split(".")[1];
    }
 }
 

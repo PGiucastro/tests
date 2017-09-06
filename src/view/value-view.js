@@ -15,8 +15,16 @@ class ValueView extends NodeView {
       this._childrenSection.remove();
    }
 
+   getSchemaName() {
+      return this.getParentName() + "." + this.getName();
+   }
+
    _getTypeOptionsToRemove() {
       return ["checkbox", "radio"];
+   }
+
+   _parseName(name) {
+      return name.split(".")[1];
    }
 }
 

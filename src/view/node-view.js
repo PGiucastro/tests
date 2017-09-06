@@ -10,7 +10,7 @@ class NodeView {
    constructor(id, name, model, clauses, eventHub) {
       this._rendered = false;
       this._id = id;
-      this._name = name;
+      this._name = this._parseName(name);
       this._model = model;
       this._clauses = clauses;
       this._eventHub = eventHub;
@@ -42,6 +42,10 @@ class NodeView {
 
    getName() {
       return this._name;
+   }
+
+   getSchemaName() {
+      return this.getName();
    }
 
    getModel() {
@@ -126,7 +130,7 @@ class NodeView {
             }
          }
       });
-      
+
       this._handleChildrenSectionVisibility();
    }
 
@@ -366,6 +370,10 @@ class NodeView {
 
    _getTypeOptionsToRemove() {
       return ["number", "text"];
+   }
+
+   _parseName(name) {
+      return name;
    }
 }
 
