@@ -16,7 +16,12 @@ class SchemaBuilder {
 
       this._views.forEach((v) => {
          var model = v.getModel();
-         model.clauses = v.getClauses();
+         var clauses = v.getClauses();
+         if (clauses.length > 0) {
+            model.clauses = v.getClauses();
+         } else {
+            delete model.clauses;
+         }
          schema.properties[v.getSchemaName()] = model;
       });
 

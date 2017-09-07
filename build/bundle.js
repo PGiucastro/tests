@@ -11828,7 +11828,12 @@ class SchemaBuilder {
 
       this._views.forEach((v) => {
          var model = v.getModel();
-         model.clauses = v.getClauses();
+         var clauses = v.getClauses();
+         if (clauses.length > 0) {
+            model.clauses = v.getClauses();
+         } else {
+            delete model.clauses;
+         }
          schema.properties[v.getSchemaName()] = model;
       });
 
@@ -12570,7 +12575,7 @@ class NodeView {
 
       this._handleNodeViewsSectionVisibility();
 
-      console.log(this._name + " holds now " + this._nodeViews.length + " node", this._nodeViews.map((n) => {
+      console.log(this._name + " has now " + this._nodeViews.length + " children", this._nodeViews.map((n) => {
          return n.getName();
       }));
    }
