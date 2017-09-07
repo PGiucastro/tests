@@ -33,14 +33,15 @@ class MainView {
                this._clausesModel = clauses[0];
 
                for (var name in nodes) {
-                  let type = nodes[name].type === "boolean" || nodes[name].type === "string" && nodes[name].enum ? "node" : "value-input"; // TODO: refactor
+                  let type = this._getTypeByModel(nodes[name]);
                   this._buildNode(type, String(this._getNextId()), name, nodes[name]);
                }
 
                this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
 
                for (var i = 0; i < this._nodeViews.length; i++) {
-                  this._renderNode(this._nodeViews[i]);
+                  let type = this._getTypeByModel(this._nodeViews[i].getModel());
+                  this._renderNode(type, this._nodeViews[i]);
                }
 
                this._handleNoNodesYetMessage();
@@ -64,9 +65,8 @@ class MainView {
       });
 
       this._addButton.click((e) => {
-         var newNode;
-         newNode = this._buildNode("node", String(this._getNextId()), "", {});
-         this._renderNode(newNode);
+         var newNode = this._buildNode("node-view", String(this._getNextId()), "", {});
+         this._renderNode("node-view", newNode);
          this._handleNoNodesYetMessage();
          this._scrollToBottom();
       });
@@ -92,7 +92,7 @@ class MainView {
 
          this._handleNoNodesYetMessage();
 
-         console.log("remaining nodes in nodes-list-view", this._nodeViews.length);
+         console.log("remaining nodes and values referenced by main-view", this._nodeViews.length);
       });
 
       this._eventHub.on("node-name-has-been-updated", (e, id, newName) => {
@@ -106,11 +106,10 @@ class MainView {
       });
 
       this._eventHub.on("please-create-child-node", (e, type, parentNodeId, parentNodeName) => {
-         var newNode;
-         newNode = this._buildNode(type, String(this._getNextId()), "", {});
+         var newNode = this._buildNode(type, String(this._getNextId()), "", {});
          newNode.setParentId(parentNodeId);
          newNode.setParentName(parentNodeName);
-         this._renderNode(newNode);
+         this._renderNode(type, newNode);
          this._scrollToNode(newNode);
       });
 
@@ -130,7 +129,7 @@ class MainView {
          let newParentView = this._getViewByName(newParentName);
 
          if (currentParentView) { // the node might be root one, in which case no current parent exists.
-            currentParentView.detachChildNode(nodeToReparent);
+            currentParentView.detachNodeView(nodeToReparent);
          }
 
          if (!newParentView) { // it has been asked to make it a root node            
@@ -138,29 +137,36 @@ class MainView {
             this._list.append(nodeToReparent.getDomNode());
          } else {
             nodeToReparent.setParentName(newParentName);
-            newParentView.appendChildNode(nodeToReparent);
+            newParentView.appendNodeView(nodeToReparent);
          }
       });
    }
 
    _buildNode(type, id, name, nodeModel) {
       var nodeView;
-      if (type === "node") {
+      if (type === "node-view") {
          nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
-      } else if (type === "value-input") {
+      } else if (type === "value-view") {
          nodeView = new ValueView(id, name, nodeModel, this._clausesModel, this._eventHub);
+      } else {
+         throw `Unknown type [${type}]`;
       }
       this._nodeViews.push(nodeView);
       return nodeView;
    }
 
-   _renderNode(nodeView) {
-      var parentId = nodeView.getParentId();
-      nodeView.render();
-      if (parentId) {
-         this._getViewById(parentId).appendChildNode(nodeView);
+   _renderNode(type, node) {
+      var parentId = node.getParentId();
+      var parent = this._getViewById(parentId);
+      node.render();
+      if (parent) {
+         if (type === "node-view") {
+            parent.appendNodeView(node);
+         } else if (type === "value-view") {
+            parent.appendValueView(node);
+         }
       } else {
-         this._list.append(nodeView.getDomNode());
+         this._list.append(node.getDomNode());
       }
    }
 
@@ -233,6 +239,10 @@ class MainView {
    _getNextId() {
       this._lastUsedId++;
       return this._lastUsedId;
+   }
+
+   _getTypeByModel(model) {
+      return model.type === "boolean" || model.type === "string" && model.enum ? "node-view" : "value-view";
    }
 }
 

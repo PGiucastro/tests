@@ -11842,7 +11842,7 @@ module.exports = SchemaBuilder;
 
 module.exports = {
    "main-view": "<div class=\"main-view\">\n   \n   <header class=\"main-header\">\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <span class=\"name-label\"></span>\n\n   <div class=\"buttons\">\n      <button class=\"add-child-node\">Add child node</button>\n      <button class=\"add-value-input\">Add value input</button>\n      <button class=\"reparent\">Reparent</button>\n      <button class=\"delete\">Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"values\">\n      <h2>Values</h2>\n      <div class=\"container\"></div>\n   </div>\n\n   <div class=\"children\">\n      <h2>Child Nodes</h2>\n      <div class=\"container\"></div>\n   </div>\n\n</div>",
+   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <span class=\"name-label\"></span>\n\n   <div class=\"buttons\">\n      <button class=\"add-child-node\">Add child node</button>\n      <button class=\"add-value-input\">Add value input</button>\n      <button class=\"reparent\">Reparent</button>\n      <button class=\"delete\">Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"value-views\">\n      <h2>Value Inputs</h2>\n      <div class=\"container\"></div>\n   </div>\n\n   <div class=\"node-views\">\n      <h2>Child Nodes</h2>\n      <div class=\"container\"></div>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>",
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
@@ -12229,14 +12229,15 @@ class MainView {
                this._clausesModel = clauses[0];
 
                for (var name in nodes) {
-                  let type = nodes[name].type === "boolean" || nodes[name].type === "string" && nodes[name].enum ? "node" : "value-input"; // TODO: refactor
+                  let type = this._getTypeByModel(nodes[name]);
                   this._buildNode(type, String(this._getNextId()), name, nodes[name]);
                }
 
                this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
 
                for (var i = 0; i < this._nodeViews.length; i++) {
-                  this._renderNode(this._nodeViews[i]);
+                  let type = this._getTypeByModel(this._nodeViews[i].getModel());
+                  this._renderNode(type, this._nodeViews[i]);
                }
 
                this._handleNoNodesYetMessage();
@@ -12260,9 +12261,8 @@ class MainView {
       });
 
       this._addButton.click((e) => {
-         var newNode;
-         newNode = this._buildNode("node", String(this._getNextId()), "", {});
-         this._renderNode(newNode);
+         var newNode = this._buildNode("node-view", String(this._getNextId()), "", {});
+         this._renderNode("node-view", newNode);
          this._handleNoNodesYetMessage();
          this._scrollToBottom();
       });
@@ -12288,7 +12288,7 @@ class MainView {
 
          this._handleNoNodesYetMessage();
 
-         console.log("remaining nodes in nodes-list-view", this._nodeViews.length);
+         console.log("remaining nodes and values referenced by main-view", this._nodeViews.length);
       });
 
       this._eventHub.on("node-name-has-been-updated", (e, id, newName) => {
@@ -12302,11 +12302,10 @@ class MainView {
       });
 
       this._eventHub.on("please-create-child-node", (e, type, parentNodeId, parentNodeName) => {
-         var newNode;
-         newNode = this._buildNode(type, String(this._getNextId()), "", {});
+         var newNode = this._buildNode(type, String(this._getNextId()), "", {});
          newNode.setParentId(parentNodeId);
          newNode.setParentName(parentNodeName);
-         this._renderNode(newNode);
+         this._renderNode(type, newNode);
          this._scrollToNode(newNode);
       });
 
@@ -12326,7 +12325,7 @@ class MainView {
          let newParentView = this._getViewByName(newParentName);
 
          if (currentParentView) { // the node might be root one, in which case no current parent exists.
-            currentParentView.detachChildNode(nodeToReparent);
+            currentParentView.detachNodeView(nodeToReparent);
          }
 
          if (!newParentView) { // it has been asked to make it a root node            
@@ -12334,29 +12333,36 @@ class MainView {
             this._list.append(nodeToReparent.getDomNode());
          } else {
             nodeToReparent.setParentName(newParentName);
-            newParentView.appendChildNode(nodeToReparent);
+            newParentView.appendNodeView(nodeToReparent);
          }
       });
    }
 
    _buildNode(type, id, name, nodeModel) {
       var nodeView;
-      if (type === "node") {
+      if (type === "node-view") {
          nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
-      } else if (type === "value-input") {
+      } else if (type === "value-view") {
          nodeView = new ValueView(id, name, nodeModel, this._clausesModel, this._eventHub);
+      } else {
+         throw `Unknown type [${type}]`;
       }
       this._nodeViews.push(nodeView);
       return nodeView;
    }
 
-   _renderNode(nodeView) {
-      var parentId = nodeView.getParentId();
-      nodeView.render();
-      if (parentId) {
-         this._getViewById(parentId).appendChildNode(nodeView);
+   _renderNode(type, node) {
+      var parentId = node.getParentId();
+      var parent = this._getViewById(parentId);
+      node.render();
+      if (parent) {
+         if (type === "node-view") {
+            parent.appendNodeView(node);
+         } else if (type === "value-view") {
+            parent.appendValueView(node);
+         }
       } else {
-         this._list.append(nodeView.getDomNode());
+         this._list.append(node.getDomNode());
       }
    }
 
@@ -12430,6 +12436,10 @@ class MainView {
       this._lastUsedId++;
       return this._lastUsedId;
    }
+
+   _getTypeByModel(model) {
+      return model.type === "boolean" || model.type === "string" && model.enum ? "node-view" : "value-view";
+   }
 }
 
 module.exports = MainView;
@@ -12446,14 +12456,18 @@ class NodeView {
    constructor(id, name, model, clauses, eventHub) {
       this._rendered = false;
       this._id = id;
+      this._parentId;
       this._name = this._parseName(name);
       this._model = model;
       this._clauses = clauses;
+
       this._eventHub = eventHub;
+
       this._configView;
       this._clausesView;
-      this._parentId;
-      this._childNodeViews = [];
+
+      this._nodeViews = [];
+      this._valueViews = [];
    }
 
    getDomNode() {
@@ -12501,10 +12515,6 @@ class NodeView {
       };
    }
 
-   getChildNodeViews() {
-      return this._childNodeViews;
-   }
-
    setParentId(id) {
       this._parentId = id;
    }
@@ -12517,10 +12527,18 @@ class NodeView {
       }
    }
 
-   appendChildNode(node) {
-      this._childNodeViews.push(node);
-      this._childrenContainer.append(node.getDomNode());
-      this._childrenSection.show();
+   appendNodeView(view) {
+      this._nodeViews.push(view);
+      this._nodeViewsContainer.append(view.getDomNode());
+      this._nodeViewsSection.show();
+      console.log(this._name + " now references " + this._nodeViews.length + " nodes");
+   }
+
+   appendValueView(view) {
+      this._valueViews.push(view);
+      this._valueViewsContainer.append(view.getDomNode());
+      this._valueViewsSection.show();
+      console.log(this._name + " now references " + this._valueViews.length + " values");
    }
 
    /** 
@@ -12528,18 +12546,18 @@ class NodeView {
     * 
     * Note: there is actually no dom removal performed here!!!
     * 
-    * This is because the dom operations performed inside `appendChildNode` already take care of this. 
+    * This is because the dom operations performed inside `appendNodeView` already take care of this. 
     * In fact appending a dom node automatically detaches it from its previous location.
     * The browser does it by itself;
     * 
     * @param {NodeView} nodeToRemove
     */
-   detachChildNode(nodeToRemove) {
+   detachNodeView(nodeToRemove) {
 
       var index = -1;
 
-      for (var i = 0; i < this._childNodeViews.length; i++) {
-         let node = this._childNodeViews[i];
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         let node = this._nodeViews[i];
          if (node.getId() === nodeToRemove.getId()) {
             index = i;
             break;
@@ -12547,27 +12565,38 @@ class NodeView {
       }
 
       if (index !== -1) {
-         this._childNodeViews.splice(index, 1);
+         this._nodeViews.splice(index, 1);
       }
 
-      this._handleChildrenSectionVisibility();
+      this._handleNodeViewsSectionVisibility();
 
-      console.log(this._name + " has now " + this._childNodeViews.length + " children", this._childNodeViews.map((n) => {
+      console.log(this._name + " has now " + this._nodeViews.length + " children", this._nodeViews.map((n) => {
          return n.getName();
       }));
    }
 
    notifyOfChildrenDestruction(ids) {
       ids.forEach((id) => {
-         for (var i = 0; i < this._childNodeViews.length; i++) {
-            if (this._childNodeViews[i].getId() === id) {
-               this._childNodeViews.splice(i, 1);
+         for (var i = 0; i < this._nodeViews.length; i++) {
+            if (this._nodeViews[i].getId() === id) {
+               this._nodeViews.splice(i, 1);
+               break;
+            }
+         }
+
+         for (var i = 0; i < this._valueViews.length; i++) {
+            if (this._valueViews[i].getId() === id) {
+               this._valueViews.splice(i, 1);
                break;
             }
          }
       });
 
-      this._handleChildrenSectionVisibility();
+      console.log("remaining nodes referenced by " + this._name, this._nodeViews.length);
+      console.log("remaining values referenced by " + this._name, this._valueViews.length);
+
+      this._handleNodeViewsSectionVisibility();
+      this._handleValueViewsSectionVisibility();
    }
 
    /**
@@ -12584,14 +12613,22 @@ class NodeView {
          dom.remove();
       });
 
-      for (var j = 0; j < this._childNodeViews.length; j++) {
-         let ids = this._childNodeViews[j].destroy();
+      for (var j = 0; j < this._nodeViews.length; j++) {
+         let ids = this._nodeViews[j].destroy();
          ids.forEach((id) => {
             destroyedIds.push(id);
          });
       }
 
-      this._childNodeViews = [];
+      for (var j = 0; j < this._valueViews.length; j++) {
+         let ids = this._valueViews[j].destroy();
+         ids.forEach((id) => {
+            destroyedIds.push(id);
+         });
+      }
+
+      this._nodeViews = [];
+      this._valueViews = [];
 
       return destroyedIds;
    }
@@ -12619,19 +12656,18 @@ class NodeView {
       this._titleInput_DE = this._root.find(".title_de");
       this._typeInput = this._root.find(".type");
 
-
-      this._addChildNodeButton = this._root.find("button.add-child-node");
-      this._addValueInputButton = this._root.find("button.add-value-input");
+      this._addNodeViewButton = this._root.find("button.add-child-node");
+      this._addValueViewButton = this._root.find("button.add-value-input");
       this._reparentButton = this._root.find("button.reparent");
       this._deleteButton = this._root.find("button.delete");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
       this._configSection = this._root.find(".config");
       this._clausesSection = this._root.find(".clauses");
       this._clausesContainer = this._clausesSection.find(".container");
-      this._childrenSection = this._root.find(".children");
-      this._childrenContainer = this._childrenSection.find(".container");
-      this._valuesSection = this._root.find(".values");
-      this._valuesContainer = this._valuesSection.find(".container");
+      this._nodeViewsSection = this._root.find(".node-views");
+      this._nodeViewsContainer = this._nodeViewsSection.find(".container");
+      this._valueViewsSection = this._root.find(".value-views");
+      this._valueViewsContainer = this._valueViewsSection.find(".container");
 
       this._loadModelData();
       this._renderSubViews();
@@ -12700,12 +12736,12 @@ class NodeView {
          this._eventHub.trigger("please-show-reparent-node-view", [this]);
       });
 
-      this._addChildNodeButton.click((e) => {
-         this._eventHub.trigger("please-create-child-node", ["node", this.getId(), this.getName()]);
+      this._addNodeViewButton.click((e) => {
+         this._eventHub.trigger("please-create-child-node", ["node-view", this.getId(), this.getName()]);
       });
 
-      this._addValueInputButton.click((e) => {
-         this._eventHub.trigger("please-create-child-node", ["value-input", this.getId(), this.getName()]);
+      this._addValueViewButton.click((e) => {
+         this._eventHub.trigger("please-create-child-node", ["value-view", this.getId(), this.getName()]);
       });
 
       this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);
@@ -12715,9 +12751,15 @@ class NodeView {
       new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
    }
 
-   _handleChildrenSectionVisibility() {
-      if (this._childNodeViews.length === 0) {
-         this._childrenSection.hide();
+   _handleNodeViewsSectionVisibility() {
+      if (this._nodeViews.length === 0) {
+         this._nodeViewsSection.hide();
+      }
+   }
+
+   _handleValueViewsSectionVisibility() {
+      if (this._valueViews.length === 0) {
+         this._valueViewsSection.hide();
       }
    }
 
@@ -12938,12 +12980,12 @@ class ValueView extends NodeView {
    render() {
       super.render();
       this.getDomNode().addClass("value-view");
-      this._clausesSection.remove();
-      this._addChildNodeButton.remove();
-      this._addValueInputButton.remove();
+      this._addNodeViewButton.remove();
+      this._addValueViewButton.remove();
       this._reparentButton.remove();
       this._clausesSection.remove();
-      this._childrenSection.remove();
+      this._nodeViewsSection.remove();
+      this._valueViewsSection.remove();
    }
 
    getSchemaName() {

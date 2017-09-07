@@ -100,15 +100,15 @@
    display: none;
 }
 
-.node-view .children, 
-.node-view .values {
+.node-view .node-views, 
+.node-view .value-views {
    display: none;
    margin-top: 30px;
    clear: both;
 }
 
-.node-view .children h2,
-.node-view .values h2 {
+.node-view .node-views h2,
+.node-view .value-views h2 {
    margin: 0px;
    font-size: 20px;
    margin-bottom: -15px;

@@ -7,12 +7,12 @@ class ValueView extends NodeView {
    render() {
       super.render();
       this.getDomNode().addClass("value-view");
-      this._clausesSection.remove();
-      this._addChildNodeButton.remove();
-      this._addValueInputButton.remove();
+      this._addNodeViewButton.remove();
+      this._addValueViewButton.remove();
       this._reparentButton.remove();
       this._clausesSection.remove();
-      this._childrenSection.remove();
+      this._nodeViewsSection.remove();
+      this._valueViewsSection.remove();
    }
 
    getSchemaName() {
