@@ -12292,7 +12292,8 @@ class MainView {
          }
 
          this._handleNoNodesYetMessage();
-
+         this._scrollToNode(parentView);
+         
          console.log("remaining nodes and values referenced by main-view", this._nodeViews.length);
       });
 
