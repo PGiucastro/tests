@@ -1,9 +1,9 @@
-.nodes-list-view {
+.main-view {
    padding-top: 60px;
    position: relative;
 }
 
-.nodes-list-view header.main-header {
+.main-view header.main-header {
    background: deepskyblue;
    position: fixed;
    top: 0;
@@ -13,27 +13,27 @@
    padding: 15px 30px;
 }
 
-.nodes-list-view header button {
+.main-view header button {
 
 }
 
-.nodes-list-view header .save {
+.main-view header .save {
    margin-left: 10px;
 }
 
-.nodes-list-view .loading {
+.main-view .loading {
    background: yellow;
    text-align: center;
    padding: 10px;
 }
 
-.nodes-list-view .no-nodes-yet {
+.main-view .no-nodes-yet {
    display: none;
    text-align: center;
    padding: 10px;
 }
 
-.nodes-list-view .list {
+.main-view .list {
    margin: 0;
    padding: 30px 30px 0px 30px;
 }

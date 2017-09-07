@@ -6,7 +6,7 @@ const templates = require('./../templates');
 const SchemaBuilder = require('./../schema-builder');
 const ReparentNodeView = require('./reparent-node-view');
 
-class NodesListView {
+class MainView {
 
    constructor(eventHub) {
       this._lastUsedId = 0;
@@ -235,4 +235,4 @@ class NodesListView {
    }
 }
 
-module.exports = NodesListView;
+module.exports = MainView;

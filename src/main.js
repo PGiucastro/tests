@@ -1,5 +1,5 @@
 const $ = require('jquery');
-const NodesList = require('./view/nodes-list-view');
+const MainView = require('./view/main-view');
 
-var list = new NodesList($({})).render();
+var list = new MainView($({})).render();
 $("body").append(list);
