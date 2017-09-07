@@ -100,13 +100,14 @@
    display: none;
 }
 
-.node-view .children {
+.node-view .children, 
+.node-view .values {
    margin-top: 30px;
-   display: none;
    clear: both;
 }
 
-.node-view .children h2 {
+.node-view .children h2,
+.node-view .values h2 {
    margin: 0px;
    font-size: 20px;
    margin-bottom: -15px;

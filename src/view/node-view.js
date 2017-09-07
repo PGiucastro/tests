@@ -194,6 +194,8 @@ class NodeView {
       this._clausesContainer = this._clausesSection.find(".container");
       this._childrenSection = this._root.find(".children");
       this._childrenContainer = this._childrenSection.find(".container");
+      this._valuesSection = this._root.find(".values");
+      this._valuesContainer = this._valuesSection.find(".container");
 
       this._loadModelData();
       this._renderSubViews();
