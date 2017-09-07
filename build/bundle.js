@@ -12289,11 +12289,11 @@ class MainView {
 
          if (parentView) {
             parentView.notifyOfChildrenDestruction(ids);
+            this._scrollToNode(parentView);
          }
 
          this._handleNoNodesYetMessage();
-         this._scrollToNode(parentView);
-         
+
          console.log("remaining nodes and values referenced by main-view", this._nodeViews.length);
       });
 
