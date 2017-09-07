@@ -102,6 +102,7 @@
 
 .node-view .children, 
 .node-view .values {
+   display: none;
    margin-top: 30px;
    clear: both;
 }

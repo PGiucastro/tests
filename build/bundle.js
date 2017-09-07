@@ -11841,7 +11841,7 @@ module.exports = SchemaBuilder;
 
 
 module.exports = {
-   "nodes-list-view": "<div class=\"main-view\">\n   \n   <header class=\"main-header\">\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
+   "main-view": "<div class=\"main-view\">\n   \n   <header class=\"main-header\">\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
    "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <span class=\"name-label\"></span>\n\n   <div class=\"buttons\">\n      <button class=\"add-child-node\">Add child node</button>\n      <button class=\"add-value-input\">Add value input</button>\n      <button class=\"reparent\">Reparent</button>\n      <button class=\"delete\">Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"values\">\n      <h2>Values</h2>\n      <div class=\"container\"></div>\n   </div>\n\n   <div class=\"children\">\n      <h2>Child Nodes</h2>\n      <div class=\"container\"></div>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>",
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
@@ -12210,7 +12210,7 @@ class MainView {
       this._nodeViews = [];
       this._clausesModel = null;
 
-      this._root = $(templates["nodes-list-view"]);
+      this._root = $(templates["main-view"]);
       this._addButton = this._root.find("button.add");
       this._saveButton = this._root.find("button.save");
       this._loader = this._root.find(".loading");
@@ -12307,7 +12307,7 @@ class MainView {
          newNode.setParentId(parentNodeId);
          newNode.setParentName(parentNodeName);
          this._renderNode(newNode);
-         this._scrollTo(newNode.geOffsetTop() - 100);
+         this._scrollToNode(newNode);
       });
 
       this._eventHub.on("please-show-reparent-node-view", (e, node) => {
@@ -12419,7 +12419,8 @@ class MainView {
       }, "slow");
    }
 
-   _scrollTo(px) {
+   _scrollToNode(node) {
+      var px = node.geOffsetTop() - 100;
       $("html, body").animate({
          scrollTop: px
       }, "slow");

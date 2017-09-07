@@ -14,7 +14,7 @@ class MainView {
       this._nodeViews = [];
       this._clausesModel = null;
 
-      this._root = $(templates["nodes-list-view"]);
+      this._root = $(templates["main-view"]);
       this._addButton = this._root.find("button.add");
       this._saveButton = this._root.find("button.save");
       this._loader = this._root.find(".loading");
@@ -111,7 +111,7 @@ class MainView {
          newNode.setParentId(parentNodeId);
          newNode.setParentName(parentNodeName);
          this._renderNode(newNode);
-         this._scrollTo(newNode.geOffsetTop() - 100);
+         this._scrollToNode(newNode);
       });
 
       this._eventHub.on("please-show-reparent-node-view", (e, node) => {
@@ -223,7 +223,8 @@ class MainView {
       }, "slow");
    }
 
-   _scrollTo(px) {
+   _scrollToNode(node) {
+      var px = node.geOffsetTop() - 100;
       $("html, body").animate({
          scrollTop: px
       }, "slow");
