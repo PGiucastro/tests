@@ -12767,7 +12767,7 @@ class NodeView {
          this._titleInput_EN.addClass("error");
          valid = false;
       }
-      
+
 //      NOT YET
 //      if ($.trim(this._titleInput_IT.val()) === "") {
 //         this._titleInput_IT.addClass("error");
@@ -12789,10 +12789,6 @@ class NodeView {
       return valid;
    }
 
-   _removeErrors() {
-      this._root.find("input, select").removeClass("error");
-   }
-
    _behaviour() {
 
       (() => {
@@ -12812,6 +12808,13 @@ class NodeView {
             debuggerBox.hide();
          }
       })();
+
+      this._root.click((e) => {
+         var trg = $(e.target);
+         if (trg.is("input, select")) {
+            trg.removeClass("error");
+         }
+      });
 
       this._nameInput.on("keyup", () => {
          this._name = this._nameInput.val();
@@ -12863,6 +12866,10 @@ class NodeView {
       this._eventHub.on("config-has-been-updated", this._onConfigUpdatedBound);
 
       new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
+   }
+
+   _removeErrors() {
+      this._root.find("input, select").removeClass("error");
    }
 
    _handleNodeViewsSectionVisibility() {
