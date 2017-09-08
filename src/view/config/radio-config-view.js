@@ -44,15 +44,26 @@ class RadioConfigView extends ConfigView {
 
       var valid = true;
       var inputs = this._radios.find("input");
+      var radioValues = [];
 
       for (var i = 0; i < inputs.length; i++) {
          let input = $(inputs[i]);
+         if (input.is(".value") && $.trim(input.val() !== "")) {
+            radioValues.push(input.val());
+         }
          if ($.trim(input.val()) === "") {
             input.addClass("error");
             valid = false;
          }
       }
-      
+
+      if (inputs.length > 0 && this._defaultInput.val() !== "") {
+         if (radioValues.indexOf(this._defaultInput.val()) === -1) {
+            this._defaultInput.addClass("error");
+            valid = false;
+         }
+      }
+
       return valid;
    }
 
