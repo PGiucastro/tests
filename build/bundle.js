@@ -12260,6 +12260,13 @@ class MainView {
    _behaviour() {
 
       this._saveButton.click((e) => {
+         for (var i = 0; i < this._nodeViews.length; i++) {
+            let node = this._nodeViews[i];
+            if (node.validate() === false) {
+               this._scrollToNode(node);
+               return;
+            }
+         }
          var sb = new SchemaBuilder(this._nodeViews);
          var json = sb.build();
          console.log(JSON.stringify(json, null, "   "));
@@ -12683,6 +12690,43 @@ class NodeView {
       this._rendered = true;
 
       return this._root;
+   }
+
+   validate() {
+      var result = true;
+
+      this._removeErrors();
+
+      if ($.trim(this._nameInput.val()) === "") {
+         this._nameInput.addClass("error");
+         result = false;
+      }
+
+      if ($.trim(this._typeInput.val()) === "-") {
+         this._typeInput.addClass("error");
+         result = false;
+      }
+
+      if ($.trim(this._titleInput_EN.val()) === "") {
+         this._titleInput_EN.addClass("error");
+         result = false;
+      }
+
+      if ($.trim(this._titleInput_IT.val()) === "") {
+         this._titleInput_IT.addClass("error");
+         result = false;
+      }
+
+      if ($.trim(this._titleInput_DE.val()) === "") {
+         this._titleInput_DE.addClass("error");
+         result = false;
+      }
+
+      return result;
+   }
+
+   _removeErrors() {
+      this._root.find("input, select").removeClass("error");
    }
 
    _behaviour() {

@@ -233,6 +233,43 @@ class NodeView {
       return this._root;
    }
 
+   validate() {
+      var result = true;
+
+      this._removeErrors();
+
+      if ($.trim(this._nameInput.val()) === "") {
+         this._nameInput.addClass("error");
+         result = false;
+      }
+
+      if ($.trim(this._typeInput.val()) === "-") {
+         this._typeInput.addClass("error");
+         result = false;
+      }
+
+      if ($.trim(this._titleInput_EN.val()) === "") {
+         this._titleInput_EN.addClass("error");
+         result = false;
+      }
+
+      if ($.trim(this._titleInput_IT.val()) === "") {
+         this._titleInput_IT.addClass("error");
+         result = false;
+      }
+
+      if ($.trim(this._titleInput_DE.val()) === "") {
+         this._titleInput_DE.addClass("error");
+         result = false;
+      }
+
+      return result;
+   }
+
+   _removeErrors() {
+      this._root.find("input, select").removeClass("error");
+   }
+
    _behaviour() {
 
       (() => {

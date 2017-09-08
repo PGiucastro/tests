@@ -3,6 +3,12 @@
    position: relative;
 }
 
+.main-view input.error,
+.main-view select.error {
+   border-color: red;
+   background: pink;
+}
+
 .main-view header.main-header {
    background: deepskyblue;
    position: fixed;

@@ -59,6 +59,13 @@ class MainView {
    _behaviour() {
 
       this._saveButton.click((e) => {
+         for (var i = 0; i < this._nodeViews.length; i++) {
+            let node = this._nodeViews[i];
+            if (node.validate() === false) {
+               this._scrollToNode(node);
+               return;
+            }
+         }
          var sb = new SchemaBuilder(this._nodeViews);
          var json = sb.build();
          console.log(JSON.stringify(json, null, "   "));
