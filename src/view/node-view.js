@@ -234,36 +234,44 @@ class NodeView {
    }
 
    validate() {
-      var result = true;
+      var valid = true;
 
       this._removeErrors();
 
       if ($.trim(this._nameInput.val()) === "") {
          this._nameInput.addClass("error");
-         result = false;
+         valid = false;
       }
 
       if ($.trim(this._typeInput.val()) === "-") {
          this._typeInput.addClass("error");
-         result = false;
+         valid = false;
       }
 
       if ($.trim(this._titleInput_EN.val()) === "") {
          this._titleInput_EN.addClass("error");
-         result = false;
+         valid = false;
+      }
+      
+//      NOT YET
+//      if ($.trim(this._titleInput_IT.val()) === "") {
+//         this._titleInput_IT.addClass("error");
+//         valid = false;
+//      }
+//
+//      if ($.trim(this._titleInput_DE.val()) === "") {
+//         this._titleInput_DE.addClass("error");
+//         valid = false;
+//      }
+
+      if (this._configView) {
+         let configValid = this._configView.validate();
+         if (!configValid) {
+            valid = false;
+         }
       }
 
-      if ($.trim(this._titleInput_IT.val()) === "") {
-         this._titleInput_IT.addClass("error");
-         result = false;
-      }
-
-      if ($.trim(this._titleInput_DE.val()) === "") {
-         this._titleInput_DE.addClass("error");
-         result = false;
-      }
-
-      return result;
+      return valid;
    }
 
    _removeErrors() {

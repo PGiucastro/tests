@@ -27,6 +27,10 @@ class NumberConfigView extends ConfigView {
       return this._model;
    }
 
+   validate() {
+      return true;
+   }
+
    _loadData() {
       this._defaultInput.val(this._model.default);
       this._minInput.val(this._model._iub_min);

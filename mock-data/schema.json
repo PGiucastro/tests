@@ -51,6 +51,7 @@
          "_iub_parent": "user_allowed_to_add_contents"
       },
       "permissive_licence_for_user_content_choice": {
+         "title": "Make a choice",
          "type": "string",
          "enum": [
             "license_your_user_content",

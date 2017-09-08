@@ -13,6 +13,14 @@ class ConfigView {
       throw "Abstract";
    }
 
+   validate() {
+      throw "Abstract";
+   }
+
+   _removeErrors() {
+      this._root.find("input, select").removeClass("error");
+   }
+
    _behaviour() {
       this._initExpander();
 

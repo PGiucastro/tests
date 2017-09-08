@@ -11951,10 +11951,12 @@ class CheckboxConfigView extends ConfigView {
       return this._root;
    }
 
-   getModel() {
-      return {
+   validate() {
+      return true;
+   }
 
-      };
+   getModel() {
+      return {};
    }
 }
 
@@ -11973,6 +11975,14 @@ class ConfigView {
 
    getModel() {
       throw "Abstract";
+   }
+
+   validate() {
+      throw "Abstract";
+   }
+
+   _removeErrors() {
+      this._root.find("input, select").removeClass("error");
    }
 
    _behaviour() {
@@ -12027,6 +12037,10 @@ class NumberConfigView extends ConfigView {
       return this._model;
    }
 
+   validate() {
+      return true;
+   }
+
    _loadData() {
       this._defaultInput.val(this._model.default);
       this._minInput.val(this._model._iub_min);
@@ -12075,6 +12089,23 @@ class RadioConfigView extends ConfigView {
       }
 
       return this._model;
+   }
+
+   validate() {
+      this._removeErrors();
+
+      var valid = true;
+      var inputs = this._radios.find("input");
+
+      for (var i = 0; i < inputs.length; i++) {
+         let input = $(inputs[i]);
+         if ($.trim(input.val()) === "") {
+            input.addClass("error");
+            valid = false;
+         }
+      }
+      
+      return valid;
    }
 
    _behaviour() {
@@ -12158,6 +12189,10 @@ class TextConfigView extends ConfigView {
       this._model.default = this._defaultInput.val();
       this._model._iub_validation = validation;
       return this._model;
+   }
+
+   validate() {
+      return true;
    }
 
    _loadData() {
@@ -12693,36 +12728,44 @@ class NodeView {
    }
 
    validate() {
-      var result = true;
+      var valid = true;
 
       this._removeErrors();
 
       if ($.trim(this._nameInput.val()) === "") {
          this._nameInput.addClass("error");
-         result = false;
+         valid = false;
       }
 
       if ($.trim(this._typeInput.val()) === "-") {
          this._typeInput.addClass("error");
-         result = false;
+         valid = false;
       }
 
       if ($.trim(this._titleInput_EN.val()) === "") {
          this._titleInput_EN.addClass("error");
-         result = false;
+         valid = false;
+      }
+      
+//      NOT YET
+//      if ($.trim(this._titleInput_IT.val()) === "") {
+//         this._titleInput_IT.addClass("error");
+//         valid = false;
+//      }
+//
+//      if ($.trim(this._titleInput_DE.val()) === "") {
+//         this._titleInput_DE.addClass("error");
+//         valid = false;
+//      }
+
+      if (this._configView) {
+         let configValid = this._configView.validate();
+         if (!configValid) {
+            valid = false;
+         }
       }
 
-      if ($.trim(this._titleInput_IT.val()) === "") {
-         this._titleInput_IT.addClass("error");
-         result = false;
-      }
-
-      if ($.trim(this._titleInput_DE.val()) === "") {
-         this._titleInput_DE.addClass("error");
-         result = false;
-      }
-
-      return result;
+      return valid;
    }
 
    _removeErrors() {
