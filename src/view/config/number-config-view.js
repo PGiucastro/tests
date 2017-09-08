@@ -28,7 +28,17 @@ class NumberConfigView extends ConfigView {
    }
 
    validate() {
-      return true;
+      this._removeErrors();
+
+      var valid = true;
+      var model = this.getModel();
+
+      if (!parseInt(this._model.default)) {
+         valid = false;
+         this._defaultInput.addClass("error");
+      }
+
+      return valid;
    }
 
    _loadData() {
