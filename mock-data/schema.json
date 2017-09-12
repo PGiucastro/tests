@@ -29,7 +29,7 @@
          "title": "I offer right of cancellation",
          "type": "boolean",
          "_iub_parent": "user_allowed_to_add_contents",
-          "_iub_position": 1
+         "_iub_position": 1
       },
       "right_of_cancellation.min_days": {
          "title": "Min",
@@ -37,25 +37,27 @@
          "default": 3,
          "_iub_min": 1,
          "_iub_max": "right_of_cancellation.max_days",
-         "_iub_parent": "right_of_cancellation"
+         "_iub_parent": "right_of_cancellation",
+         "_iub_position": 1
       },
       "right_of_cancellation.max_days": {
          "title": "Max",
          "type": "number",
          "default": 10,
-         "_iub_parent": "right_of_cancellation"
+         "_iub_parent": "right_of_cancellation",
+         "_iub_position": 2
       },
       "user_generated_content_for_apple_apps_possible": {
          "title": "Are you making user generated content for Apple apps possible?",
          "type": "boolean",
          "_iub_parent": "user_allowed_to_add_contents",
-          "_iub_position": 2
+         "_iub_position": 2
       },
       "permissive_licence_for_user_content": {
          "title": "Do you need a permissive licence for user content (i.e.: leaving all rights to user)",
          "type": "boolean",
          "_iub_parent": "user_allowed_to_add_contents",
-          "_iub_position": 3
+         "_iub_position": 3
       },
       "permissive_licence_for_user_content_choice": {
          "title": "Make a choice",
@@ -70,7 +72,8 @@
             "All rights remain with users"
          ],
          "_iub_parent": "permissive_licence_for_user_content",
-         "_iub_validation": "required"
+         "_iub_validation": "required",
+         "_iub_position": 1
       },
       "offered_type": {
          "title": "What do you offer?",
@@ -85,27 +88,32 @@
          ],
          "_iub_triggering_value": "goods",
          "_iub_parent": "paid_goods_and_or_services",
-         "_iub_validation": "required"
+         "_iub_validation": "required",
+         "_iub_position": 1
       },
       "trial_offered": {
          "title": "Trail offered?",
          "type": "boolean",
-         "_iub_parent": "paid_goods_and_or_services"
+         "_iub_parent": "paid_goods_and_or_services",
+         "_iub_position": 2
       },
       "in_app_purchase_offered": {
          "title": "In-app purchase offered?",
          "type": "boolean",
-         "_iub_parent": "paid_goods_and_or_services"
+         "_iub_parent": "paid_goods_and_or_services",
+         "_iub_position": 3
       },
       "coupons_offered": {
          "title": "Do you offer discount coupons?",
          "type": "boolean",
-         "_iub_parent": "paid_goods_and_or_services"
+         "_iub_parent": "paid_goods_and_or_services",
+         "_iub_position": 4
       },
       "recurring_subscription_offered": {
          "title": "Recurring subscription offered?",
          "type": "boolean",
-         "_iub_parent": "paid_goods_and_or_services"
+         "_iub_parent": "paid_goods_and_or_services",
+         "_iub_position": 5
       },
       "automatic_renewal": {
          "title": "Do you offer automatic renewal?",
@@ -118,12 +126,14 @@
             "Yes",
             "No"
          ],
-         "_iub_parent": "recurring_subscription_offered"
+         "_iub_parent": "recurring_subscription_offered",
+         "_iub_position": 1
       },
       "alcoholic_goods": {
          "title": "Are you selling alcoholic goods?",
          "type": "boolean",
-         "_iub_parent": "offered_type"
+         "_iub_parent": "offered_type",
+         "_iub_position": 1
       }
    }
 }
