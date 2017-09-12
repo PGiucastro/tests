@@ -34,6 +34,20 @@ class NodesOrderManager {
       this._workOutMaxPositionBasedOnModelsData();
    }
 
+   moveNodeToLowerPosition(node) {
+      var newPosition = node.getPosition() - 1;
+      var effectedNode = this._findNodeByPosition(newPosition);
+      effectedNode.setPosition(node.getPosition());
+      node.setPosition(newPosition);
+   }
+
+   moveNodeToHigherPosition(node) {
+      var newPosition = node.getPosition() + 1;
+      var effectedNode = this._findNodeByPosition(newPosition);
+      effectedNode.setPosition(node.getPosition());
+      node.setPosition(newPosition);
+   }
+
    _workOutMaxPositionBasedOnModelsData() {
       this._maxPosition = 0;
       this._nodes.forEach((n) => {
@@ -42,6 +56,15 @@ class NodesOrderManager {
             this._maxPosition = position;
          }
       });
+   }
+
+   _findNodeByPosition(position) {
+      for (var i = 0; i < this._nodes.length; i++) {
+         let node = this._nodes[i];
+         if (node.getPosition() === position) {
+            return node;
+         }
+      }
    }
 }
 

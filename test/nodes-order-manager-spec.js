@@ -47,4 +47,16 @@ describe('NodesOrderManager', function() {
       assert.equal(2, manager.getMaxPosition());
       assert.equal(2, newNode.getPosition());
    });
+
+   it('Can move a node to a lower positions', function() {
+      manager.moveNodeToLowerPosition(node3);
+      assert.equal(2, node3.getPosition());
+      assert.equal(3, node2.getPosition());
+   });
+
+   it('Can move a node to a higher positions', function() {
+      manager.moveNodeToHigherPosition(node2);
+      assert.equal(3, node2.getPosition());
+      assert.equal(2, node3.getPosition());
+   });
 });

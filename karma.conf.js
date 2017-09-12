@@ -22,12 +22,6 @@ module.exports = function(config) {
             included: false
          },
 
-         /* html fixtures */
-         'template/**/*.html',
-
-         /* app */
-         'src/order/nodes-order-manager.js',
-
          /* tests */
          'test/**/*-spec.js'
       ],
