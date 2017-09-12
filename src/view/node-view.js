@@ -22,6 +22,15 @@ class NodeView {
 
       this._nodeViews = [];
       this._valueViews = [];
+      this._positionIndex;
+   }
+
+   getPosition() {
+      return this._model._iub_position;
+   }
+
+   setPosition(index) {
+      return this._model._iub_position = index;
    }
 
    getDomNode() {
