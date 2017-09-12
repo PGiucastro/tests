@@ -25,6 +25,13 @@ describe('NodesOrderManager', function() {
       assert.equal(3, manager.getMaxPosition());
    });
 
+   it('Can be created empty and still work', function() {
+      manager = new NodesOrderManager([]);
+      manager.addNode(newNode);
+      assert.equal(1, manager.getMaxPosition());
+      assert.equal(1, newNode.getPosition());
+   });
+
    it('Assigns a new coherent order to any new node', function() {
       manager.addNode(newNode);
       assert.equal(4, manager.getMaxPosition());
@@ -58,5 +65,17 @@ describe('NodesOrderManager', function() {
       manager.moveNodeToHigherPosition(node2);
       assert.equal(3, node2.getPosition());
       assert.equal(2, node3.getPosition());
+   });
+
+   it('Does not do anything when reaching higher boundary', function() {
+      assert.equal(3, node3.getPosition());
+      manager.moveNodeToHigherPosition(node3);
+      assert.equal(3, node3.getPosition());
+   });
+
+   it('Does not do anything when reaching lower boundary', function() {
+      assert.equal(1, node1.getPosition());
+      manager.moveNodeToLowerPosition(node1);
+      assert.equal(1, node1.getPosition());
    });
 });

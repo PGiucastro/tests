@@ -11809,7 +11809,83 @@ const MainView = require('./view/main-view');
 
 var list = new MainView($({})).render();
 $("body").append(list);
-},{"./view/main-view":14,"jquery":1}],4:[function(require,module,exports){
+},{"./view/main-view":15,"jquery":1}],4:[function(require,module,exports){
+class NodesOrderManager {
+
+   constructor(nodes) {
+      this._maxPosition = -1;
+      this._nodes = nodes;
+      this._workOutMaxPositionBasedOnModelsData();
+   }
+
+   getMaxPosition() {
+      return this._maxPosition;
+   }
+
+   addNode(node) {
+      this._maxPosition++;
+      this._nodes.push(node);
+      node.setPosition(this._maxPosition);
+   }
+
+   removeNode(node) {
+      var newNodesList = [];
+      var positionOfTheNodeToRemove = node.getPosition();
+
+      this._nodes.forEach((current) => {
+         let position = current.getPosition();
+         if (node.getId() !== current.getId()) {
+            if (position > positionOfTheNodeToRemove) {
+               current.setPosition(position - 1);
+            }
+            newNodesList.push(current);
+         }
+      });
+
+      this._nodes = newNodesList;
+      this._workOutMaxPositionBasedOnModelsData();
+   }
+
+   moveNodeToLowerPosition(node) {
+      var newPosition = node.getPosition() - 1;
+      var effectedNode = this._findNodeByPosition(newPosition);
+      if (effectedNode) {
+         effectedNode.setPosition(node.getPosition());
+         node.setPosition(newPosition);
+      }
+   }
+
+   moveNodeToHigherPosition(node) {
+      var newPosition = node.getPosition() + 1;
+      var effectedNode = this._findNodeByPosition(newPosition);
+      if (effectedNode) {
+         effectedNode.setPosition(node.getPosition());
+         node.setPosition(newPosition);
+      }
+   }
+
+   _workOutMaxPositionBasedOnModelsData() {
+      this._maxPosition = 0;
+      this._nodes.forEach((n) => {
+         let position = n.getPosition();
+         if (this._maxPosition < position) {
+            this._maxPosition = position;
+         }
+      });
+   }
+
+   _findNodeByPosition(position) {
+      for (var i = 0; i < this._nodes.length; i++) {
+         let node = this._nodes[i];
+         if (node.getPosition() === position) {
+            return node;
+         }
+      }
+   }
+}
+
+module.exports = NodesOrderManager;
+},{}],5:[function(require,module,exports){
 class SchemaBuilder {
 
    constructor(nodeViews) {
@@ -11842,12 +11918,12 @@ class SchemaBuilder {
 }
 
 module.exports = SchemaBuilder;
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 
 
 module.exports = {
    "main-view": "<div class=\"main-view\">\n   \n   <header class=\"main-header\">\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <span class=\"name-label\"></span>\n\n   <div class=\"buttons\">\n      <button class=\"add-child-node\">Add child node</button>\n      <button class=\"add-value-input\">Add value input</button>\n      <button class=\"reparent\">Reparent</button>\n      <button class=\"delete\">Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"value-views\">\n      <h2>Value Inputs</h2>\n      <div class=\"container\"></div>\n   </div>\n\n   <div class=\"node-views\">\n      <h2>Child Nodes</h2>\n      <div class=\"container\"></div>\n   </div>\n\n</div>",
+   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <span class=\"name-label\"></span>\n\n   <div class=\"buttons\">\n      <button class=\"up\">Up</button>\n      <button class=\"down\">Down</button>\n      <button class=\"add-child-node\">Add child node</button>\n      <button class=\"add-value-input\">Add value input</button>\n      <button class=\"reparent\">Reparent</button>\n      <button class=\"delete\">Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"value-views\">\n      <h2>Value Inputs</h2>\n      <div class=\"container\"></div>\n   </div>\n\n   <div class=\"node-views\">\n      <h2>Child Nodes</h2>\n      <div class=\"container\"></div>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>",
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
@@ -11855,7 +11931,7 @@ module.exports = {
    "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <div class=\"input-wrapper prototype\" style=\"display: none\">\n      <label>Label</label>\n      <input type=\"text\" class=\"label\" />\n      <label>Value</label>\n      <input type=\"text\" class=\"value\" />\n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type=\"text\" class=\"default\" />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"radios\"></div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n   </section>\n\n\n\n</div>",
    "reparent-node-view": "<div class=\"reparent-node-view\">\n   \n   <span class=\"close\">Close (Esc)</span>\n\n   <div class=\"warning\"></div>\n\n   <label>Choose the new parent</label>\n   <select></select>\n\n   <button>Reparent</button>\n\n</div>"
 };
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 const $ = require('jquery');
 const _ = require('underscore');
 const templates = require('./../templates');
@@ -11897,7 +11973,7 @@ class ClausesView {
 }
 
 module.exports = ClausesView;
-},{"./../templates":5,"jquery":1,"underscore":2}],7:[function(require,module,exports){
+},{"./../templates":6,"jquery":1,"underscore":2}],8:[function(require,module,exports){
 const $ = require('jquery');
 const ConfigView = require('./config-view');
 const CheckboxConfigView = require('./checkbox-config-view');
@@ -11934,7 +12010,7 @@ module.exports = function(configType, nodeViewId, nodeModel, eventHub) {
 
    return view;
 };
-},{"./checkbox-config-view":8,"./config-view":9,"./number-config-view":10,"./radio-config-view":11,"./text-config-view":12,"jquery":1}],8:[function(require,module,exports){
+},{"./checkbox-config-view":9,"./config-view":10,"./number-config-view":11,"./radio-config-view":12,"./text-config-view":13,"jquery":1}],9:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
 const ConfigView = require('./config-view');
@@ -11961,7 +12037,7 @@ class CheckboxConfigView extends ConfigView {
 }
 
 module.exports = CheckboxConfigView;
-},{"./../../templates":5,"./config-view":9,"jquery":1}],9:[function(require,module,exports){
+},{"./../../templates":6,"./config-view":10,"jquery":1}],10:[function(require,module,exports){
 const $ = require('jquery');
 const Expander = require('./../expander');
 
@@ -12007,7 +12083,7 @@ class ConfigView {
 }
 
 module.exports = ConfigView;
-},{"./../expander":13,"jquery":1}],10:[function(require,module,exports){
+},{"./../expander":14,"jquery":1}],11:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
 const ConfigView = require('./config-view');
@@ -12059,7 +12135,7 @@ class NumberConfigView extends ConfigView {
 }
 
 module.exports = NumberConfigView;
-},{"./../../templates":5,"./config-view":9,"jquery":1}],11:[function(require,module,exports){
+},{"./../../templates":6,"./config-view":10,"jquery":1}],12:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
 const ConfigView = require('./config-view');
@@ -12185,7 +12261,7 @@ class RadioConfigView extends ConfigView {
 }
 
 module.exports = RadioConfigView;
-},{"./../../templates":5,"./config-view":9,"jquery":1}],12:[function(require,module,exports){
+},{"./../../templates":6,"./config-view":10,"jquery":1}],13:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
 const ConfigView = require('./config-view');
@@ -12223,7 +12299,7 @@ class TextConfigView extends ConfigView {
 }
 
 module.exports = TextConfigView;
-},{"./../../templates":5,"./config-view":9,"jquery":1}],13:[function(require,module,exports){
+},{"./../../templates":6,"./config-view":10,"jquery":1}],14:[function(require,module,exports){
 class Expander {
 
    constructor(trigger, panel, label, initiallyExpanded) {
@@ -12254,7 +12330,7 @@ class Expander {
 }
 
 module.exports = Expander;
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const NodeView = require('./node-view');
@@ -12262,6 +12338,7 @@ const ValueView = require('./value-view');
 const templates = require('./../templates');
 const SchemaBuilder = require('./../schema-builder');
 const ReparentNodeView = require('./reparent-node-view');
+const NodesOrderManager = require('./../order/nodes-order-manager');
 
 class MainView {
 
@@ -12270,6 +12347,7 @@ class MainView {
       this._eventHub = eventHub;
       this._nodeViews = [];
       this._clausesModel = null;
+      this._orderManager = new NodesOrderManager([]);
 
       this._root = $(templates["main-view"]);
       this._addButton = this._root.find("button.add");
@@ -12410,14 +12488,22 @@ class MainView {
    _buildNode(type, id, name, nodeModel) {
       var nodeView;
       if (type === "node-view") {
-         nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
+         nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub, this._moveNodeUp.bind(this), this._moveNodeDown.bind(this));
       } else if (type === "value-view") {
-         nodeView = new ValueView(id, name, nodeModel, this._clausesModel, this._eventHub);
+         nodeView = new ValueView(id, name, nodeModel, this._clausesModel, this._eventHub, this._moveNodeUp.bind(this), this._moveNodeDown.bind(this));
       } else {
          throw `Unknown type [${type}]`;
       }
       this._nodeViews.push(nodeView);
       return nodeView;
+   }
+
+   _moveNodeUp(node) {
+      this._orderManager.moveNodeToLowerPosition(node);
+   }
+
+   _moveNodeDown(node) {
+      this._orderManager.moveNodeToHigherPosition(node);
    }
 
    _renderNode(type, node) {
@@ -12432,6 +12518,7 @@ class MainView {
          }
       } else {
          this._list.append(node.getDomNode());
+         this._orderManager.addNode(node);
       }
    }
 
@@ -12512,7 +12599,7 @@ class MainView {
 }
 
 module.exports = MainView;
-},{"./../schema-builder":4,"./../templates":5,"./node-view":15,"./reparent-node-view":16,"./value-view":17,"jquery":1,"underscore":2}],15:[function(require,module,exports){
+},{"./../order/nodes-order-manager":4,"./../schema-builder":5,"./../templates":6,"./node-view":16,"./reparent-node-view":17,"./value-view":18,"jquery":1,"underscore":2}],16:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const templates = require('./../templates');
@@ -12522,7 +12609,7 @@ const Expander = require('./expander');
 
 class NodeView {
 
-   constructor(id, name, model, clauses, eventHub) {
+   constructor(id, name, model, clauses, eventHub, moveUp, moveDown) {
       this._rendered = false;
       this._id = id;
       this._parentId;
@@ -12532,12 +12619,14 @@ class NodeView {
 
       this._eventHub = eventHub;
 
+      this._moveUp = moveUp;
+      this._moveDown = moveDown;
+
       this._configView;
       this._clausesView;
 
       this._nodeViews = [];
       this._valueViews = [];
-      this._positionIndex;
    }
 
    getPosition() {
@@ -12734,6 +12823,8 @@ class NodeView {
       this._titleInput_DE = this._root.find(".title_de");
       this._typeInput = this._root.find(".type");
 
+      this._upButton = this._root.find("button.up");
+      this._downButton = this._root.find("button.down");
       this._addNodeViewButton = this._root.find("button.add-child-node");
       this._addValueViewButton = this._root.find("button.add-value-input");
       this._reparentButton = this._root.find("button.reparent");
@@ -12823,6 +12914,14 @@ class NodeView {
          if (trg.is("input, select")) {
             trg.removeClass("error");
          }
+      });
+
+      this._upButton.click(() => {
+         this._moveUp(this);
+      });
+
+      this._downButton.click(() => {
+         this._moveDown(this);
       });
 
       this._nameInput.on("keyup", () => {
@@ -12988,7 +13087,7 @@ class NodeView {
 }
 
 module.exports = NodeView;
-},{"./../templates":5,"./clauses-view":6,"./config/build-config-view":7,"./expander":13,"jquery":1,"underscore":2}],16:[function(require,module,exports){
+},{"./../templates":6,"./clauses-view":7,"./config/build-config-view":8,"./expander":14,"jquery":1,"underscore":2}],17:[function(require,module,exports){
 const $ = require('jquery');
 const _ = require('underscore');
 const templates = require('./../templates');
@@ -13100,7 +13199,7 @@ class ReparentNodeView {
 }
 
 module.exports = ReparentNodeView;
-},{"./../templates":5,"jquery":1,"underscore":2}],17:[function(require,module,exports){
+},{"./../templates":6,"jquery":1,"underscore":2}],18:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const NodeView = require('./node-view');
@@ -13132,4 +13231,4 @@ class ValueView extends NodeView {
 }
 
 module.exports = ValueView;
-},{"./node-view":15,"jquery":1,"underscore":2}]},{},[3]);
+},{"./node-view":16,"jquery":1,"underscore":2}]},{},[3]);

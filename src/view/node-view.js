@@ -7,7 +7,7 @@ const Expander = require('./expander');
 
 class NodeView {
 
-   constructor(id, name, model, clauses, eventHub) {
+   constructor(id, name, model, clauses, eventHub, moveUp, moveDown) {
       this._rendered = false;
       this._id = id;
       this._parentId;
@@ -17,12 +17,14 @@ class NodeView {
 
       this._eventHub = eventHub;
 
+      this._moveUp = moveUp;
+      this._moveDown = moveDown;
+
       this._configView;
       this._clausesView;
 
       this._nodeViews = [];
       this._valueViews = [];
-      this._positionIndex;
    }
 
    getPosition() {
@@ -219,6 +221,8 @@ class NodeView {
       this._titleInput_DE = this._root.find(".title_de");
       this._typeInput = this._root.find(".type");
 
+      this._upButton = this._root.find("button.up");
+      this._downButton = this._root.find("button.down");
       this._addNodeViewButton = this._root.find("button.add-child-node");
       this._addValueViewButton = this._root.find("button.add-value-input");
       this._reparentButton = this._root.find("button.reparent");
@@ -308,6 +312,14 @@ class NodeView {
          if (trg.is("input, select")) {
             trg.removeClass("error");
          }
+      });
+
+      this._upButton.click(() => {
+         this._moveUp(this);
+      });
+
+      this._downButton.click(() => {
+         this._moveDown(this);
       });
 
       this._nameInput.on("keyup", () => {

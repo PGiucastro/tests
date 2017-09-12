@@ -5,6 +5,7 @@ const ValueView = require('./value-view');
 const templates = require('./../templates');
 const SchemaBuilder = require('./../schema-builder');
 const ReparentNodeView = require('./reparent-node-view');
+const NodesOrderManager = require('./../order/nodes-order-manager');
 
 class MainView {
 
@@ -13,6 +14,7 @@ class MainView {
       this._eventHub = eventHub;
       this._nodeViews = [];
       this._clausesModel = null;
+      this._orderManager = new NodesOrderManager([]);
 
       this._root = $(templates["main-view"]);
       this._addButton = this._root.find("button.add");
@@ -153,14 +155,22 @@ class MainView {
    _buildNode(type, id, name, nodeModel) {
       var nodeView;
       if (type === "node-view") {
-         nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
+         nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub, this._moveNodeUp.bind(this), this._moveNodeDown.bind(this));
       } else if (type === "value-view") {
-         nodeView = new ValueView(id, name, nodeModel, this._clausesModel, this._eventHub);
+         nodeView = new ValueView(id, name, nodeModel, this._clausesModel, this._eventHub, this._moveNodeUp.bind(this), this._moveNodeDown.bind(this));
       } else {
          throw `Unknown type [${type}]`;
       }
       this._nodeViews.push(nodeView);
       return nodeView;
+   }
+
+   _moveNodeUp(node) {
+      this._orderManager.moveNodeToLowerPosition(node);
+   }
+
+   _moveNodeDown(node) {
+      this._orderManager.moveNodeToHigherPosition(node);
    }
 
    _renderNode(type, node) {
@@ -175,6 +185,7 @@ class MainView {
          }
       } else {
          this._list.append(node.getDomNode());
+         this._orderManager.addNode(node);
       }
    }
 

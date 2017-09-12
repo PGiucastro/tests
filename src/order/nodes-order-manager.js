@@ -37,15 +37,19 @@ class NodesOrderManager {
    moveNodeToLowerPosition(node) {
       var newPosition = node.getPosition() - 1;
       var effectedNode = this._findNodeByPosition(newPosition);
-      effectedNode.setPosition(node.getPosition());
-      node.setPosition(newPosition);
+      if (effectedNode) {
+         effectedNode.setPosition(node.getPosition());
+         node.setPosition(newPosition);
+      }
    }
 
    moveNodeToHigherPosition(node) {
       var newPosition = node.getPosition() + 1;
       var effectedNode = this._findNodeByPosition(newPosition);
-      effectedNode.setPosition(node.getPosition());
-      node.setPosition(newPosition);
+      if (effectedNode) {
+         effectedNode.setPosition(node.getPosition());
+         node.setPosition(newPosition);
+      }
    }
 
    _workOutMaxPositionBasedOnModelsData() {
