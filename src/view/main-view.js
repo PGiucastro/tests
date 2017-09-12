@@ -89,8 +89,7 @@ class MainView {
          ids.forEach((id) => {
             for (var i = 0; i < this._nodeViews.length; i++) {
                if (this._nodeViews[i].getId() === id) {
-                  this._orderManager.removeNode(this._nodeViews[i]);
-                  this._nodeViews.splice(i, 1);                  
+                  this._nodeViews.splice(i, 1);
                   break;
                }
             }
@@ -174,6 +173,10 @@ class MainView {
       this._orderManager.moveNodeToHigherPosition(node);
    }
 
+   _removeFromOrderManager(node) {
+      this._orderManager.removeNode(node);
+   }
+
    _renderNode(type, node) {
       var parentId = node.getParentId();
       var parent = this._getViewById(parentId);
@@ -187,6 +190,7 @@ class MainView {
       } else {
          node.setMoveDownCommand(this._moveNodeDown.bind(this));
          node.setMoveUpCommand(this._moveNodeUp.bind(this));
+         node.setRemoveFromPositionManagerCommand(this._removeFromOrderManager.bind(this));
          this._orderManager.addNode(node);
          this._list.append(node.getDomNode());
       }

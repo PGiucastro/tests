@@ -12422,8 +12422,7 @@ class MainView {
          ids.forEach((id) => {
             for (var i = 0; i < this._nodeViews.length; i++) {
                if (this._nodeViews[i].getId() === id) {
-                  this._orderManager.removeNode(this._nodeViews[i]);
-                  this._nodeViews.splice(i, 1);                  
+                  this._nodeViews.splice(i, 1);
                   break;
                }
             }
@@ -12507,6 +12506,10 @@ class MainView {
       this._orderManager.moveNodeToHigherPosition(node);
    }
 
+   _removeFromOrderManager(node) {
+      this._orderManager.removeNode(node);
+   }
+
    _renderNode(type, node) {
       var parentId = node.getParentId();
       var parent = this._getViewById(parentId);
@@ -12520,6 +12523,7 @@ class MainView {
       } else {
          node.setMoveDownCommand(this._moveNodeDown.bind(this));
          node.setMoveUpCommand(this._moveNodeUp.bind(this));
+         node.setRemoveFromPositionManagerCommand(this._removeFromOrderManager.bind(this));
          this._orderManager.addNode(node);
          this._list.append(node.getDomNode());
       }
@@ -12625,6 +12629,7 @@ class NodeView {
 
       this._moveUp;
       this._moveDown;
+      this._removeFromPositionManager;
 
       this._configView;
       this._clausesView;
@@ -12702,6 +12707,10 @@ class NodeView {
       this._moveDown = f;
    }
 
+   setRemoveFromPositionManagerCommand(f) {
+      this._removeFromPositionManager = f;
+   }
+
    setParentName(name) {
       if (!name) {
          delete this._model._iub_parent;
@@ -12712,6 +12721,12 @@ class NodeView {
 
    appendNodeView(view) {
       this._nodeViews.push(view);
+
+      this._nodeViewsOrderManager.addNode(view);
+      view.setMoveUpCommand(this._moveNodeViewUp.bind(this));
+      view.setMoveDownCommand(this._moveNodeViewDown.bind(this));
+      view.setRemoveFromPositionManagerCommand(this._removeNodeViewFromOrderManager.bind(this));
+
       this._nodeViewsContainer.append(view.getDomNode());
       this._nodeViewsSection.show();
       console.log(this._name + " now references " + this._nodeViews.length + " nodes");
@@ -12719,6 +12734,12 @@ class NodeView {
 
    appendValueView(view) {
       this._valueViews.push(view);
+
+      this._valueViewsOrderManager.addNode(view);
+      view.setMoveUpCommand(this._moveValueViewUp.bind(this));
+      view.setMoveDownCommand(this._moveValueViewDown.bind(this));
+      view.setRemoveFromPositionManagerCommand(this._removeValueViewFromOrderManager.bind(this));
+
       this._valueViewsContainer.append(view.getDomNode());
       this._valueViewsSection.show();
       console.log(this._name + " now references " + this._valueViews.length + " values");
@@ -12968,6 +12989,7 @@ class NodeView {
       this._deleteButton.click((e) => {
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
+            this._removeFromPositionManager(this);
             this._eventHub.off("config-has-been-updated", this._onConfigUpdatedBound);
             this._eventHub.trigger("please-delete-node", [this.getId()]);
          }
@@ -13099,6 +13121,30 @@ class NodeView {
 
    _parseName(name) {
       return name;
+   }
+
+   _moveNodeViewUp(node) {
+      this._nodeViewsOrderManager.moveNodeToLowerPosition(node);
+   }
+
+   _moveNodeViewDown(node) {
+      this._nodeViewsOrderManager.moveNodeToHigherPosition(node);
+   }
+
+   _removeNodeViewFromOrderManager(node) {
+      this._nodeViewsOrderManager.removeNode(node);
+   }
+
+   _moveValueViewUp(node) {
+      this._valueViewsOrderManager.moveNodeToLowerPosition(node);
+   }
+
+   _moveValueViewDown(node) {
+      this._valueViewsOrderManager.moveNodeToHigherPosition(node);
+   }
+
+   _removeValueViewFromOrderManager(node) {
+      this._valueViewsOrderManager.removeNode(node);
    }
 }
 
