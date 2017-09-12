@@ -11,6 +11,10 @@ class NodesOrderManager {
       });
    }
 
+   getMaxPosition() {
+      return this._maxPosition;
+   }
+
    addNode(node) {
       this._maxPosition++;
       this._nodes.push(node);
@@ -20,7 +24,6 @@ class NodesOrderManager {
    removeNode(node) {
 
    }
-
 }
 
 module.exports = NodesOrderManager;
