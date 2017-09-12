@@ -155,9 +155,9 @@ class MainView {
    _buildNode(type, id, name, nodeModel) {
       var nodeView;
       if (type === "node-view") {
-         nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub, this._moveNodeUp.bind(this), this._moveNodeDown.bind(this));
+         nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
       } else if (type === "value-view") {
-         nodeView = new ValueView(id, name, nodeModel, this._clausesModel, this._eventHub, this._moveNodeUp.bind(this), this._moveNodeDown.bind(this));
+         nodeView = new ValueView(id, name, nodeModel, this._clausesModel, this._eventHub);
       } else {
          throw `Unknown type [${type}]`;
       }
@@ -184,9 +184,13 @@ class MainView {
             parent.appendValueView(node);
          }
       } else {
-         this._list.append(node.getDomNode());
+         node.setMoveDownCommand(this._moveNodeDown.bind(this));
+         node.setMoveUpCommand(this._moveNodeUp.bind(this));
          this._orderManager.addNode(node);
+         this._list.append(node.getDomNode());
       }
+
+      //, this._moveNodeUp.bind(this), this._moveNodeDown.bind(this)
    }
 
    _handleNoNodesYetMessage() {

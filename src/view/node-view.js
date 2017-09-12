@@ -7,7 +7,7 @@ const Expander = require('./expander');
 
 class NodeView {
 
-   constructor(id, name, model, clauses, eventHub, moveUp, moveDown) {
+   constructor(id, name, model, clauses, eventHub) {
       this._rendered = false;
       this._id = id;
       this._parentId;
@@ -17,8 +17,8 @@ class NodeView {
 
       this._eventHub = eventHub;
 
-      this._moveUp = moveUp;
-      this._moveDown = moveDown;
+      this._moveUp;
+      this._moveDown;
 
       this._configView;
       this._clausesView;
@@ -29,10 +29,6 @@ class NodeView {
 
    getPosition() {
       return this._model._iub_position;
-   }
-
-   setPosition(index) {
-      return this._model._iub_position = index;
    }
 
    getDomNode() {
@@ -82,6 +78,18 @@ class NodeView {
 
    setParentId(id) {
       this._parentId = id;
+   }
+
+   setPosition(index) {
+      return this._model._iub_position = index;
+   }
+
+   setMoveUpCommand(f) {
+      this._moveUp = f;
+   }
+
+   setMoveDownCommand(f) {
+      this._moveDown = f;
    }
 
    setParentName(name) {

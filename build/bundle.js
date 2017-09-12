@@ -12488,9 +12488,9 @@ class MainView {
    _buildNode(type, id, name, nodeModel) {
       var nodeView;
       if (type === "node-view") {
-         nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub, this._moveNodeUp.bind(this), this._moveNodeDown.bind(this));
+         nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
       } else if (type === "value-view") {
-         nodeView = new ValueView(id, name, nodeModel, this._clausesModel, this._eventHub, this._moveNodeUp.bind(this), this._moveNodeDown.bind(this));
+         nodeView = new ValueView(id, name, nodeModel, this._clausesModel, this._eventHub);
       } else {
          throw `Unknown type [${type}]`;
       }
@@ -12517,9 +12517,13 @@ class MainView {
             parent.appendValueView(node);
          }
       } else {
-         this._list.append(node.getDomNode());
+         node.setMoveDownCommand(this._moveNodeDown.bind(this));
+         node.setMoveUpCommand(this._moveNodeUp.bind(this));
          this._orderManager.addNode(node);
+         this._list.append(node.getDomNode());
       }
+
+      //, this._moveNodeUp.bind(this), this._moveNodeDown.bind(this)
    }
 
    _handleNoNodesYetMessage() {
@@ -12609,7 +12613,7 @@ const Expander = require('./expander');
 
 class NodeView {
 
-   constructor(id, name, model, clauses, eventHub, moveUp, moveDown) {
+   constructor(id, name, model, clauses, eventHub) {
       this._rendered = false;
       this._id = id;
       this._parentId;
@@ -12619,8 +12623,8 @@ class NodeView {
 
       this._eventHub = eventHub;
 
-      this._moveUp = moveUp;
-      this._moveDown = moveDown;
+      this._moveUp;
+      this._moveDown;
 
       this._configView;
       this._clausesView;
@@ -12631,10 +12635,6 @@ class NodeView {
 
    getPosition() {
       return this._model._iub_position;
-   }
-
-   setPosition(index) {
-      return this._model._iub_position = index;
    }
 
    getDomNode() {
@@ -12684,6 +12684,18 @@ class NodeView {
 
    setParentId(id) {
       this._parentId = id;
+   }
+
+   setPosition(index) {
+      return this._model._iub_position = index;
+   }
+
+   setMoveUpCommand(f) {
+      this._moveUp = f;
+   }
+
+   setMoveDownCommand(f) {
+      this._moveDown = f;
    }
 
    setParentName(name) {
