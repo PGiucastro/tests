@@ -12422,7 +12422,8 @@ class MainView {
          ids.forEach((id) => {
             for (var i = 0; i < this._nodeViews.length; i++) {
                if (this._nodeViews[i].getId() === id) {
-                  this._nodeViews.splice(i, 1);
+                  this._orderManager.removeNode(this._nodeViews[i]);
+                  this._nodeViews.splice(i, 1);                  
                   break;
                }
             }
@@ -12522,8 +12523,6 @@ class MainView {
          this._orderManager.addNode(node);
          this._list.append(node.getDomNode());
       }
-
-      //, this._moveNodeUp.bind(this), this._moveNodeDown.bind(this)
    }
 
    _handleNoNodesYetMessage() {
@@ -12610,6 +12609,7 @@ const templates = require('./../templates');
 const ClausesView = require('./clauses-view');
 const buildConfigView = require('./config/build-config-view');
 const Expander = require('./expander');
+const NodesOrderManager = require('./../order/nodes-order-manager');
 
 class NodeView {
 
@@ -12631,6 +12631,10 @@ class NodeView {
 
       this._nodeViews = [];
       this._valueViews = [];
+
+      this._nodeViewsOrderManager = new NodesOrderManager([]);
+      this._valueViewsOrderManager = new NodesOrderManager([]);
+
    }
 
    getPosition() {
@@ -13099,7 +13103,7 @@ class NodeView {
 }
 
 module.exports = NodeView;
-},{"./../templates":6,"./clauses-view":7,"./config/build-config-view":8,"./expander":14,"jquery":1,"underscore":2}],17:[function(require,module,exports){
+},{"./../order/nodes-order-manager":4,"./../templates":6,"./clauses-view":7,"./config/build-config-view":8,"./expander":14,"jquery":1,"underscore":2}],17:[function(require,module,exports){
 const $ = require('jquery');
 const _ = require('underscore');
 const templates = require('./../templates');

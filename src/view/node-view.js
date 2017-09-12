@@ -4,6 +4,7 @@ const templates = require('./../templates');
 const ClausesView = require('./clauses-view');
 const buildConfigView = require('./config/build-config-view');
 const Expander = require('./expander');
+const NodesOrderManager = require('./../order/nodes-order-manager');
 
 class NodeView {
 
@@ -25,6 +26,10 @@ class NodeView {
 
       this._nodeViews = [];
       this._valueViews = [];
+
+      this._nodeViewsOrderManager = new NodesOrderManager([]);
+      this._valueViewsOrderManager = new NodesOrderManager([]);
+
    }
 
    getPosition() {
