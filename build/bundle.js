@@ -12775,26 +12775,46 @@ class NodeView {
 
    appendNodeView(view) {
       this._nodeViews.push(view);
-
       this._nodeViewsOrderManager.addNode(view);
+
+      var previousNode = this._nodeViewsOrderManager.getPreviousNode(view);
+      var nextNode = this._nodeViewsOrderManager.getNextNode(view);
+
       view.setMoveUpCommand(this._moveNodeViewUp.bind(this));
       view.setMoveDownCommand(this._moveNodeViewDown.bind(this));
       view.setRemoveFromPositionManagerCommand(this._removeNodeViewFromOrderManager.bind(this));
 
-      this._nodeViewsContainer.append(view.getDomNode());
+      if (!previousNode && !nextNode) { // it is the first being added
+         this._nodeViewsContainer.append(view.getDomNode());
+      } else if (previousNode) {
+         view.getDomNode().insertAfter(previousNode.getDomNode());
+      } else if (nextNode) {
+         view.getDomNode().insertBefore(nextNode.getDomNode());
+      }
+
       this._nodeViewsSection.show();
       console.log(this._name + " now references " + this._nodeViews.length + " nodes");
    }
 
    appendValueView(view) {
       this._valueViews.push(view);
-
       this._valueViewsOrderManager.addNode(view);
+
+      var previousNode = this._valueViewsOrderManager.getPreviousNode(view);
+      var nextNode = this._valueViewsOrderManager.getNextNode(view);
+
       view.setMoveUpCommand(this._moveValueViewUp.bind(this));
       view.setMoveDownCommand(this._moveValueViewDown.bind(this));
       view.setRemoveFromPositionManagerCommand(this._removeValueViewFromOrderManager.bind(this));
+      
+      if (!previousNode && !nextNode) { // it is the first being added
+         this._valueViewsContainer.append(view.getDomNode());
+      } else if (previousNode) {
+         view.getDomNode().insertAfter(previousNode.getDomNode());
+      } else if (nextNode) {
+         view.getDomNode().insertBefore(nextNode.getDomNode());
+      }
 
-      this._valueViewsContainer.append(view.getDomNode());
       this._valueViewsSection.show();
       console.log(this._name + " now references " + this._valueViews.length + " values");
    }
