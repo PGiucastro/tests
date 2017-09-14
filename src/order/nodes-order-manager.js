@@ -1,7 +1,7 @@
 class NodesOrderManager {
 
    constructor(nodes) {
-      this._maxPosition = -1;
+      this._maxPosition = 0;
       this._nodes = nodes;
       this._workOutMaxPositionBasedOnModelsData();
    }
@@ -11,9 +11,53 @@ class NodesOrderManager {
    }
 
    addNode(node) {
-      this._maxPosition++;
       this._nodes.push(node);
-      node.setPosition(this._maxPosition);
+      if (!node.getPosition()) { // fresh node, not previously saved!
+         this._maxPosition++;
+         node.setPosition(this._maxPosition);
+      } else {
+         this._workOutMaxPositionBasedOnModelsData();
+      }
+   }
+
+   getPreviousNode(node) {
+      var output;
+      var nodePosition = node.getPosition();
+
+      for (var i = 0; i < this._nodes.length; i++) {
+         let currentNode = this._nodes[i];
+         if (node.getId() !== currentNode.getId()) {
+            if (!output && currentNode.getPosition() < nodePosition) {
+               output = currentNode;
+            } else {
+               if (currentNode.getPosition() < nodePosition && currentNode.getPosition() > output.getPosition()) {
+                  output = currentNode;
+               }
+            }
+         }
+      }
+
+      return output;
+   }
+
+   getNextNode(node) {
+      var output;
+      var nodePosition = node.getPosition();
+
+      for (var i = 0; i < this._nodes.length; i++) {
+         let currentNode = this._nodes[i];
+         if (node.getId() !== currentNode.getId()) {
+            if (!output && currentNode.getPosition() > nodePosition) {
+               output = currentNode;
+            } else {
+               if (currentNode.getPosition() > nodePosition && currentNode.getPosition() < output.getPosition()) {
+                  output = currentNode;
+               }
+            }
+         }
+      }
+
+      return output;
    }
 
    removeNode(node) {

@@ -180,6 +180,8 @@ class MainView {
    _renderNode(type, node) {
       var parentId = node.getParentId();
       var parent = this._getViewById(parentId);
+      var previousNode;
+      var nextNode;
       node.render();
       if (parent) {
          if (type === "node-view") {
@@ -192,7 +194,15 @@ class MainView {
          node.setMoveUpCommand(this._moveNodeUp.bind(this));
          node.setRemoveFromPositionManagerCommand(this._removeFromOrderManager.bind(this));
          this._orderManager.addNode(node);
-         this._list.append(node.getDomNode());
+         previousNode = this._orderManager.getPreviousNode(node);
+         nextNode = this._orderManager.getNextNode(node);
+         if (!previousNode && !nextNode) { // it is the first being added
+            this._list.append(node.getDomNode());
+         } else if (previousNode) {
+            node.getDomNode().insertAfter(previousNode.getDomNode());
+         } else if (nextNode) {
+            node.getDomNode().insertBefore(nextNode.getDomNode());
+         }
       }
    }
 

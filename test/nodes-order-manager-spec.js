@@ -7,16 +7,18 @@ describe('NodesOrderManager', function() {
 
    var manager, node1, node2, node3;
    var newNode;
+   var eventHub;
 
    beforeEach(function() {
 
-      var eventHub = $({});
+      eventHub = $({});
 
-      node1 = new NodeView(1, "name1", {_iub_position: 1}, [], eventHub);
-      node2 = new NodeView(2, "name2", {_iub_position: 2}, [], eventHub);
-      node3 = new NodeView(3, "name3", {_iub_position: 3}, [], eventHub);
+      node1 = new NodeView("1", "name1", {_iub_position: 1}, [], eventHub);
+      node2 = new NodeView("2", "name2", {_iub_position: 2}, [], eventHub);
+      node3 = new NodeView("3", "name3", {_iub_position: 3}, [], eventHub);
 
       newNode = new NodeView(1, "name1", {}, [], eventHub);
+      anotherNewNode = new NodeView(1, "name1", {}, [], eventHub);
 
       manager = new NodesOrderManager([node1, node2, node3]);
    });
@@ -45,7 +47,7 @@ describe('NodesOrderManager', function() {
       assert.equal(2, node3.getPosition());
    });
 
-   it('Can removing and add nodes and consistenly keep track of the positions', function() {
+   it('Can remove and add nodes and consistenly keep track of the positions', function() {
       manager.removeNode(node2);
       manager.removeNode(node1);
       assert.equal(1, manager.getMaxPosition());
@@ -77,5 +79,32 @@ describe('NodesOrderManager', function() {
       assert.equal(1, node1.getPosition());
       manager.moveNodeToLowerPosition(node1);
       assert.equal(1, node1.getPosition());
+   });
+
+   it('Tells you which one is the previous node', function() {
+      assert.equal(undefined, manager.getPreviousNode(node1));
+      assert.equal("1", manager.getPreviousNode(node2).getId());
+      assert.equal("2", manager.getPreviousNode(node3).getId());
+   });
+
+   it('Tells you which one is the next node', function() {
+      assert.equal("2", manager.getNextNode(node1).getId());
+      assert.equal("3", manager.getNextNode(node2).getId());
+      assert.equal(undefined, manager.getNextNode(node3));
+   });
+
+   it('Increment the max position when previously fresh nodes are added', function() {
+      manager = new NodesOrderManager([]);
+      manager.addNode(node3);
+      manager.addNode(node2);
+      manager.addNode(node1);
+      assert.equal(3, manager.getMaxPosition());
+   });
+
+   it('Increment the max position when previously saved nodes are added', function() {
+      manager = new NodesOrderManager([]);
+      manager.addNode(newNode);
+      manager.addNode(anotherNewNode);
+      assert.equal(2, manager.getMaxPosition());
    });
 });

@@ -11813,7 +11813,7 @@ $("body").append(list);
 class NodesOrderManager {
 
    constructor(nodes) {
-      this._maxPosition = -1;
+      this._maxPosition = 0;
       this._nodes = nodes;
       this._workOutMaxPositionBasedOnModelsData();
    }
@@ -11823,9 +11823,53 @@ class NodesOrderManager {
    }
 
    addNode(node) {
-      this._maxPosition++;
       this._nodes.push(node);
-      node.setPosition(this._maxPosition);
+      if (!node.getPosition()) { // fresh node, not previously saved!
+         this._maxPosition++;
+         node.setPosition(this._maxPosition);
+      } else {
+         this._workOutMaxPositionBasedOnModelsData();
+      }
+   }
+
+   getPreviousNode(node) {
+      var output;
+      var nodePosition = node.getPosition();
+
+      for (var i = 0; i < this._nodes.length; i++) {
+         let currentNode = this._nodes[i];
+         if (node.getId() !== currentNode.getId()) {
+            if (!output && currentNode.getPosition() < nodePosition) {
+               output = currentNode;
+            } else {
+               if (currentNode.getPosition() < nodePosition && currentNode.getPosition() > output.getPosition()) {
+                  output = currentNode;
+               }
+            }
+         }
+      }
+
+      return output;
+   }
+
+   getNextNode(node) {
+      var output;
+      var nodePosition = node.getPosition();
+
+      for (var i = 0; i < this._nodes.length; i++) {
+         let currentNode = this._nodes[i];
+         if (node.getId() !== currentNode.getId()) {
+            if (!output && currentNode.getPosition() > nodePosition) {
+               output = currentNode;
+            } else {
+               if (currentNode.getPosition() > nodePosition && currentNode.getPosition() < output.getPosition()) {
+                  output = currentNode;
+               }
+            }
+         }
+      }
+
+      return output;
    }
 
    removeNode(node) {
@@ -12513,6 +12557,8 @@ class MainView {
    _renderNode(type, node) {
       var parentId = node.getParentId();
       var parent = this._getViewById(parentId);
+      var previousNode;
+      var nextNode;
       node.render();
       if (parent) {
          if (type === "node-view") {
@@ -12525,7 +12571,15 @@ class MainView {
          node.setMoveUpCommand(this._moveNodeUp.bind(this));
          node.setRemoveFromPositionManagerCommand(this._removeFromOrderManager.bind(this));
          this._orderManager.addNode(node);
-         this._list.append(node.getDomNode());
+         previousNode = this._orderManager.getPreviousNode(node);
+         nextNode = this._orderManager.getNextNode(node);
+         if (!previousNode && !nextNode) { // it is the first being added
+            this._list.append(node.getDomNode());
+         } else if (previousNode) {
+            node.getDomNode().insertAfter(previousNode.getDomNode());
+         } else if (nextNode) {
+            node.getDomNode().insertBefore(nextNode.getDomNode());
+         }
       }
    }
 
