@@ -12571,10 +12571,20 @@ class MainView {
    }
 
    _moveNodeUp(node) {
+      var prevNode = this._orderManager.getPreviousNode(node);
+      if (prevNode) {
+         node.getDomNode().insertBefore(prevNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
       this._orderManager.moveNodeToLowerPosition(node);
    }
 
    _moveNodeDown(node) {
+      var nextNode = this._orderManager.getNextNode(node);
+      if (nextNode) {
+         node.getDomNode().insertAfter(nextNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
       this._orderManager.moveNodeToHigherPosition(node);
    }
 
