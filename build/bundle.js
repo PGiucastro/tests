@@ -12541,19 +12541,24 @@ class MainView {
          let currentParentView = this._getViewByName(currentParentName);
          let newParentView = this._getViewByName(newParentName);
 
-         if (currentParentView) { // the node might be root one, in which case no current parent exists.
+         if (currentParentView) { // the node might be a root one, in which case no current parent exists.
             currentParentView.detachNodeView(nodeToReparent);
+         } else {
+            this._orderManager.removeNode(nodeToReparent);
          }
 
          nodeToReparent.resetPosition();
 
-         if (!newParentView) { // it has been asked to make it a root node            
+         if (!newParentView) { // it has been asked to make it a root node
+            this._orderManager.addNode(nodeToReparent);
             nodeToReparent.setParentName(null);
             this._list.append(nodeToReparent.getDomNode());
          } else {
             nodeToReparent.setParentName(newParentName);
             newParentView.appendNodeView(nodeToReparent);
          }
+         
+         scrolling.scrollToNode(nodeToReparent);
       });
    }
 
