@@ -90,6 +90,10 @@ class NodeView {
       return this._model._iub_position = index;
    }
 
+   resetPosition() {
+      delete this._model._iub_position;
+   }
+
    setMoveUpCommand(f) {
       this._moveUp = f;
    }

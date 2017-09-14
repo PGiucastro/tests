@@ -12519,6 +12519,8 @@ class MainView {
             currentParentView.detachNodeView(nodeToReparent);
          }
 
+         nodeToReparent.resetPosition();
+
          if (!newParentView) { // it has been asked to make it a root node            
             nodeToReparent.setParentName(null);
             this._list.append(nodeToReparent.getDomNode());
@@ -12751,6 +12753,10 @@ class NodeView {
 
    setPosition(index) {
       return this._model._iub_position = index;
+   }
+
+   resetPosition() {
+      delete this._model._iub_position;
    }
 
    setMoveUpCommand(f) {

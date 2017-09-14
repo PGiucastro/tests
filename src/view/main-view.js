@@ -142,6 +142,8 @@ class MainView {
             currentParentView.detachNodeView(nodeToReparent);
          }
 
+         nodeToReparent.resetPosition();
+
          if (!newParentView) { // it has been asked to make it a root node            
             nodeToReparent.setParentName(null);
             this._list.append(nodeToReparent.getDomNode());
