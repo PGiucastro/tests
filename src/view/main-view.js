@@ -6,6 +6,7 @@ const templates = require('./../templates');
 const SchemaBuilder = require('./../schema-builder');
 const ReparentNodeView = require('./reparent-node-view');
 const NodesOrderManager = require('./../order/nodes-order-manager');
+const scrolling = require('./../utils/scrolling');
 
 class MainView {
 
@@ -64,7 +65,7 @@ class MainView {
          for (var i = 0; i < this._nodeViews.length; i++) {
             let node = this._nodeViews[i];
             if (node.validate() === false) {
-               this._scrollToNode(node);
+               scrolling.scrollToNode(node);
                return;
             }
          }
@@ -77,7 +78,7 @@ class MainView {
          var newNode = this._buildNode("node-view", String(this._getNextId()), "", {});
          this._renderNode("node-view", newNode);
          this._handleNoNodesYetMessage();
-         this._scrollToBottom();
+         scrolling.scrollToBottom();
       });
 
       this._eventHub.on("please-delete-node", (e, id) => {
@@ -97,7 +98,7 @@ class MainView {
 
          if (parentView) {
             parentView.notifyOfChildrenDestruction(ids);
-            this._scrollToNode(parentView);
+            scrolling.scrollToNode(parentView);
          }
 
          this._handleNoNodesYetMessage();
@@ -253,25 +254,6 @@ class MainView {
          }
          view.setParentId(parentId);
       }
-   }
-
-   _scrollToTop() {
-      $("html, body").animate({
-         scrollTop: 0
-      }, "slow");
-   }
-
-   _scrollToBottom() {
-      $("html, body").animate({
-         scrollTop: $(document).height()
-      }, "slow");
-   }
-
-   _scrollToNode(node) {
-      var px = node.geOffsetTop() - 100;
-      $("html, body").animate({
-         scrollTop: px
-      }, "slow");
    }
 
    _getNextId() {

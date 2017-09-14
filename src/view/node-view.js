@@ -5,6 +5,7 @@ const ClausesView = require('./clauses-view');
 const buildConfigView = require('./config/build-config-view');
 const Expander = require('./expander');
 const NodesOrderManager = require('./../order/nodes-order-manager');
+const scrolling = require('./../utils/scrolling');
 
 class NodeView {
 
@@ -540,10 +541,20 @@ class NodeView {
    }
 
    _moveNodeViewUp(node) {
+      var prevNode = this._nodeViewsOrderManager.getPreviousNode(node);
+      if (prevNode) {
+         node.getDomNode().insertBefore(prevNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
       this._nodeViewsOrderManager.moveNodeToLowerPosition(node);
    }
 
    _moveNodeViewDown(node) {
+      var nextNode = this._nodeViewsOrderManager.getNextNode(node);
+      if (nextNode) {
+         node.getDomNode().insertAfter(nextNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
       this._nodeViewsOrderManager.moveNodeToHigherPosition(node);
    }
 
@@ -552,10 +563,20 @@ class NodeView {
    }
 
    _moveValueViewUp(node) {
+      var prevNode = this._valueViewsOrderManager.getPreviousNode(node);
+      if (prevNode) {
+         node.getDomNode().insertBefore(prevNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
       this._valueViewsOrderManager.moveNodeToLowerPosition(node);
    }
 
    _moveValueViewDown(node) {
+      var nextNode = this._valueViewsOrderManager.getNextNode(node);
+      if (nextNode) {
+         node.getDomNode().insertAfter(nextNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
       this._valueViewsOrderManager.moveNodeToHigherPosition(node);
    }
 

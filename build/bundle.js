@@ -11809,7 +11809,7 @@ const MainView = require('./view/main-view');
 
 var list = new MainView($({})).render();
 $("body").append(list);
-},{"./view/main-view":15,"jquery":1}],4:[function(require,module,exports){
+},{"./view/main-view":16,"jquery":1}],4:[function(require,module,exports){
 class NodesOrderManager {
 
    constructor(nodes) {
@@ -11977,6 +11977,31 @@ module.exports = {
 };
 },{}],7:[function(require,module,exports){
 const $ = require('jquery');
+
+module.exports = {
+
+   scrollToTop: () => {
+      $("html, body").animate({
+         scrollTop: 0
+      }, "slow");
+   },
+
+   scrollToBottom: () => {
+      $("html, body").animate({
+         scrollTop: $(document).height()
+      }, "slow");
+   },
+
+   scrollToNode: (node) => {
+      var px = node.geOffsetTop() - 100;
+      $("html, body").animate({
+         scrollTop: px
+      }, "slow");
+   }
+};
+
+},{"jquery":1}],8:[function(require,module,exports){
+const $ = require('jquery');
 const _ = require('underscore');
 const templates = require('./../templates');
 
@@ -12017,7 +12042,7 @@ class ClausesView {
 }
 
 module.exports = ClausesView;
-},{"./../templates":6,"jquery":1,"underscore":2}],8:[function(require,module,exports){
+},{"./../templates":6,"jquery":1,"underscore":2}],9:[function(require,module,exports){
 const $ = require('jquery');
 const ConfigView = require('./config-view');
 const CheckboxConfigView = require('./checkbox-config-view');
@@ -12054,7 +12079,7 @@ module.exports = function(configType, nodeViewId, nodeModel, eventHub) {
 
    return view;
 };
-},{"./checkbox-config-view":9,"./config-view":10,"./number-config-view":11,"./radio-config-view":12,"./text-config-view":13,"jquery":1}],9:[function(require,module,exports){
+},{"./checkbox-config-view":10,"./config-view":11,"./number-config-view":12,"./radio-config-view":13,"./text-config-view":14,"jquery":1}],10:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
 const ConfigView = require('./config-view');
@@ -12081,7 +12106,7 @@ class CheckboxConfigView extends ConfigView {
 }
 
 module.exports = CheckboxConfigView;
-},{"./../../templates":6,"./config-view":10,"jquery":1}],10:[function(require,module,exports){
+},{"./../../templates":6,"./config-view":11,"jquery":1}],11:[function(require,module,exports){
 const $ = require('jquery');
 const Expander = require('./../expander');
 
@@ -12127,7 +12152,7 @@ class ConfigView {
 }
 
 module.exports = ConfigView;
-},{"./../expander":14,"jquery":1}],11:[function(require,module,exports){
+},{"./../expander":15,"jquery":1}],12:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
 const ConfigView = require('./config-view');
@@ -12179,7 +12204,7 @@ class NumberConfigView extends ConfigView {
 }
 
 module.exports = NumberConfigView;
-},{"./../../templates":6,"./config-view":10,"jquery":1}],12:[function(require,module,exports){
+},{"./../../templates":6,"./config-view":11,"jquery":1}],13:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
 const ConfigView = require('./config-view');
@@ -12305,7 +12330,7 @@ class RadioConfigView extends ConfigView {
 }
 
 module.exports = RadioConfigView;
-},{"./../../templates":6,"./config-view":10,"jquery":1}],13:[function(require,module,exports){
+},{"./../../templates":6,"./config-view":11,"jquery":1}],14:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
 const ConfigView = require('./config-view');
@@ -12343,7 +12368,7 @@ class TextConfigView extends ConfigView {
 }
 
 module.exports = TextConfigView;
-},{"./../../templates":6,"./config-view":10,"jquery":1}],14:[function(require,module,exports){
+},{"./../../templates":6,"./config-view":11,"jquery":1}],15:[function(require,module,exports){
 class Expander {
 
    constructor(trigger, panel, label, initiallyExpanded) {
@@ -12374,7 +12399,7 @@ class Expander {
 }
 
 module.exports = Expander;
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const NodeView = require('./node-view');
@@ -12383,6 +12408,7 @@ const templates = require('./../templates');
 const SchemaBuilder = require('./../schema-builder');
 const ReparentNodeView = require('./reparent-node-view');
 const NodesOrderManager = require('./../order/nodes-order-manager');
+const scrolling = require('./../utils/scrolling');
 
 class MainView {
 
@@ -12441,7 +12467,7 @@ class MainView {
          for (var i = 0; i < this._nodeViews.length; i++) {
             let node = this._nodeViews[i];
             if (node.validate() === false) {
-               this._scrollToNode(node);
+               scrolling.scrollToNode(node);
                return;
             }
          }
@@ -12454,7 +12480,7 @@ class MainView {
          var newNode = this._buildNode("node-view", String(this._getNextId()), "", {});
          this._renderNode("node-view", newNode);
          this._handleNoNodesYetMessage();
-         this._scrollToBottom();
+         scrolling.scrollToBottom();
       });
 
       this._eventHub.on("please-delete-node", (e, id) => {
@@ -12474,7 +12500,7 @@ class MainView {
 
          if (parentView) {
             parentView.notifyOfChildrenDestruction(ids);
-            this._scrollToNode(parentView);
+            scrolling.scrollToNode(parentView);
          }
 
          this._handleNoNodesYetMessage();
@@ -12632,25 +12658,6 @@ class MainView {
       }
    }
 
-   _scrollToTop() {
-      $("html, body").animate({
-         scrollTop: 0
-      }, "slow");
-   }
-
-   _scrollToBottom() {
-      $("html, body").animate({
-         scrollTop: $(document).height()
-      }, "slow");
-   }
-
-   _scrollToNode(node) {
-      var px = node.geOffsetTop() - 100;
-      $("html, body").animate({
-         scrollTop: px
-      }, "slow");
-   }
-
    _getNextId() {
       this._lastUsedId++;
       return this._lastUsedId;
@@ -12662,7 +12669,7 @@ class MainView {
 }
 
 module.exports = MainView;
-},{"./../order/nodes-order-manager":4,"./../schema-builder":5,"./../templates":6,"./node-view":16,"./reparent-node-view":17,"./value-view":18,"jquery":1,"underscore":2}],16:[function(require,module,exports){
+},{"./../order/nodes-order-manager":4,"./../schema-builder":5,"./../templates":6,"./../utils/scrolling":7,"./node-view":17,"./reparent-node-view":18,"./value-view":19,"jquery":1,"underscore":2}],17:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const templates = require('./../templates');
@@ -12670,6 +12677,7 @@ const ClausesView = require('./clauses-view');
 const buildConfigView = require('./config/build-config-view');
 const Expander = require('./expander');
 const NodesOrderManager = require('./../order/nodes-order-manager');
+const scrolling = require('./../utils/scrolling');
 
 class NodeView {
 
@@ -13205,10 +13213,20 @@ class NodeView {
    }
 
    _moveNodeViewUp(node) {
+      var prevNode = this._nodeViewsOrderManager.getPreviousNode(node);
+      if (prevNode) {
+         node.getDomNode().insertBefore(prevNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
       this._nodeViewsOrderManager.moveNodeToLowerPosition(node);
    }
 
    _moveNodeViewDown(node) {
+      var nextNode = this._nodeViewsOrderManager.getNextNode(node);
+      if (nextNode) {
+         node.getDomNode().insertAfter(nextNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
       this._nodeViewsOrderManager.moveNodeToHigherPosition(node);
    }
 
@@ -13217,10 +13235,20 @@ class NodeView {
    }
 
    _moveValueViewUp(node) {
+      var prevNode = this._valueViewsOrderManager.getPreviousNode(node);
+      if (prevNode) {
+         node.getDomNode().insertBefore(prevNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
       this._valueViewsOrderManager.moveNodeToLowerPosition(node);
    }
 
    _moveValueViewDown(node) {
+      var nextNode = this._valueViewsOrderManager.getNextNode(node);
+      if (nextNode) {
+         node.getDomNode().insertAfter(nextNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
       this._valueViewsOrderManager.moveNodeToHigherPosition(node);
    }
 
@@ -13230,7 +13258,7 @@ class NodeView {
 }
 
 module.exports = NodeView;
-},{"./../order/nodes-order-manager":4,"./../templates":6,"./clauses-view":7,"./config/build-config-view":8,"./expander":14,"jquery":1,"underscore":2}],17:[function(require,module,exports){
+},{"./../order/nodes-order-manager":4,"./../templates":6,"./../utils/scrolling":7,"./clauses-view":8,"./config/build-config-view":9,"./expander":15,"jquery":1,"underscore":2}],18:[function(require,module,exports){
 const $ = require('jquery');
 const _ = require('underscore');
 const templates = require('./../templates');
@@ -13342,7 +13370,7 @@ class ReparentNodeView {
 }
 
 module.exports = ReparentNodeView;
-},{"./../templates":6,"jquery":1,"underscore":2}],18:[function(require,module,exports){
+},{"./../templates":6,"jquery":1,"underscore":2}],19:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const NodeView = require('./node-view');
@@ -13374,4 +13402,4 @@ class ValueView extends NodeView {
 }
 
 module.exports = ValueView;
-},{"./node-view":16,"jquery":1,"underscore":2}]},{},[3]);
+},{"./node-view":17,"jquery":1,"underscore":2}]},{},[3]);
