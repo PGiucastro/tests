@@ -12806,7 +12806,7 @@ class NodeView {
       view.setMoveUpCommand(this._moveValueViewUp.bind(this));
       view.setMoveDownCommand(this._moveValueViewDown.bind(this));
       view.setRemoveFromPositionManagerCommand(this._removeValueViewFromOrderManager.bind(this));
-      
+
       if (!previousNode && !nextNode) { // it is the first being added
          this._valueViewsContainer.append(view.getDomNode());
       } else if (previousNode) {
@@ -12844,6 +12844,7 @@ class NodeView {
 
       if (index !== -1) {
          this._nodeViews.splice(index, 1);
+         this._nodeViewsOrderManager.removeNode(nodeToRemove);
       }
 
       this._handleNodeViewsSectionVisibility();
