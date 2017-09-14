@@ -84,7 +84,11 @@ class NodeView {
    }
 
    setParentId(id) {
-      this._parentId = id;
+      if (id) {
+         this._parentId = id;
+      } else {
+         delete this._parentId;
+      }
    }
 
    setPosition(index) {

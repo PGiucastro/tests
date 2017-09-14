@@ -121,7 +121,7 @@ class MainView {
          newNode.setParentId(parentNodeId);
          newNode.setParentName(parentNodeName);
          this._renderNode(type, newNode);
-         this._scrollToNode(newNode);
+         scrolling.scrollToNode(newNode);
       });
 
       this._eventHub.on("please-show-reparent-node-view", (e, node) => {
@@ -149,13 +149,18 @@ class MainView {
 
          if (!newParentView) { // it has been asked to make it a root node
             this._orderManager.addNode(nodeToReparent);
+            nodeToReparent.setParentId(null);
             nodeToReparent.setParentName(null);
+            nodeToReparent.setMoveDownCommand(this._moveNodeDown.bind(this));
+            nodeToReparent.setMoveUpCommand(this._moveNodeUp.bind(this));
+            nodeToReparent.setRemoveFromPositionManagerCommand(this._removeFromOrderManager.bind(this));
             this._list.append(nodeToReparent.getDomNode());
          } else {
+            nodeToReparent.setParentId(newParentView.getId());
             nodeToReparent.setParentName(newParentName);
             newParentView.appendNodeView(nodeToReparent);
          }
-         
+
          scrolling.scrollToNode(nodeToReparent);
       });
    }
