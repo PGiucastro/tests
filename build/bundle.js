@@ -11972,7 +11972,7 @@ module.exports = {
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
    "text-config-view": "<div class=\"config-view text-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n   </section>\n\n</div>",
-   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <div class=\"input-wrapper prototype\" style=\"display: none\">\n      <label>Label</label>\n      <input type=\"text\" class=\"label\" />\n      <label>Value</label>\n      <input type=\"text\" class=\"value\" />\n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type=\"text\" class=\"default\" />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"radios\"></div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n   </section>\n\n\n\n</div>",
+   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <div class=\"input-wrapper prototype\" style=\"display: none\">\n      <label>Label</label>\n      <input type=\"text\" class=\"label\" />\n      <label>Value</label>\n      <input type=\"text\" class=\"value\" />\n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type=\"text\" class=\"default\" />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Triggering value</label>\n         <input type=\"text\" class=\"triggering-value\" />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"radios\"></div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n   </section>\n\n\n\n</div>",
    "reparent-node-view": "<div class=\"reparent-node-view\">\n   \n   <span class=\"close\">Close (Esc)</span>\n\n   <div class=\"warning\"></div>\n\n   <label>Choose the new parent</label>\n   <select></select>\n\n   <button>Reparent</button>\n\n</div>"
 };
 },{}],7:[function(require,module,exports){
@@ -12068,7 +12068,8 @@ module.exports = function(configType, nodeViewId, nodeModel, eventHub) {
          enum: nodeModel.enum,
          default: nodeModel.default,
          _iub_labels: nodeModel._iub_labels,
-         _iub_validation: nodeModel._iub_validation
+         _iub_validation: nodeModel._iub_validation,
+         _iub_triggering_value: nodeModel._iub_triggering_value
       }, eventHub);
    } else if (configType === "text") {
       view = new TextConfigView(nodeViewId, {
@@ -12219,6 +12220,7 @@ class RadioConfigView extends ConfigView {
       this._root = $(templates["radio-config-view"]);
       this._proto = this._root.find(".prototype");
       this._defaultInput = this._root.find("input.default");
+      this._triggeringValueInput = this._root.find("input.triggering-value");
       this._validationSelect = this._root.find("select.validation");
       this._radios = this._root.find(".radios");
       this._loadData();
@@ -12271,6 +12273,13 @@ class RadioConfigView extends ConfigView {
          }
       }
 
+      if (inputs.length > 0 && this._triggeringValueInput.val() !== "") {
+         if (radioValues.indexOf(this._triggeringValueInput.val()) === -1) {
+            this._triggeringValueInput.addClass("error");
+            valid = false;
+         }
+      }
+
       return valid;
    }
 
@@ -12316,6 +12325,7 @@ class RadioConfigView extends ConfigView {
 
    _loadData() {
       this._defaultInput.val(this._model.default);
+      this._triggeringValueInput.val(this._model._iub_triggering_value);
       this._validationSelect.val(this._model._iub_validation || "-");
       // when a new config view is created there is no `enum` attribute yet, so I need to make the following check
       if (this._model.enum) {

@@ -23,7 +23,8 @@ module.exports = function(configType, nodeViewId, nodeModel, eventHub) {
          enum: nodeModel.enum,
          default: nodeModel.default,
          _iub_labels: nodeModel._iub_labels,
-         _iub_validation: nodeModel._iub_validation
+         _iub_validation: nodeModel._iub_validation,
+         _iub_triggering_value: nodeModel._iub_triggering_value
       }, eventHub);
    } else if (configType === "text") {
       view = new TextConfigView(nodeViewId, {
