@@ -12230,10 +12230,28 @@ class RadioConfigView extends ConfigView {
 
    getModel() {
 
+      var defaultValue = this._defaultInput.val();
       var validation = this._validationSelect.val();
+      var triggeringValue = this._triggeringValueInput.val();
 
-      this._model.default = this._defaultInput.val();
-      this._model._iub_validation = validation;
+      if (defaultValue) {
+         this._model.default = defaultValue;
+      } else {
+         delete this._model.default;
+      }
+
+      if (validation !== "-") {
+         this._model._iub_validation = validation;
+      } else {
+         delete this._model._iub_validation;
+      }
+
+      if (triggeringValue) {
+         this._model._iub_triggering_value = triggeringValue;
+      } else {
+         delete this._model._iub_triggering_value;
+      }
+
       this._model.enum = [];
       this._model._iub_labels = [];
 
@@ -13160,6 +13178,12 @@ class NodeView {
    }
 
    _onConfigUpdated(e, id, configModel) {
+      
+      // TODO: here the received config model might contains less properties than the model during the previous update
+      // therefore stale data copied over from the previous version config model could remain in the node view model...
+      // Address this defect!
+      // A good example is the default, validation and triggering value of the radio config view.
+      
       if (id === this._id) {
          for (var p in configModel) {
             this._model[p] = configModel[p];

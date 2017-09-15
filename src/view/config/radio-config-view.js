@@ -22,10 +22,28 @@ class RadioConfigView extends ConfigView {
 
    getModel() {
 
+      var defaultValue = this._defaultInput.val();
       var validation = this._validationSelect.val();
+      var triggeringValue = this._triggeringValueInput.val();
 
-      this._model.default = this._defaultInput.val();
-      this._model._iub_validation = validation;
+      if (defaultValue) {
+         this._model.default = defaultValue;
+      } else {
+         delete this._model.default;
+      }
+
+      if (validation !== "-") {
+         this._model._iub_validation = validation;
+      } else {
+         delete this._model._iub_validation;
+      }
+
+      if (triggeringValue) {
+         this._model._iub_triggering_value = triggeringValue;
+      } else {
+         delete this._model._iub_triggering_value;
+      }
+
       this._model.enum = [];
       this._model._iub_labels = [];
 
