@@ -371,6 +371,12 @@ class NodeView {
          var trg = $(e.target);
          if (trg.is("input, select")) {
             trg.removeClass("error");
+         } else if (trg.is(".buttons") || trg.is(".name-label")) {
+            if (!this._root[0].style.height || this._root[0].style.height === "auto") {
+               this._root.height("12");
+            } else {
+               this._root.css("height", "auto");
+            }
          }
       });
 
@@ -458,12 +464,12 @@ class NodeView {
    }
 
    _onConfigUpdated(e, id, configModel) {
-      
+
       // TODO: here the received config model might contains less properties than the model during the previous update
       // therefore stale data copied over from the previous version config model could remain in the node view model...
       // Address this defect!
       // A good example is the default, validation and triggering value of the radio config view.
-      
+
       if (id === this._id) {
          for (var p in configModel) {
             this._model[p] = configModel[p];
