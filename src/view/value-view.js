@@ -20,11 +20,15 @@ class ValueView extends NodeView {
    }
 
    _getTypeOptionsToRemove() {
-      return ["checkbox", "radio"];
+      return ["checkbox"];
    }
 
    _parseName(name) {
       return name.split(".")[1];
+   }
+
+   _loadModelType() {
+      this._typeInput.val(this._getSelectTypeFromModel() || "-");
    }
 }
 

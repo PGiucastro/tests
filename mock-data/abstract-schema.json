@@ -55,6 +55,24 @@
          "_iub_position": 2
       },
 
+      "node-2-1.type": {
+         "_iub_parent": "node-2-1",
+         "_iub_position": 3,
+         "type": "string",
+         "enum": [
+            "a",
+            "b"
+         ],
+         "title": "Type",
+         "_iub_title_en": "Type",
+         "_iub_labels": [
+            "Type A",
+            "Type B"
+         ],
+         "_iub_validation": "required",
+         "default": "a"
+      },
+
       "node-2-2": {
          "title": "node-2-2-title",
          "type": "boolean",
@@ -69,81 +87,32 @@
          "_iub_position": 3
       },
 
-      "node-2-3-1": {
-         "title": "node-2-3-1-title",
-         "type": "string",
-         "enum": [
-            "node-2-3-1-choice-1-value",
-            "node-2-3-1-choice-2-value"
-         ],
-         "default": "node-2-3-1-choice-1-value",
-         "_iub_labels": [
-            "node-2-3-1-choice-1-label",
-            "node-2-3-1-choice-2-label"
-         ],
-         "_iub_parent": "node-2-3",
-         "_iub_validation": "required",
-         "_iub_position": 1
-      },
-
       "node-3-1": {
-         "title": "node-3-1-title",
-         "type": "string",
-         "enum": [
-            "node-3-1-choice-1-value",
-            "node-3-1-choice-2-value"
-         ],
-         "_iub_labels": [
-            "node-3-1-choice-1-label",
-            "node-3-1-choice-2-label"
-         ],
-         "_iub_triggering_value": "node-3-1-choice-1-value",
+         "title": "node-3-2-title",
+         "type": "boolean",
          "_iub_parent": "node-3",
-         "_iub_validation": "required",
          "_iub_position": 1
       },
 
       "node-3-2": {
-         "title": "node-3-2-title",
+         "title": "node-3-3-title",
          "type": "boolean",
          "_iub_parent": "node-3",
          "_iub_position": 2
       },
 
       "node-3-3": {
-         "title": "node-3-3-title",
+         "title": "node-3-4 title",
          "type": "boolean",
          "_iub_parent": "node-3",
          "_iub_position": 3
       },
 
       "node-3-4": {
-         "title": "node-3-4 title",
-         "type": "boolean",
-         "_iub_parent": "node-3",
-         "_iub_position": 4
-      },
-
-      "node-3-5": {
          "title": "node-3-5-title",
          "type": "boolean",
          "_iub_parent": "node-3",
-         "_iub_position": 5
-      },
-
-      "node-3-5-1": {
-         "title": "node-3-5-1-title",
-         "type": "string",
-         "enum": [
-            "node-3-5-1-choice-1-value",
-            "node-3-5-1-choice-2-value"
-         ],
-         "_iub_labels": [
-            "node-3-5-1-choice-1-label",
-            "node-3-5-1-choice-2-label"
-         ],
-         "_iub_parent": "node-3-5",
-         "_iub_position": 1
+         "_iub_position": 4
       },
 
       "node-3-1-1": {

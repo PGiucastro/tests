@@ -260,7 +260,7 @@ class NodeView {
 
    canBeAParentNode() {
       var type = this._getSelectTypeFromModel();
-      return type === "checkbox" || type === "radio";
+      return type === "checkbox";
    }
 
    render() {
@@ -509,7 +509,12 @@ class NodeView {
       this._titleInput_IT.val(this._model.title_it);
       this._titleInput_EN.val(this._model.title);
       this._titleInput_DE.val(this._model.title_de);
-      this._typeInput.val(this._getSelectTypeFromModel() || "-");
+      this._loadModelType();
+   }
+
+   _loadModelType() {
+      this._model.type = "boolean";
+      this._typeInput.val("checkbox").attr("disabled", true);
    }
 
    _getSelectTypeFromModel() {
@@ -549,7 +554,7 @@ class NodeView {
    }
 
    _getTypeOptionsToRemove() {
-      return ["number", "text"];
+      return ["number", "text", "radio"];
    }
 
    _parseName(name) {
