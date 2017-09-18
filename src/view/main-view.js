@@ -62,6 +62,8 @@ class MainView {
    _behaviour() {
 
       this._saveButton.click((e) => {
+         console.log(JSON.stringify(json, null, "   "));
+         return;
          for (var i = 0; i < this._nodeViews.length; i++) {
             let node = this._nodeViews[i];
             if (node.validate() === false) {
