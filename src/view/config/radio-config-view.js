@@ -12,6 +12,7 @@ class RadioConfigView extends ConfigView {
       this._root = $(templates["radio-config-view"]);
       this._proto = this._root.find(".prototype");
       this._defaultInput = this._root.find("input.default");
+      this._triggeringValueInput = this._root.find("input.triggering-value");
       this._validationSelect = this._root.find("select.validation");
       this._radios = this._root.find(".radios");
       this._loadData();
@@ -21,10 +22,28 @@ class RadioConfigView extends ConfigView {
 
    getModel() {
 
+      var defaultValue = this._defaultInput.val();
       var validation = this._validationSelect.val();
+      var triggeringValue = this._triggeringValueInput.val();
 
-      this._model.default = this._defaultInput.val();
-      this._model._iub_validation = validation;
+      if (defaultValue) {
+         this._model.default = defaultValue;
+      } else {
+         delete this._model.default;
+      }
+
+      if (validation !== "-") {
+         this._model._iub_validation = validation;
+      } else {
+         delete this._model._iub_validation;
+      }
+
+      if (triggeringValue) {
+         this._model._iub_triggering_value = triggeringValue;
+      } else {
+         delete this._model._iub_triggering_value;
+      }
+
       this._model.enum = [];
       this._model._iub_labels = [];
 
@@ -37,6 +56,41 @@ class RadioConfigView extends ConfigView {
       }
 
       return this._model;
+   }
+
+   validate() {
+      this._removeErrors();
+
+      var valid = true;
+      var inputs = this._radios.find("input");
+      var radioValues = [];
+
+      for (var i = 0; i < inputs.length; i++) {
+         let input = $(inputs[i]);
+         if (input.is(".value") && $.trim(input.val() !== "")) {
+            radioValues.push(input.val());
+         }
+         if ($.trim(input.val()) === "") {
+            input.addClass("error");
+            valid = false;
+         }
+      }
+
+      if (inputs.length > 0 && this._defaultInput.val() !== "") {
+         if (radioValues.indexOf(this._defaultInput.val()) === -1) {
+            this._defaultInput.addClass("error");
+            valid = false;
+         }
+      }
+
+      if (inputs.length > 0 && this._triggeringValueInput.val() !== "") {
+         if (radioValues.indexOf(this._triggeringValueInput.val()) === -1) {
+            this._triggeringValueInput.addClass("error");
+            valid = false;
+         }
+      }
+
+      return valid;
    }
 
    _behaviour() {
@@ -75,12 +129,13 @@ class RadioConfigView extends ConfigView {
    _removeRadio(el) {
       el.slideUp(() => {
          el.remove();
-         this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
+         this._eventHub.trigger("config-has-been-updated", [this._nodeViewId, this.getModel()]);
       });
    }
 
    _loadData() {
       this._defaultInput.val(this._model.default);
+      this._triggeringValueInput.val(this._model._iub_triggering_value);
       this._validationSelect.val(this._model._iub_validation || "-");
       // when a new config view is created there is no `enum` attribute yet, so I need to make the following check
       if (this._model.enum) {

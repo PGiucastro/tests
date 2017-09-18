@@ -11805,11 +11805,131 @@ return jQuery;
 
 },{}],3:[function(require,module,exports){
 const $ = require('jquery');
-const NodesList = require('./view/nodes-list-view');
+const MainView = require('./view/main-view');
 
-var list = new NodesList($({})).render();
+var list = new MainView($({})).render();
 $("body").append(list);
-},{"./view/nodes-list-view":15,"jquery":1}],4:[function(require,module,exports){
+},{"./view/main-view":16,"jquery":1}],4:[function(require,module,exports){
+class NodesOrderManager {
+
+   constructor(nodes) {
+      this._maxPosition = 0;
+      this._nodes = nodes;
+      this._workOutMaxPositionBasedOnModelsData();
+   }
+
+   getMaxPosition() {
+      return this._maxPosition;
+   }
+
+   addNode(node) {
+      this._nodes.push(node);
+      if (!node.getPosition()) { // fresh node, not previously saved!
+         this._maxPosition++;
+         node.setPosition(this._maxPosition);
+      } else {
+         this._workOutMaxPositionBasedOnModelsData();
+      }
+   }
+
+   getPreviousNode(node) {
+      var output;
+      var nodePosition = node.getPosition();
+
+      for (var i = 0; i < this._nodes.length; i++) {
+         let currentNode = this._nodes[i];
+         if (node.getId() !== currentNode.getId()) {
+            if (!output && currentNode.getPosition() < nodePosition) {
+               output = currentNode;
+            } else {
+               if (currentNode.getPosition() < nodePosition && currentNode.getPosition() > output.getPosition()) {
+                  output = currentNode;
+               }
+            }
+         }
+      }
+
+      return output;
+   }
+
+   getNextNode(node) {
+      var output;
+      var nodePosition = node.getPosition();
+
+      for (var i = 0; i < this._nodes.length; i++) {
+         let currentNode = this._nodes[i];
+         if (node.getId() !== currentNode.getId()) {
+            if (!output && currentNode.getPosition() > nodePosition) {
+               output = currentNode;
+            } else {
+               if (currentNode.getPosition() > nodePosition && currentNode.getPosition() < output.getPosition()) {
+                  output = currentNode;
+               }
+            }
+         }
+      }
+
+      return output;
+   }
+
+   removeNode(node) {
+      var newNodesList = [];
+      var positionOfTheNodeToRemove = node.getPosition();
+
+      this._nodes.forEach((current) => {
+         let position = current.getPosition();
+         if (node.getId() !== current.getId()) {
+            if (position > positionOfTheNodeToRemove) {
+               current.setPosition(position - 1);
+            }
+            newNodesList.push(current);
+         }
+      });
+
+      this._nodes = newNodesList;
+      this._workOutMaxPositionBasedOnModelsData();
+   }
+
+   moveNodeToLowerPosition(node) {
+      var newPosition = node.getPosition() - 1;
+      var effectedNode = this._findNodeByPosition(newPosition);
+      if (effectedNode) {
+         effectedNode.setPosition(node.getPosition());
+         node.setPosition(newPosition);
+      }
+   }
+
+   moveNodeToHigherPosition(node) {
+      var newPosition = node.getPosition() + 1;
+      var effectedNode = this._findNodeByPosition(newPosition);
+      if (effectedNode) {
+         effectedNode.setPosition(node.getPosition());
+         node.setPosition(newPosition);
+      }
+   }
+
+   _workOutMaxPositionBasedOnModelsData() {
+      this._maxPosition = 0;
+      this._nodes.forEach((n) => {
+         let position = n.getPosition();
+         if (this._maxPosition < position) {
+            this._maxPosition = position;
+         }
+      });
+   }
+
+   _findNodeByPosition(position) {
+      for (var i = 0; i < this._nodes.length; i++) {
+         let node = this._nodes[i];
+         if (node.getPosition() === position) {
+            return node;
+         }
+      }
+   }
+}
+
+module.exports = NodesOrderManager;
+},{}],5:[function(require,module,exports){
 class SchemaBuilder {
 
    constructor(nodeViews) {
@@ -11828,8 +11948,13 @@ class SchemaBuilder {
 
       this._views.forEach((v) => {
          var model = v.getModel();
-         model.clauses = v.getClauses();
-         schema.properties[v.getName()] = model;
+         var clauses = v.getClauses();
+         if (clauses.length > 0) {
+            model.clauses = v.getClauses();
+         } else {
+            delete model.clauses;
+         }
+         schema.properties[v.getSchemaName()] = model;
       });
 
       return schema;
@@ -11837,19 +11962,45 @@ class SchemaBuilder {
 }
 
 module.exports = SchemaBuilder;
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 
 
 module.exports = {
-   "nodes-list-view": "<div class=\"nodes-list-view\">\n   \n   <header class=\"main-header\">\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n      \n      <div class=\"config\"></div>\n\n      <div class=\"input-wrapper\">\n         <label>Parent</label>\n         <select class='parent'>\n            <option>-</option>\n         </select>\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"buttons\">\n      <button>Delete</button>\n   </div>\n\n</div>",
+   "main-view": "<div class=\"main-view\">\n   \n   <header class=\"main-header\">\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
+   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <span class=\"name-label\"></span>\n\n   <div class=\"buttons\">\n      <button class=\"up\">Up</button>\n      <button class=\"down\">Down</button>\n      <button class=\"add-child-node\">Add child node</button>\n      <button class=\"add-value-input\">Add value input</button>\n      <button class=\"reparent\">Reparent</button>\n      <button class=\"delete\">Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"value-views\">\n      <h2>Value Inputs</h2>\n      <div class=\"container\"></div>\n   </div>\n\n   <div class=\"node-views\">\n      <h2>Child Nodes</h2>\n      <div class=\"container\"></div>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>",
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
    "text-config-view": "<div class=\"config-view text-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n   </section>\n\n</div>",
-   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <div class=\"input-wrapper prototype\" style=\"display: none\">\n      <input type=\"text\" class=\"label\" placeholder=\"label\" />\n      <input type=\"text\" class=\"value\" placeholder=\"value\" />\n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type=\"text\" class=\"default\" />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n      <div class=\"radios\"></div>\n\n   </section>\n\n\n\n</div>"
+   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <div class=\"input-wrapper prototype\" style=\"display: none\">\n      <label>Label</label>\n      <input type=\"text\" class=\"label\" />\n      <label>Value</label>\n      <input type=\"text\" class=\"value\" />\n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type=\"text\" class=\"default\" />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Triggering value</label>\n         <input type=\"text\" class=\"triggering-value\" />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"radios\"></div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n   </section>\n\n\n\n</div>",
+   "reparent-node-view": "<div class=\"reparent-node-view\">\n   \n   <span class=\"close\">Close (Esc)</span>\n\n   <div class=\"warning\"></div>\n\n   <label>Choose the new parent</label>\n   <select></select>\n\n   <button>Reparent</button>\n\n</div>"
 };
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
+const $ = require('jquery');
+
+module.exports = {
+
+   scrollToTop: () => {
+      $("html, body").animate({
+         scrollTop: 0
+      }, "slow");
+   },
+
+   scrollToBottom: () => {
+      $("html, body").animate({
+         scrollTop: $(document).height()
+      }, "slow");
+   },
+
+   scrollToNode: (node) => {
+      var px = node.geOffsetTop() - 100;
+      $("html, body").animate({
+         scrollTop: px
+      }, "slow");
+   }
+};
+
+},{"jquery":1}],8:[function(require,module,exports){
 const $ = require('jquery');
 const _ = require('underscore');
 const templates = require('./../templates');
@@ -11864,8 +12015,12 @@ class ClausesView {
       var tmpl = _.template(templates["clauses-view"]);
       this._root = $(tmpl({
          html: this._createCheckboxesHTML()
-      }));      
+      }));
       return this._root;
+   }
+
+   reset() {
+      this._root.find("input").prop("checked", false);
    }
 
    getChosenClausues() {
@@ -11887,7 +12042,7 @@ class ClausesView {
 }
 
 module.exports = ClausesView;
-},{"./../templates":5,"jquery":1,"underscore":2}],7:[function(require,module,exports){
+},{"./../templates":6,"jquery":1,"underscore":2}],9:[function(require,module,exports){
 const $ = require('jquery');
 const ConfigView = require('./config-view');
 const CheckboxConfigView = require('./checkbox-config-view');
@@ -11913,7 +12068,8 @@ module.exports = function(configType, nodeViewId, nodeModel, eventHub) {
          enum: nodeModel.enum,
          default: nodeModel.default,
          _iub_labels: nodeModel._iub_labels,
-         _iub_validation: nodeModel._iub_validation
+         _iub_validation: nodeModel._iub_validation,
+         _iub_triggering_value: nodeModel._iub_triggering_value
       }, eventHub);
    } else if (configType === "text") {
       view = new TextConfigView(nodeViewId, {
@@ -11924,7 +12080,7 @@ module.exports = function(configType, nodeViewId, nodeModel, eventHub) {
 
    return view;
 };
-},{"./checkbox-config-view":8,"./config-view":9,"./number-config-view":10,"./radio-config-view":11,"./text-config-view":12,"jquery":1}],8:[function(require,module,exports){
+},{"./checkbox-config-view":10,"./config-view":11,"./number-config-view":12,"./radio-config-view":13,"./text-config-view":14,"jquery":1}],10:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
 const ConfigView = require('./config-view');
@@ -11941,15 +12097,17 @@ class CheckboxConfigView extends ConfigView {
       return this._root;
    }
 
-   getModel() {
-      return {
+   validate() {
+      return true;
+   }
 
-      };
+   getModel() {
+      return {};
    }
 }
 
 module.exports = CheckboxConfigView;
-},{"./../../templates":5,"./config-view":9,"jquery":1}],9:[function(require,module,exports){
+},{"./../../templates":6,"./config-view":11,"jquery":1}],11:[function(require,module,exports){
 const $ = require('jquery');
 const Expander = require('./../expander');
 
@@ -11965,6 +12123,14 @@ class ConfigView {
       throw "Abstract";
    }
 
+   validate() {
+      throw "Abstract";
+   }
+
+   _removeErrors() {
+      this._root.find("input, select").removeClass("error");
+   }
+
    _behaviour() {
       this._initExpander();
 
@@ -11978,7 +12144,7 @@ class ConfigView {
    }
 
    _triggerConfigUpdate() {
-      this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
+      this._eventHub.trigger("config-has-been-updated", [this._nodeViewId, this.getModel()]);
    }
 
    _initExpander() {
@@ -11987,7 +12153,7 @@ class ConfigView {
 }
 
 module.exports = ConfigView;
-},{"./../expander":13,"jquery":1}],10:[function(require,module,exports){
+},{"./../expander":15,"jquery":1}],12:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
 const ConfigView = require('./config-view');
@@ -12017,6 +12183,20 @@ class NumberConfigView extends ConfigView {
       return this._model;
    }
 
+   validate() {
+      this._removeErrors();
+
+      var valid = true;
+      var model = this.getModel();
+
+      if (!parseInt(this._model.default)) {
+         valid = false;
+         this._defaultInput.addClass("error");
+      }
+
+      return valid;
+   }
+
    _loadData() {
       this._defaultInput.val(this._model.default);
       this._minInput.val(this._model._iub_min);
@@ -12025,7 +12205,7 @@ class NumberConfigView extends ConfigView {
 }
 
 module.exports = NumberConfigView;
-},{"./../../templates":5,"./config-view":9,"jquery":1}],11:[function(require,module,exports){
+},{"./../../templates":6,"./config-view":11,"jquery":1}],13:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
 const ConfigView = require('./config-view');
@@ -12040,6 +12220,7 @@ class RadioConfigView extends ConfigView {
       this._root = $(templates["radio-config-view"]);
       this._proto = this._root.find(".prototype");
       this._defaultInput = this._root.find("input.default");
+      this._triggeringValueInput = this._root.find("input.triggering-value");
       this._validationSelect = this._root.find("select.validation");
       this._radios = this._root.find(".radios");
       this._loadData();
@@ -12049,10 +12230,28 @@ class RadioConfigView extends ConfigView {
 
    getModel() {
 
+      var defaultValue = this._defaultInput.val();
       var validation = this._validationSelect.val();
+      var triggeringValue = this._triggeringValueInput.val();
 
-      this._model.default = this._defaultInput.val();
-      this._model._iub_validation = validation;
+      if (defaultValue) {
+         this._model.default = defaultValue;
+      } else {
+         delete this._model.default;
+      }
+
+      if (validation !== "-") {
+         this._model._iub_validation = validation;
+      } else {
+         delete this._model._iub_validation;
+      }
+
+      if (triggeringValue) {
+         this._model._iub_triggering_value = triggeringValue;
+      } else {
+         delete this._model._iub_triggering_value;
+      }
+
       this._model.enum = [];
       this._model._iub_labels = [];
 
@@ -12065,6 +12264,41 @@ class RadioConfigView extends ConfigView {
       }
 
       return this._model;
+   }
+
+   validate() {
+      this._removeErrors();
+
+      var valid = true;
+      var inputs = this._radios.find("input");
+      var radioValues = [];
+
+      for (var i = 0; i < inputs.length; i++) {
+         let input = $(inputs[i]);
+         if (input.is(".value") && $.trim(input.val() !== "")) {
+            radioValues.push(input.val());
+         }
+         if ($.trim(input.val()) === "") {
+            input.addClass("error");
+            valid = false;
+         }
+      }
+
+      if (inputs.length > 0 && this._defaultInput.val() !== "") {
+         if (radioValues.indexOf(this._defaultInput.val()) === -1) {
+            this._defaultInput.addClass("error");
+            valid = false;
+         }
+      }
+
+      if (inputs.length > 0 && this._triggeringValueInput.val() !== "") {
+         if (radioValues.indexOf(this._triggeringValueInput.val()) === -1) {
+            this._triggeringValueInput.addClass("error");
+            valid = false;
+         }
+      }
+
+      return valid;
    }
 
    _behaviour() {
@@ -12103,12 +12337,13 @@ class RadioConfigView extends ConfigView {
    _removeRadio(el) {
       el.slideUp(() => {
          el.remove();
-         this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
+         this._eventHub.trigger("config-has-been-updated", [this._nodeViewId, this.getModel()]);
       });
    }
 
    _loadData() {
       this._defaultInput.val(this._model.default);
+      this._triggeringValueInput.val(this._model._iub_triggering_value);
       this._validationSelect.val(this._model._iub_validation || "-");
       // when a new config view is created there is no `enum` attribute yet, so I need to make the following check
       if (this._model.enum) {
@@ -12123,7 +12358,7 @@ class RadioConfigView extends ConfigView {
 }
 
 module.exports = RadioConfigView;
-},{"./../../templates":5,"./config-view":9,"jquery":1}],12:[function(require,module,exports){
+},{"./../../templates":6,"./config-view":11,"jquery":1}],14:[function(require,module,exports){
 const $ = require('jquery');
 const templates = require('./../../templates');
 const ConfigView = require('./config-view');
@@ -12150,6 +12385,10 @@ class TextConfigView extends ConfigView {
       return this._model;
    }
 
+   validate() {
+      return true;
+   }
+
    _loadData() {
       this._defaultInput.val(this._model.default);
       this._validationSelect.val(this._model._iub_validation || "-");
@@ -12157,7 +12396,7 @@ class TextConfigView extends ConfigView {
 }
 
 module.exports = TextConfigView;
-},{"./../../templates":5,"./config-view":9,"jquery":1}],13:[function(require,module,exports){
+},{"./../../templates":6,"./config-view":11,"jquery":1}],15:[function(require,module,exports){
 class Expander {
 
    constructor(trigger, panel, label, initiallyExpanded) {
@@ -12188,29 +12427,343 @@ class Expander {
 }
 
 module.exports = Expander;
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
+const _ = require('underscore');
+const $ = require('jquery');
+const NodeView = require('./node-view');
+const ValueView = require('./value-view');
+const templates = require('./../templates');
+const SchemaBuilder = require('./../schema-builder');
+const ReparentNodeView = require('./reparent-node-view');
+const NodesOrderManager = require('./../order/nodes-order-manager');
+const scrolling = require('./../utils/scrolling');
+
+class MainView {
+
+   constructor(eventHub) {
+      this._lastUsedId = 0;
+      this._eventHub = eventHub;
+      this._nodeViews = [];
+      this._clausesModel = null;
+      this._orderManager = new NodesOrderManager([]);
+
+      this._root = $(templates["main-view"]);
+      this._addButton = this._root.find("button.add");
+      this._saveButton = this._root.find("button.save");
+      this._loader = this._root.find(".loading");
+      this._list = this._root.find(".list");
+      this._noNodesYet = this._root.find(".no-nodes-yet");
+   }
+
+   render() {
+
+      $.when($.get("/mock-data/abstract-schema.json"), $.get("/mock-data/clauses.json"))
+         .then((schema, clauses) => {
+            setTimeout(() => { // TODO: remove timeout
+               var nodes = schema[0].properties;
+
+               this._loader.hide();
+               this._clausesModel = clauses[0];
+
+               for (var name in nodes) {
+                  let type = this._getTypeByModel(nodes[name]);
+                  this._buildNode(type, String(this._getNextId()), name, nodes[name]);
+               }
+
+               this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
+
+               for (var i = 0; i < this._nodeViews.length; i++) {
+                  let type = this._getTypeByModel(this._nodeViews[i].getModel());
+                  this._renderNode(type, this._nodeViews[i]);
+               }
+
+               this._handleNoNodesYetMessage();
+               this._behaviour();
+            }, 300);
+         });
+
+      this._reparentNodeview = new ReparentNodeView(this._eventHub);
+      this._root.append(this._reparentNodeview.render());
+      this._reparentNodeview.hide();
+
+      return this._root;
+   }
+
+   _behaviour() {
+
+      this._saveButton.click((e) => {
+         for (var i = 0; i < this._nodeViews.length; i++) {
+            let node = this._nodeViews[i];
+            if (node.validate() === false) {
+               scrolling.scrollToNode(node);
+               return;
+            }
+         }
+         var sb = new SchemaBuilder(this._nodeViews);
+         var json = sb.build();
+         console.log(JSON.stringify(json, null, "   "));
+      });
+
+      this._addButton.click((e) => {
+         var newNode = this._buildNode("node-view", String(this._getNextId()), "", {});
+         this._renderNode("node-view", newNode);
+         this._handleNoNodesYetMessage();
+         scrolling.scrollToBottom();
+      });
+
+      this._eventHub.on("please-delete-node", (e, id) => {
+         var viewToDestroy = this._getViewById(id);
+         var parentView = this._getViewByName(viewToDestroy.getParentName());
+         var ids = viewToDestroy.destroy(true);
+         console.warn("removed ones", ids);
+
+         ids.forEach((id) => {
+            for (var i = 0; i < this._nodeViews.length; i++) {
+               if (this._nodeViews[i].getId() === id) {
+                  this._nodeViews.splice(i, 1);
+                  break;
+               }
+            }
+         });
+
+         if (parentView) {
+            parentView.notifyOfChildrenDestruction(ids);
+            scrolling.scrollToNode(parentView);
+         }
+
+         this._handleNoNodesYetMessage();
+
+         console.log("remaining nodes and values referenced by main-view", this._nodeViews.length);
+      });
+
+      this._eventHub.on("node-name-has-been-updated", (e, id, newName) => {
+         var node;
+         for (var i = 0; i < this._nodeViews.length; i++) {
+            node = this._nodeViews[i];
+            if (node.getParentId() === id) {
+               node.setParentName(newName);
+            }
+         }
+      });
+
+      this._eventHub.on("please-create-child-node", (e, type, parentNodeId, parentNodeName) => {
+         var newNode = this._buildNode(type, String(this._getNextId()), "", {});
+         newNode.setParentId(parentNodeId);
+         newNode.setParentName(parentNodeName);
+         this._renderNode(type, newNode);
+         scrolling.scrollToNode(newNode);
+      });
+
+      this._eventHub.on("please-show-reparent-node-view", (e, node) => {
+         console.log("show reparent view for view " + node.getName());
+         this._reparentNodeview.setNodeToBeReparented(node);
+         this._reparentNodeview.show(this._nodeViews);
+      });
+
+      this._eventHub.on("please-reparent-this-node-view", (e, nameOfNodeToReparent, currentParentName, newParentName) => {
+         console.log("node to reparent", nameOfNodeToReparent);
+         console.log("from", currentParentName);
+         console.log("to", newParentName);
+
+         let nodeToReparent = this._getViewByName(nameOfNodeToReparent);
+         let currentParentView = this._getViewByName(currentParentName);
+         let newParentView = this._getViewByName(newParentName);
+
+         if (currentParentView) { // the node might be a root one, in which case no current parent exists.
+            currentParentView.detachNodeView(nodeToReparent);
+         } else {
+            this._orderManager.removeNode(nodeToReparent);
+         }
+
+         nodeToReparent.resetPosition();
+
+         if (!newParentView) { // it has been asked to make it a root node
+            this._orderManager.addNode(nodeToReparent);
+            nodeToReparent.setParentId(null);
+            nodeToReparent.setParentName(null);
+            nodeToReparent.setMoveDownCommand(this._moveNodeDown.bind(this));
+            nodeToReparent.setMoveUpCommand(this._moveNodeUp.bind(this));
+            nodeToReparent.setRemoveFromPositionManagerCommand(this._removeFromOrderManager.bind(this));
+            this._list.append(nodeToReparent.getDomNode());
+         } else {
+            nodeToReparent.setParentId(newParentView.getId());
+            nodeToReparent.setParentName(newParentName);
+            newParentView.appendNodeView(nodeToReparent);
+         }
+
+         scrolling.scrollToNode(nodeToReparent);
+      });
+   }
+
+   _buildNode(type, id, name, nodeModel) {
+      var nodeView;
+      if (type === "node-view") {
+         nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
+      } else if (type === "value-view") {
+         nodeView = new ValueView(id, name, nodeModel, this._clausesModel, this._eventHub);
+      } else {
+         throw `Unknown type [${type}]`;
+      }
+      this._nodeViews.push(nodeView);
+      return nodeView;
+   }
+
+   _moveNodeUp(node) {
+      var prevNode = this._orderManager.getPreviousNode(node);
+      if (prevNode) {
+         node.getDomNode().insertBefore(prevNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
+      this._orderManager.moveNodeToLowerPosition(node);
+   }
+
+   _moveNodeDown(node) {
+      var nextNode = this._orderManager.getNextNode(node);
+      if (nextNode) {
+         node.getDomNode().insertAfter(nextNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
+      this._orderManager.moveNodeToHigherPosition(node);
+   }
+
+   _removeFromOrderManager(node) {
+      this._orderManager.removeNode(node);
+   }
+
+   _renderNode(type, node) {
+      var parentId = node.getParentId();
+      var parent = this._getViewById(parentId);
+      var previousNode;
+      var nextNode;
+      node.render();
+      if (parent) {
+         if (type === "node-view") {
+            parent.appendNodeView(node);
+         } else if (type === "value-view") {
+            parent.appendValueView(node);
+         }
+      } else {
+         node.setMoveDownCommand(this._moveNodeDown.bind(this));
+         node.setMoveUpCommand(this._moveNodeUp.bind(this));
+         node.setRemoveFromPositionManagerCommand(this._removeFromOrderManager.bind(this));
+         this._orderManager.addNode(node);
+         previousNode = this._orderManager.getPreviousNode(node);
+         nextNode = this._orderManager.getNextNode(node);
+         if (!previousNode && !nextNode) { // it is the first being added
+            this._list.append(node.getDomNode());
+         } else if (previousNode) {
+            node.getDomNode().insertAfter(previousNode.getDomNode());
+         } else if (nextNode) {
+            node.getDomNode().insertBefore(nextNode.getDomNode());
+         }
+      }
+   }
+
+   _handleNoNodesYetMessage() {
+      if (this._nodeViews.length === 0) {
+         this._noNodesYet.show();
+      } else {
+         this._noNodesYet.hide();
+      }
+   }
+
+   _getViewByName(name) {
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         var view = this._nodeViews[i];
+         if (view.getName() === name) {
+            return view;
+         }
+      }
+   }
+
+   _getViewById(id) {
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         var view = this._nodeViews[i];
+         if (view.getId() === id) {
+            return view;
+         }
+      }
+   }
+
+   _doesViewExists(id) {
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         var view = this._nodeViews[i];
+         if (view.getId() === id) {
+            return view;
+         }
+      }
+   }
+
+   _setNodeViewsParentId() {
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         var view = this._nodeViews[i];
+         var parentName = view.getParentName();
+         var parentId;
+         if (parentName) {
+            parentId = this._getViewByName(parentName).getId();
+         }
+         view.setParentId(parentId);
+      }
+   }
+
+   _getNextId() {
+      this._lastUsedId++;
+      return this._lastUsedId;
+   }
+
+   _getTypeByModel(model) {
+      return model.type === "boolean" || model.type === "string" && model.enum ? "node-view" : "value-view";
+   }
+}
+
+module.exports = MainView;
+},{"./../order/nodes-order-manager":4,"./../schema-builder":5,"./../templates":6,"./../utils/scrolling":7,"./node-view":17,"./reparent-node-view":18,"./value-view":19,"jquery":1,"underscore":2}],17:[function(require,module,exports){
 const _ = require('underscore');
 const $ = require('jquery');
 const templates = require('./../templates');
 const ClausesView = require('./clauses-view');
 const buildConfigView = require('./config/build-config-view');
 const Expander = require('./expander');
+const NodesOrderManager = require('./../order/nodes-order-manager');
+const scrolling = require('./../utils/scrolling');
 
 class NodeView {
 
    constructor(id, name, model, clauses, eventHub) {
+      this._rendered = false;
       this._id = id;
-      this._name = name;
+      this._parentId;
+      this._name = this._parseName(name);
       this._model = model;
       this._clauses = clauses;
+
       this._eventHub = eventHub;
+
+      this._moveUp;
+      this._moveDown;
+      this._removeFromPositionManager;
+
       this._configView;
       this._clausesView;
-      this._parentId;
+
+      this._nodeViews = [];
+      this._valueViews = [];
+
+      this._nodeViewsOrderManager = new NodesOrderManager([]);
+      this._valueViewsOrderManager = new NodesOrderManager([]);
+
    }
 
-   getRootNode() {
+   getPosition() {
+      return this._model._iub_position;
+   }
+
+   getDomNode() {
       return this._root;
+   }
+
+   geOffsetTop() {
+      return this._root.offset().top;
    }
 
    getId() {
@@ -12221,12 +12774,16 @@ class NodeView {
       return this._parentId;
    }
 
+   getParentName() {
+      return this.getModel()._iub_parent;
+   }
+
    getName() {
       return this._name;
    }
 
-   getParentName() {
-      return this.getModel()._iub_parent;
+   getSchemaName() {
+      return this.getName();
    }
 
    getModel() {
@@ -12234,7 +12791,7 @@ class NodeView {
    }
 
    getClauses() {
-      return this._clausesView.getChosenClausues();
+      return this._clausesView && this._clausesView.getChosenClausues();
    }
 
    getData() {
@@ -12247,93 +12804,314 @@ class NodeView {
    }
 
    setParentId(id) {
-      this._parentId = id;
-   }
-
-   setParentSelectValue(parentId) {
-      this._parentInput.val(parentId);
-   }
-
-   updateParentName(parentId) {
-      var parentName;
-
-      if (parentId !== "-") {
-         parentName = this._parentInput.find(`option[value=${parentId}]`).text();
-         this._model._iub_parent = parentName;
+      if (id) {
+         this._parentId = id;
       } else {
-         delete this._model._iub_parent;
+         delete this._parentId;
       }
    }
 
+   setPosition(index) {
+      return this._model._iub_position = index;
+   }
+
+   resetPosition() {
+      delete this._model._iub_position;
+   }
+
+   setMoveUpCommand(f) {
+      this._moveUp = f;
+   }
+
+   setMoveDownCommand(f) {
+      this._moveDown = f;
+   }
+
+   setRemoveFromPositionManagerCommand(f) {
+      this._removeFromPositionManager = f;
+   }
+
+   setParentName(name) {
+      if (!name) {
+         delete this._model._iub_parent;
+      } else {
+         this._model._iub_parent = name;
+      }
+   }
+
+   appendNodeView(view) {
+      this._nodeViews.push(view);
+      this._nodeViewsOrderManager.addNode(view);
+
+      var previousNode = this._nodeViewsOrderManager.getPreviousNode(view);
+      var nextNode = this._nodeViewsOrderManager.getNextNode(view);
+
+      view.setMoveUpCommand(this._moveNodeViewUp.bind(this));
+      view.setMoveDownCommand(this._moveNodeViewDown.bind(this));
+      view.setRemoveFromPositionManagerCommand(this._removeNodeViewFromOrderManager.bind(this));
+
+      if (!previousNode && !nextNode) { // it is the first being added
+         this._nodeViewsContainer.append(view.getDomNode());
+      } else if (previousNode) {
+         view.getDomNode().insertAfter(previousNode.getDomNode());
+      } else if (nextNode) {
+         view.getDomNode().insertBefore(nextNode.getDomNode());
+      }
+
+      this._nodeViewsSection.show();
+      console.log(this._name + " now references " + this._nodeViews.length + " nodes");
+   }
+
+   appendValueView(view) {
+      this._valueViews.push(view);
+      this._valueViewsOrderManager.addNode(view);
+
+      var previousNode = this._valueViewsOrderManager.getPreviousNode(view);
+      var nextNode = this._valueViewsOrderManager.getNextNode(view);
+
+      view.setMoveUpCommand(this._moveValueViewUp.bind(this));
+      view.setMoveDownCommand(this._moveValueViewDown.bind(this));
+      view.setRemoveFromPositionManagerCommand(this._removeValueViewFromOrderManager.bind(this));
+
+      if (!previousNode && !nextNode) { // it is the first being added
+         this._valueViewsContainer.append(view.getDomNode());
+      } else if (previousNode) {
+         view.getDomNode().insertAfter(previousNode.getDomNode());
+      } else if (nextNode) {
+         view.getDomNode().insertBefore(nextNode.getDomNode());
+      }
+
+      this._valueViewsSection.show();
+      console.log(this._name + " now references " + this._valueViews.length + " values");
+   }
+
+   /** 
+    * Detach a certain node from the list of child nodes.
+    * 
+    * Note: there is actually no dom removal performed here!!!
+    * 
+    * This is because the dom operations performed inside `appendNodeView` already take care of this. 
+    * In fact appending a dom node automatically detaches it from its previous location.
+    * The browser does it by itself;
+    * 
+    * @param {NodeView} nodeToRemove
+    */
+   detachNodeView(nodeToRemove) {
+
+      var index = -1;
+
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         let node = this._nodeViews[i];
+         if (node.getId() === nodeToRemove.getId()) {
+            index = i;
+            break;
+         }
+      }
+
+      if (index !== -1) {
+         this._nodeViews.splice(index, 1);
+         this._nodeViewsOrderManager.removeNode(nodeToRemove);
+      }
+
+      this._handleNodeViewsSectionVisibility();
+
+      console.log(this._name + " has now " + this._nodeViews.length + " children", this._nodeViews.map((n) => {
+         return n.getName();
+      }));
+   }
+
+   notifyOfChildrenDestruction(ids) {
+      ids.forEach((id) => {
+         for (var i = 0; i < this._nodeViews.length; i++) {
+            if (this._nodeViews[i].getId() === id) {
+               this._nodeViews.splice(i, 1);
+               break;
+            }
+         }
+
+         for (var i = 0; i < this._valueViews.length; i++) {
+            if (this._valueViews[i].getId() === id) {
+               this._valueViews.splice(i, 1);
+               break;
+            }
+         }
+      });
+
+      console.log("remaining nodes referenced by " + this._name, this._nodeViews.length);
+      console.log("remaining values referenced by " + this._name, this._valueViews.length);
+
+      this._handleNodeViewsSectionVisibility();
+      this._handleValueViewsSectionVisibility();
+   }
+
+   /**
+    * Recursively destroy a node and return all the destroyed ids.
+    * 
+    * @returns {Array}
+    */
+   destroy() {
+
+      var destroyedIds = [this._id];
+      var dom = this.getDomNode();
+
+      dom.slideUp(() => {
+         dom.remove();
+      });
+
+      for (var j = 0; j < this._nodeViews.length; j++) {
+         let ids = this._nodeViews[j].destroy();
+         ids.forEach((id) => {
+            destroyedIds.push(id);
+         });
+      }
+
+      for (var j = 0; j < this._valueViews.length; j++) {
+         let ids = this._valueViews[j].destroy();
+         ids.forEach((id) => {
+            destroyedIds.push(id);
+         });
+      }
+
+      this._nodeViews = [];
+      this._valueViews = [];
+
+      return destroyedIds;
+   }
+
+   canBeAParentNode() {
+      var type = this._getSelectTypeFromModel();
+      return type === "checkbox" || type === "radio";
+   }
+
    render() {
+
+      if (this._rendered) {
+         throw "Double rendering";
+      }
 
       var tmpl = _.template(templates["node-view"]);
       this._root = $(tmpl({
          id: this._id
       }));
 
+      this._nameLabel = this._root.find(".name-label");
       this._nameInput = this._root.find(".name");
       this._titleInput_IT = this._root.find(".title_it");
       this._titleInput_EN = this._root.find(".title_en");
       this._titleInput_DE = this._root.find(".title_de");
       this._typeInput = this._root.find(".type");
-      this._parentInput = this._root.find(".parent");
 
-      this._deleteButton = this._root.find("button");
+      this._upButton = this._root.find("button.up");
+      this._downButton = this._root.find("button.down");
+      this._addNodeViewButton = this._root.find("button.add-child-node");
+      this._addValueViewButton = this._root.find("button.add-value-input");
+      this._reparentButton = this._root.find("button.reparent");
+      this._deleteButton = this._root.find("button.delete");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
-      this._configContainer = this._root.find(".config");
-      this._clausesContainer = this._root.find(".clauses .container");
+      this._configSection = this._root.find(".config");
+      this._clausesSection = this._root.find(".clauses");
+      this._clausesContainer = this._clausesSection.find(".container");
+      this._nodeViewsSection = this._root.find(".node-views");
+      this._nodeViewsContainer = this._nodeViewsSection.find(".container");
+      this._valueViewsSection = this._root.find(".value-views");
+      this._valueViewsContainer = this._valueViewsSection.find(".container");
 
       this._loadModelData();
       this._renderSubViews();
+      this._removeTypeOptions();
       this._behaviour();
+
+      this._rendered = true;
 
       return this._root;
    }
 
-   drawParentSelect(nodes) {
+   validate() {
+      var valid = true;
 
-      var i, option, name, id;
+      this._removeErrors();
 
-      this._sortByName(nodes);
-      this._parentInput.empty();
-      this._parentInput.append("<option value='-'>-</option>");
-
-      for (var i = 0; i < nodes.length; i++) {
-
-         id = nodes[i].id;
-         name = nodes[i].name;
-
-         if (id === this.getId()) {
-            continue;
-         }
-
-         if (!name) {
-            name = "...";
-         }
-
-         option = $("<option>" + name + "</option>");
-         option.attr("value", id);
-         this._parentInput.append(option);
+      if ($.trim(this._nameInput.val()) === "") {
+         this._nameInput.addClass("error");
+         valid = false;
       }
+
+      if ($.trim(this._typeInput.val()) === "-") {
+         this._typeInput.addClass("error");
+         valid = false;
+      }
+
+      if ($.trim(this._titleInput_EN.val()) === "") {
+         this._titleInput_EN.addClass("error");
+         valid = false;
+      }
+
+//      NOT YET
+//      if ($.trim(this._titleInput_IT.val()) === "") {
+//         this._titleInput_IT.addClass("error");
+//         valid = false;
+//      }
+//
+//      if ($.trim(this._titleInput_DE.val()) === "") {
+//         this._titleInput_DE.addClass("error");
+//         valid = false;
+//      }
+
+      if (this._configView) {
+         let configValid = this._configView.validate();
+         if (!configValid) {
+            valid = false;
+         }
+      }
+
+      return valid;
    }
 
    _behaviour() {
 
-      // Uncomment for debugging
-      setInterval(() => {
-         var data = this.getData();
-         data.parentId = this._parentId;
-         this._root.find(".debugger")
-            .text(JSON.stringify(data, null, "  "));
-      }, 1000);
+      (() => {
+         let debuggerBox = this._root.find(".debugger");
+         let data;
+         if (window.location.href.indexOf("debugger") > -1) {
+            setInterval(() => {
+               data = this.getData();
+               data.parentId = this._parentId;
+               let oldJSON = debuggerBox.text();
+               let newJSON = JSON.stringify(data, null, "  ");
+               if (oldJSON !== newJSON) {
+                  debuggerBox.text(newJSON);
+               }
+            }, 1000);
+         } else {
+            debuggerBox.hide();
+         }
+      })();
 
-      // Comment out for debugging
-      // this._root.find(".model").hide();
+      this._root.click((e) => {
+         e.stopPropagation(); // this prevents the event from being fired when clicking on child nodes
+         var trg = $(e.target);
+
+         if (trg.is("input, select")) {
+            trg.removeClass("error");
+         }
+
+         if (trg.is(".buttons") || trg.is(".name-label")) {
+            this._root.toggleClass("collapsed");
+         }
+      });
+
+      this._upButton.click(() => {
+         this._moveUp(this);
+      });
+
+      this._downButton.click(() => {
+         this._moveDown(this);
+      });
 
       this._nameInput.on("keyup", () => {
          this._name = this._nameInput.val();
-         this._eventHub.trigger("node-name-updated");
+         this._nameLabel.text(this._name);
+         this._eventHub.trigger("node-name-has-been-updated", [this._id, this._name]);
       });
 
       this._titleInput_IT.on("keyup", () => {
@@ -12351,33 +13129,67 @@ class NodeView {
 
       this._typeInput.on("change", () => {
          var configType = this._typeInput.val();
-         this._model.type = this._getModelTypeFromSelect(configType);
+         this._setModelTypeFromSelect(configType);
          this._renderConfigView(configType);
       });
 
-      this._parentInput.on("change", () => {
-         var parentId = this._parentInput.val();
-         this.setParentId(parentId);
-         this.updateParentName(parentId);
-      });
-
       this._deleteButton.click((e) => {
-         e.preventDefault();
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
-            this._eventHub.off("config-updated", this._onConfigUpdatedBound);
-            this._eventHub.trigger("node-removed", this.getId());
+            this._removeFromPositionManager(this);
+            this._eventHub.off("config-has-been-updated", this._onConfigUpdatedBound);
+            this._eventHub.trigger("please-delete-node", [this.getId()]);
          }
       });
 
+      this._reparentButton.click(() => {
+         this._eventHub.trigger("please-show-reparent-node-view", [this]);
+      });
+
+      this._addNodeViewButton.click((e) => {
+         this._eventHub.trigger("please-create-child-node", ["node-view", this.getId(), this.getName()]);
+      });
+
+      this._addValueViewButton.click((e) => {
+         this._eventHub.trigger("please-create-child-node", ["value-view", this.getId(), this.getName()]);
+      });
+
       this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);
-      this._eventHub.on("config-updated", this._onConfigUpdatedBound);
+
+      this._eventHub.on("config-has-been-updated", this._onConfigUpdatedBound);
 
       new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
    }
 
+   _removeErrors() {
+      this._root.find("input, select").removeClass("error");
+   }
+
+   _handleNodeViewsSectionVisibility() {
+      if (this._nodeViews.length === 0) {
+         this._nodeViewsSection.hide();
+      }
+   }
+
+   _handleValueViewsSectionVisibility() {
+      if (this._valueViews.length === 0) {
+         this._valueViewsSection.hide();
+      }
+   }
+
+   _removeTypeOptions() {
+      this._getTypeOptionsToRemove().forEach((value) => {
+         this._typeInput.find(`option[value=${value}]`).remove();
+      });
+   }
+
    _onConfigUpdated(e, id, configModel) {
-      console.log("up")
+
+      // TODO: here the received config model might contains less properties than the model during the previous update
+      // therefore stale data copied over from the previous version config model could remain in the node view model...
+      // Address this defect!
+      // A good example is the default, validation and triggering value of the radio config view.
+
       if (id === this._id) {
          for (var p in configModel) {
             this._model[p] = configModel[p];
@@ -12400,7 +13212,7 @@ class NodeView {
       this._configView = buildConfigView(type, this._id, this._model, this._eventHub);
 
       if (this._configView) { // newly created nodes have empty model so the created config view undefined
-         this._configContainer.empty().append(this._configView.render());
+         this._configSection.empty().append(this._configView.render());
       }
    }
 
@@ -12412,6 +13224,7 @@ class NodeView {
    }
 
    _loadModelData() {
+      this._nameLabel.text(this._name);
       this._nameInput.val(this._name);
       this._titleInput_IT.val(this._model.title_it);
       this._titleInput_EN.val(this._model.title);
@@ -12435,7 +13248,7 @@ class NodeView {
       return type;
    }
 
-   _getModelTypeFromSelect(v) {
+   _setModelTypeFromSelect(v) {
       var type;
 
       if (v === "checkbox") {
@@ -12448,200 +13261,209 @@ class NodeView {
          type = "number";
       }
 
-      return type;
+      this._model.type = type;
+
+      if (v === "radio") {
+         this._model.enum = [];
+      }
    }
 
-   _sortByName(nodes) {
-      return nodes.sort((a, b) => {
-         if (a.name < b.name) {
-            return -1;
-         }
-         if (a.name > b.name) {
-            return 1;
-         }
-         return 0;
-      });
+   _getTypeOptionsToRemove() {
+      return ["number", "text"];
+   }
+
+   _parseName(name) {
+      return name;
+   }
+
+   _moveNodeViewUp(node) {
+      var prevNode = this._nodeViewsOrderManager.getPreviousNode(node);
+      if (prevNode) {
+         node.getDomNode().insertBefore(prevNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
+      this._nodeViewsOrderManager.moveNodeToLowerPosition(node);
+   }
+
+   _moveNodeViewDown(node) {
+      var nextNode = this._nodeViewsOrderManager.getNextNode(node);
+      if (nextNode) {
+         node.getDomNode().insertAfter(nextNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
+      this._nodeViewsOrderManager.moveNodeToHigherPosition(node);
+   }
+
+   _removeNodeViewFromOrderManager(node) {
+      this._nodeViewsOrderManager.removeNode(node);
+   }
+
+   _moveValueViewUp(node) {
+      var prevNode = this._valueViewsOrderManager.getPreviousNode(node);
+      if (prevNode) {
+         node.getDomNode().insertBefore(prevNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
+      this._valueViewsOrderManager.moveNodeToLowerPosition(node);
+   }
+
+   _moveValueViewDown(node) {
+      var nextNode = this._valueViewsOrderManager.getNextNode(node);
+      if (nextNode) {
+         node.getDomNode().insertAfter(nextNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
+      this._valueViewsOrderManager.moveNodeToHigherPosition(node);
+   }
+
+   _removeValueViewFromOrderManager(node) {
+      this._valueViewsOrderManager.removeNode(node);
    }
 }
 
 module.exports = NodeView;
-},{"./../templates":5,"./clauses-view":6,"./config/build-config-view":7,"./expander":13,"jquery":1,"underscore":2}],15:[function(require,module,exports){
-const _ = require('underscore');
+},{"./../order/nodes-order-manager":4,"./../templates":6,"./../utils/scrolling":7,"./clauses-view":8,"./config/build-config-view":9,"./expander":15,"jquery":1,"underscore":2}],18:[function(require,module,exports){
 const $ = require('jquery');
-const NodeView = require('./node-view');
+const _ = require('underscore');
 const templates = require('./../templates');
-const SchemaBuilder = require('./../schema-builder');
 
-class NodesListView {
+class ReparentNodeView {
 
    constructor(eventHub) {
-      this._lastUsedId = 0;
       this._eventHub = eventHub;
-      this._renderedNodeViews = [];
-      this._clausesModel = null;
-
-      this._root = $(templates["nodes-list-view"]);
-      this._addButton = this._root.find("button.add");
-      this._saveButton = this._root.find("button.save");
-      this._loader = this._root.find(".loading");
-      this._list = this._root.find(".list");
-      this._noNodesYet = this._root.find(".no-nodes-yet");
    }
 
    render() {
-
-      $.when($.get("/mock-data/schema.json"), $.get("/mock-data/clauses.json"))
-         .then((schema, clauses) => {
-            setTimeout(() => {
-               var nodes = schema[0].properties;
-
-               this._loader.hide();
-               this._clausesModel = clauses[0];
-
-               for (var name in nodes) {
-                  this._lastUsedId++;
-                  this._renderNode(String(this._lastUsedId), name, nodes[name]);
-               }
-
-               this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
-               this._drawNodesParentSelect();
-               this._setNodesParentSelectValue();
-               this._handleNoNodesYetMessage();
-               this._behaviour();
-            }, 300);
-         });
-
+      var tmpl = _.template(templates["reparent-node-view"]);
+      this._root = $(tmpl());
+      this._warning = this._root.find(".warning");
+      this._select = this._root.find("select");
+      this._closeButton = this._root.find(".close");
+      this._executeButton = this._root.find("button");
+      this._behaviour();
       return this._root;
+   }
+
+   setNodeToBeReparented(node) {
+      this._node = node;
+   }
+
+   show(nodes) {
+
+      var view, option;
+      var names = this._getSortedListOfNodeNames(nodes);
+
+      this._warning.empty().text("You are about to choose a new parent for the node [" + this._node.getName() + "]");
+
+      this._select.append("<option value='-'>- no parent (make it a root node) -</option>");
+
+      for (var i = 0; i < names.length; i++) {
+         name = names[i];
+         view = this._getViewByName(nodes, name);
+         if (view.canBeAParentNode() && view.getId() !== this._node.getId()) {
+            option = $("<option />");
+            option.attr("value", name);
+            option.text(name);
+            this._select.append(option);
+         }
+      }
+
+      this._root.show();
+   }
+
+   hide() {
+      this._root.hide();
+      this._node = null;
+      this._select.empty();
    }
 
    _behaviour() {
 
-      this._saveButton.click((e) => {
-         var sb = new SchemaBuilder(this._renderedNodeViews);
-         var json = sb.build();
-         console.log(JSON.stringify(json, null, "   "));
+      $(document).on("keyup", (e) => {
+         if (e.keyCode === 27) {
+            this.hide();
+         }
       });
 
-      this._addButton.click((e) => {
-         e.preventDefault();
-         this._lastUsedId++;
-         this._renderNode(String(this._lastUsedId), "", {});
-         this._drawNodesParentSelect();
-         this._setNodesParentSelectValue();
-         this._handleNoNodesYetMessage();
-         this._slideDown();
+      this._closeButton.click((e) => {
+         this.hide();
       });
 
-      this._eventHub.on("node-removed", (e, id) => {
-         var index = -1;
-         var node, dom;
-
-         for (var i = 0; i < this._renderedNodeViews.length; i++) {
-            node = this._renderedNodeViews[i];
-            if (node.getId() === id) {
-               dom = node.getRootNode();
-               dom.slideUp(() => {
-                  dom.remove();
-               });
-               index = i;
-               break;
+      this._executeButton.click((e) => {
+         let newParentName = this._select.val();
+         let currentParentName = this._node.getParentName();
+         if (!currentParentName && newParentName === "-") {
+            alert("Choosen a new parent");
+         } else {
+            if (newParentName !== currentParentName) {
+               this._eventHub.trigger("please-reparent-this-node-view", [this._node.getName(), currentParentName, newParentName]);
+               this.hide();
+            } else {
+               alert("Choosen a new parent");
             }
          }
+      });
+   }
 
-         if (index !== -1) {
-            this._renderedNodeViews.splice(index, 1);
+   _getSortedListOfNodeNames(nodes) {
+      var names = nodes.map((node) => {
+         return node.getName();
+      });
+
+      names.sort((a, b) => {
+         if (a < b) {
+            return -1;
          }
-
-         this._drawNodesParentSelect();
-         this._setNodesParentSelectValue();
-         this._handleNoNodesYetMessage();
-      });
-
-      this._eventHub.on("node-name-updated", (e) => {
-         this._drawNodesParentSelect();
-         this._setNodesParentSelectValue();
-      });
-   }
-
-   _renderNode(id, name, nodeModel) {
-      var nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
-      this._list.append(nodeView.render());
-      this._renderedNodeViews.push(nodeView);
-   }
-
-   _drawNodesParentSelect() {
-      var data = this._renderedNodeViews.map((view) => {
-         return view.getData();
-      });
-      for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         this._renderedNodeViews[i].drawParentSelect(data);
-      }
-   }
-
-   _setNodesParentSelectValue() {
-      var parentId, view, parentId, parentId;
-      for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         view = this._renderedNodeViews[i];
-         parentId = view.getParentId();
-         if (!this._doesViewExists(parentId)) {
-            parentId = "-";
+         if (a > b) {
+            return 1;
          }
-         view.setParentId(parentId);
-         view.updateParentName(parentId);
-         view.setParentSelectValue(parentId);
-      }
+         return 0;
+      });
+
+      return names;
    }
 
-   _handleNoNodesYetMessage() {
-      if (this._renderedNodeViews.length === 0) {
-         this._noNodesYet.show();
-      } else {
-         this._noNodesYet.hide();
-      }
-   }
-
-   _getViewByName(name) {
-      for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         var view = this._renderedNodeViews[i];
+   _getViewByName(views, name) {
+      for (var i = 0; i < views.length; i++) {
+         let view = views[i];
          if (view.getName() === name) {
             return view;
          }
       }
    }
+}
 
-   _doesViewExists(id) {
-      for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         var view = this._renderedNodeViews[i];
-         if (view.getId() === id) {
-            return view;
-         }
-      }
+module.exports = ReparentNodeView;
+},{"./../templates":6,"jquery":1,"underscore":2}],19:[function(require,module,exports){
+const _ = require('underscore');
+const $ = require('jquery');
+const NodeView = require('./node-view');
+
+class ValueView extends NodeView {
+
+   render() {
+      super.render();
+      this.getDomNode().addClass("value-view");
+      this._addNodeViewButton.remove();
+      this._addValueViewButton.remove();
+      this._reparentButton.remove();
+      this._clausesSection.remove();
+      this._nodeViewsSection.remove();
+      this._valueViewsSection.remove();
    }
 
-   _setNodeViewsParentId() {
-      for (var i = 0; i < this._renderedNodeViews.length; i++) {
-         var view = this._renderedNodeViews[i];
-         var parentName = view.getParentName();
-         var parentId = "-";
-         if (parentName) {
-            parentId = this._getViewByName(parentName).getId();
-         }
-         view.setParentId(parentId);
-      }
+   getSchemaName() {
+      return this.getParentName() + "." + this.getName();
    }
 
-   _slideUp() {
-      $("html, body").animate({
-         scrollTop: 0
-      }, "slow");
+   _getTypeOptionsToRemove() {
+      return ["checkbox", "radio"];
    }
 
-   _slideDown() {
-      $("html, body").animate({
-         scrollTop: $(document).height()
-      }, "slow");
+   _parseName(name) {
+      return name.split(".")[1];
    }
 }
 
-module.exports = NodesListView;
-},{"./../schema-builder":4,"./../templates":5,"./node-view":14,"jquery":1,"underscore":2}]},{},[3]);
+module.exports = ValueView;
+},{"./node-view":17,"jquery":1,"underscore":2}]},{},[3]);

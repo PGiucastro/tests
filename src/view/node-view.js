@@ -4,22 +4,46 @@ const templates = require('./../templates');
 const ClausesView = require('./clauses-view');
 const buildConfigView = require('./config/build-config-view');
 const Expander = require('./expander');
+const NodesOrderManager = require('./../order/nodes-order-manager');
+const scrolling = require('./../utils/scrolling');
 
 class NodeView {
 
    constructor(id, name, model, clauses, eventHub) {
+      this._rendered = false;
       this._id = id;
-      this._name = name;
+      this._parentId;
+      this._name = this._parseName(name);
       this._model = model;
       this._clauses = clauses;
+
       this._eventHub = eventHub;
+
+      this._moveUp;
+      this._moveDown;
+      this._removeFromPositionManager;
+
       this._configView;
       this._clausesView;
-      this._parentId;
+
+      this._nodeViews = [];
+      this._valueViews = [];
+
+      this._nodeViewsOrderManager = new NodesOrderManager([]);
+      this._valueViewsOrderManager = new NodesOrderManager([]);
+
    }
 
-   getRootNode() {
+   getPosition() {
+      return this._model._iub_position;
+   }
+
+   getDomNode() {
       return this._root;
+   }
+
+   geOffsetTop() {
+      return this._root.offset().top;
    }
 
    getId() {
@@ -30,12 +54,16 @@ class NodeView {
       return this._parentId;
    }
 
+   getParentName() {
+      return this.getModel()._iub_parent;
+   }
+
    getName() {
       return this._name;
    }
 
-   getParentName() {
-      return this.getModel()._iub_parent;
+   getSchemaName() {
+      return this.getName();
    }
 
    getModel() {
@@ -43,7 +71,7 @@ class NodeView {
    }
 
    getClauses() {
-      return this._clausesView.getChosenClausues();
+      return this._clausesView && this._clausesView.getChosenClausues();
    }
 
    getData() {
@@ -56,93 +84,314 @@ class NodeView {
    }
 
    setParentId(id) {
-      this._parentId = id;
-   }
-
-   setParentSelectValue(parentId) {
-      this._parentInput.val(parentId);
-   }
-
-   updateParentName(parentId) {
-      var parentName;
-
-      if (parentId !== "-") {
-         parentName = this._parentInput.find(`option[value=${parentId}]`).text();
-         this._model._iub_parent = parentName;
+      if (id) {
+         this._parentId = id;
       } else {
-         delete this._model._iub_parent;
+         delete this._parentId;
       }
    }
 
+   setPosition(index) {
+      return this._model._iub_position = index;
+   }
+
+   resetPosition() {
+      delete this._model._iub_position;
+   }
+
+   setMoveUpCommand(f) {
+      this._moveUp = f;
+   }
+
+   setMoveDownCommand(f) {
+      this._moveDown = f;
+   }
+
+   setRemoveFromPositionManagerCommand(f) {
+      this._removeFromPositionManager = f;
+   }
+
+   setParentName(name) {
+      if (!name) {
+         delete this._model._iub_parent;
+      } else {
+         this._model._iub_parent = name;
+      }
+   }
+
+   appendNodeView(view) {
+      this._nodeViews.push(view);
+      this._nodeViewsOrderManager.addNode(view);
+
+      var previousNode = this._nodeViewsOrderManager.getPreviousNode(view);
+      var nextNode = this._nodeViewsOrderManager.getNextNode(view);
+
+      view.setMoveUpCommand(this._moveNodeViewUp.bind(this));
+      view.setMoveDownCommand(this._moveNodeViewDown.bind(this));
+      view.setRemoveFromPositionManagerCommand(this._removeNodeViewFromOrderManager.bind(this));
+
+      if (!previousNode && !nextNode) { // it is the first being added
+         this._nodeViewsContainer.append(view.getDomNode());
+      } else if (previousNode) {
+         view.getDomNode().insertAfter(previousNode.getDomNode());
+      } else if (nextNode) {
+         view.getDomNode().insertBefore(nextNode.getDomNode());
+      }
+
+      this._nodeViewsSection.show();
+      console.log(this._name + " now references " + this._nodeViews.length + " nodes");
+   }
+
+   appendValueView(view) {
+      this._valueViews.push(view);
+      this._valueViewsOrderManager.addNode(view);
+
+      var previousNode = this._valueViewsOrderManager.getPreviousNode(view);
+      var nextNode = this._valueViewsOrderManager.getNextNode(view);
+
+      view.setMoveUpCommand(this._moveValueViewUp.bind(this));
+      view.setMoveDownCommand(this._moveValueViewDown.bind(this));
+      view.setRemoveFromPositionManagerCommand(this._removeValueViewFromOrderManager.bind(this));
+
+      if (!previousNode && !nextNode) { // it is the first being added
+         this._valueViewsContainer.append(view.getDomNode());
+      } else if (previousNode) {
+         view.getDomNode().insertAfter(previousNode.getDomNode());
+      } else if (nextNode) {
+         view.getDomNode().insertBefore(nextNode.getDomNode());
+      }
+
+      this._valueViewsSection.show();
+      console.log(this._name + " now references " + this._valueViews.length + " values");
+   }
+
+   /** 
+    * Detach a certain node from the list of child nodes.
+    * 
+    * Note: there is actually no dom removal performed here!!!
+    * 
+    * This is because the dom operations performed inside `appendNodeView` already take care of this. 
+    * In fact appending a dom node automatically detaches it from its previous location.
+    * The browser does it by itself;
+    * 
+    * @param {NodeView} nodeToRemove
+    */
+   detachNodeView(nodeToRemove) {
+
+      var index = -1;
+
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         let node = this._nodeViews[i];
+         if (node.getId() === nodeToRemove.getId()) {
+            index = i;
+            break;
+         }
+      }
+
+      if (index !== -1) {
+         this._nodeViews.splice(index, 1);
+         this._nodeViewsOrderManager.removeNode(nodeToRemove);
+      }
+
+      this._handleNodeViewsSectionVisibility();
+
+      console.log(this._name + " has now " + this._nodeViews.length + " children", this._nodeViews.map((n) => {
+         return n.getName();
+      }));
+   }
+
+   notifyOfChildrenDestruction(ids) {
+      ids.forEach((id) => {
+         for (var i = 0; i < this._nodeViews.length; i++) {
+            if (this._nodeViews[i].getId() === id) {
+               this._nodeViews.splice(i, 1);
+               break;
+            }
+         }
+
+         for (var i = 0; i < this._valueViews.length; i++) {
+            if (this._valueViews[i].getId() === id) {
+               this._valueViews.splice(i, 1);
+               break;
+            }
+         }
+      });
+
+      console.log("remaining nodes referenced by " + this._name, this._nodeViews.length);
+      console.log("remaining values referenced by " + this._name, this._valueViews.length);
+
+      this._handleNodeViewsSectionVisibility();
+      this._handleValueViewsSectionVisibility();
+   }
+
+   /**
+    * Recursively destroy a node and return all the destroyed ids.
+    * 
+    * @returns {Array}
+    */
+   destroy() {
+
+      var destroyedIds = [this._id];
+      var dom = this.getDomNode();
+
+      dom.slideUp(() => {
+         dom.remove();
+      });
+
+      for (var j = 0; j < this._nodeViews.length; j++) {
+         let ids = this._nodeViews[j].destroy();
+         ids.forEach((id) => {
+            destroyedIds.push(id);
+         });
+      }
+
+      for (var j = 0; j < this._valueViews.length; j++) {
+         let ids = this._valueViews[j].destroy();
+         ids.forEach((id) => {
+            destroyedIds.push(id);
+         });
+      }
+
+      this._nodeViews = [];
+      this._valueViews = [];
+
+      return destroyedIds;
+   }
+
+   canBeAParentNode() {
+      var type = this._getSelectTypeFromModel();
+      return type === "checkbox" || type === "radio";
+   }
+
    render() {
+
+      if (this._rendered) {
+         throw "Double rendering";
+      }
 
       var tmpl = _.template(templates["node-view"]);
       this._root = $(tmpl({
          id: this._id
       }));
 
+      this._nameLabel = this._root.find(".name-label");
       this._nameInput = this._root.find(".name");
       this._titleInput_IT = this._root.find(".title_it");
       this._titleInput_EN = this._root.find(".title_en");
       this._titleInput_DE = this._root.find(".title_de");
       this._typeInput = this._root.find(".type");
-      this._parentInput = this._root.find(".parent");
 
-      this._deleteButton = this._root.find("button");
+      this._upButton = this._root.find("button.up");
+      this._downButton = this._root.find("button.down");
+      this._addNodeViewButton = this._root.find("button.add-child-node");
+      this._addValueViewButton = this._root.find("button.add-value-input");
+      this._reparentButton = this._root.find("button.reparent");
+      this._deleteButton = this._root.find("button.delete");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
-      this._configContainer = this._root.find(".config");
-      this._clausesContainer = this._root.find(".clauses .container");
+      this._configSection = this._root.find(".config");
+      this._clausesSection = this._root.find(".clauses");
+      this._clausesContainer = this._clausesSection.find(".container");
+      this._nodeViewsSection = this._root.find(".node-views");
+      this._nodeViewsContainer = this._nodeViewsSection.find(".container");
+      this._valueViewsSection = this._root.find(".value-views");
+      this._valueViewsContainer = this._valueViewsSection.find(".container");
 
       this._loadModelData();
       this._renderSubViews();
+      this._removeTypeOptions();
       this._behaviour();
+
+      this._rendered = true;
 
       return this._root;
    }
 
-   drawParentSelect(nodes) {
+   validate() {
+      var valid = true;
 
-      var i, option, name, id;
+      this._removeErrors();
 
-      this._sortByName(nodes);
-      this._parentInput.empty();
-      this._parentInput.append("<option value='-'>-</option>");
-
-      for (var i = 0; i < nodes.length; i++) {
-
-         id = nodes[i].id;
-         name = nodes[i].name;
-
-         if (id === this.getId()) {
-            continue;
-         }
-
-         if (!name) {
-            name = "...";
-         }
-
-         option = $("<option>" + name + "</option>");
-         option.attr("value", id);
-         this._parentInput.append(option);
+      if ($.trim(this._nameInput.val()) === "") {
+         this._nameInput.addClass("error");
+         valid = false;
       }
+
+      if ($.trim(this._typeInput.val()) === "-") {
+         this._typeInput.addClass("error");
+         valid = false;
+      }
+
+      if ($.trim(this._titleInput_EN.val()) === "") {
+         this._titleInput_EN.addClass("error");
+         valid = false;
+      }
+
+//      NOT YET
+//      if ($.trim(this._titleInput_IT.val()) === "") {
+//         this._titleInput_IT.addClass("error");
+//         valid = false;
+//      }
+//
+//      if ($.trim(this._titleInput_DE.val()) === "") {
+//         this._titleInput_DE.addClass("error");
+//         valid = false;
+//      }
+
+      if (this._configView) {
+         let configValid = this._configView.validate();
+         if (!configValid) {
+            valid = false;
+         }
+      }
+
+      return valid;
    }
 
    _behaviour() {
 
-      // Uncomment for debugging
-      setInterval(() => {
-         var data = this.getData();
-         data.parentId = this._parentId;
-         this._root.find(".debugger")
-            .text(JSON.stringify(data, null, "  "));
-      }, 1000);
+      (() => {
+         let debuggerBox = this._root.find(".debugger");
+         let data;
+         if (window.location.href.indexOf("debugger") > -1) {
+            setInterval(() => {
+               data = this.getData();
+               data.parentId = this._parentId;
+               let oldJSON = debuggerBox.text();
+               let newJSON = JSON.stringify(data, null, "  ");
+               if (oldJSON !== newJSON) {
+                  debuggerBox.text(newJSON);
+               }
+            }, 1000);
+         } else {
+            debuggerBox.hide();
+         }
+      })();
 
-      // Comment out for debugging
-      // this._root.find(".model").hide();
+      this._root.click((e) => {
+         e.stopPropagation(); // this prevents the event from being fired when clicking on child nodes
+         var trg = $(e.target);
+
+         if (trg.is("input, select")) {
+            trg.removeClass("error");
+         }
+
+         if (trg.is(".buttons") || trg.is(".name-label")) {
+            this._root.toggleClass("collapsed");
+         }
+      });
+
+      this._upButton.click(() => {
+         this._moveUp(this);
+      });
+
+      this._downButton.click(() => {
+         this._moveDown(this);
+      });
 
       this._nameInput.on("keyup", () => {
          this._name = this._nameInput.val();
-         this._eventHub.trigger("node-name-updated");
+         this._nameLabel.text(this._name);
+         this._eventHub.trigger("node-name-has-been-updated", [this._id, this._name]);
       });
 
       this._titleInput_IT.on("keyup", () => {
@@ -160,33 +409,67 @@ class NodeView {
 
       this._typeInput.on("change", () => {
          var configType = this._typeInput.val();
-         this._model.type = this._getModelTypeFromSelect(configType);
+         this._setModelTypeFromSelect(configType);
          this._renderConfigView(configType);
       });
 
-      this._parentInput.on("change", () => {
-         var parentId = this._parentInput.val();
-         this.setParentId(parentId);
-         this.updateParentName(parentId);
-      });
-
       this._deleteButton.click((e) => {
-         e.preventDefault();
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
-            this._eventHub.off("config-updated", this._onConfigUpdatedBound);
-            this._eventHub.trigger("node-removed", this.getId());
+            this._removeFromPositionManager(this);
+            this._eventHub.off("config-has-been-updated", this._onConfigUpdatedBound);
+            this._eventHub.trigger("please-delete-node", [this.getId()]);
          }
       });
 
+      this._reparentButton.click(() => {
+         this._eventHub.trigger("please-show-reparent-node-view", [this]);
+      });
+
+      this._addNodeViewButton.click((e) => {
+         this._eventHub.trigger("please-create-child-node", ["node-view", this.getId(), this.getName()]);
+      });
+
+      this._addValueViewButton.click((e) => {
+         this._eventHub.trigger("please-create-child-node", ["value-view", this.getId(), this.getName()]);
+      });
+
       this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);
-      this._eventHub.on("config-updated", this._onConfigUpdatedBound);
+
+      this._eventHub.on("config-has-been-updated", this._onConfigUpdatedBound);
 
       new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
    }
 
+   _removeErrors() {
+      this._root.find("input, select").removeClass("error");
+   }
+
+   _handleNodeViewsSectionVisibility() {
+      if (this._nodeViews.length === 0) {
+         this._nodeViewsSection.hide();
+      }
+   }
+
+   _handleValueViewsSectionVisibility() {
+      if (this._valueViews.length === 0) {
+         this._valueViewsSection.hide();
+      }
+   }
+
+   _removeTypeOptions() {
+      this._getTypeOptionsToRemove().forEach((value) => {
+         this._typeInput.find(`option[value=${value}]`).remove();
+      });
+   }
+
    _onConfigUpdated(e, id, configModel) {
-      console.log("up")
+
+      // TODO: here the received config model might contains less properties than the model during the previous update
+      // therefore stale data copied over from the previous version config model could remain in the node view model...
+      // Address this defect!
+      // A good example is the default, validation and triggering value of the radio config view.
+
       if (id === this._id) {
          for (var p in configModel) {
             this._model[p] = configModel[p];
@@ -209,7 +492,7 @@ class NodeView {
       this._configView = buildConfigView(type, this._id, this._model, this._eventHub);
 
       if (this._configView) { // newly created nodes have empty model so the created config view undefined
-         this._configContainer.empty().append(this._configView.render());
+         this._configSection.empty().append(this._configView.render());
       }
    }
 
@@ -221,6 +504,7 @@ class NodeView {
    }
 
    _loadModelData() {
+      this._nameLabel.text(this._name);
       this._nameInput.val(this._name);
       this._titleInput_IT.val(this._model.title_it);
       this._titleInput_EN.val(this._model.title);
@@ -244,7 +528,7 @@ class NodeView {
       return type;
    }
 
-   _getModelTypeFromSelect(v) {
+   _setModelTypeFromSelect(v) {
       var type;
 
       if (v === "checkbox") {
@@ -257,19 +541,63 @@ class NodeView {
          type = "number";
       }
 
-      return type;
+      this._model.type = type;
+
+      if (v === "radio") {
+         this._model.enum = [];
+      }
    }
 
-   _sortByName(nodes) {
-      return nodes.sort((a, b) => {
-         if (a.name < b.name) {
-            return -1;
-         }
-         if (a.name > b.name) {
-            return 1;
-         }
-         return 0;
-      });
+   _getTypeOptionsToRemove() {
+      return ["number", "text"];
+   }
+
+   _parseName(name) {
+      return name;
+   }
+
+   _moveNodeViewUp(node) {
+      var prevNode = this._nodeViewsOrderManager.getPreviousNode(node);
+      if (prevNode) {
+         node.getDomNode().insertBefore(prevNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
+      this._nodeViewsOrderManager.moveNodeToLowerPosition(node);
+   }
+
+   _moveNodeViewDown(node) {
+      var nextNode = this._nodeViewsOrderManager.getNextNode(node);
+      if (nextNode) {
+         node.getDomNode().insertAfter(nextNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
+      this._nodeViewsOrderManager.moveNodeToHigherPosition(node);
+   }
+
+   _removeNodeViewFromOrderManager(node) {
+      this._nodeViewsOrderManager.removeNode(node);
+   }
+
+   _moveValueViewUp(node) {
+      var prevNode = this._valueViewsOrderManager.getPreviousNode(node);
+      if (prevNode) {
+         node.getDomNode().insertBefore(prevNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
+      this._valueViewsOrderManager.moveNodeToLowerPosition(node);
+   }
+
+   _moveValueViewDown(node) {
+      var nextNode = this._valueViewsOrderManager.getNextNode(node);
+      if (nextNode) {
+         node.getDomNode().insertAfter(nextNode.getDomNode());
+         scrolling.scrollToNode(node);
+      }
+      this._valueViewsOrderManager.moveNodeToHigherPosition(node);
+   }
+
+   _removeValueViewFromOrderManager(node) {
+      this._valueViewsOrderManager.removeNode(node);
    }
 }
 

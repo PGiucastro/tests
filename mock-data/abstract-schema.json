@@ -1,0 +1,156 @@
+{
+
+   "$schema": "http://json-schema.org/draft-04/schema#",
+   "type": "object",
+
+   "properties": {
+
+      "node-1": {
+         "title": "node-1-title",
+         "type": "boolean",
+         "_iub_position": 4
+      },
+
+      "node-2": {
+         "title": "node-2-title",
+         "type": "boolean",
+         "_iub_group_validation": "at-least-one-checkbox-selected",
+         "_iub_position": 2
+      },
+
+      "node-3": {
+         "title": "node-3-title",
+         "type": "boolean",
+         "_iub_position": 3
+      },
+
+      "node-4": {
+         "title": "node-4-title",
+         "type": "boolean",
+         "_iub_position": 1
+      },
+
+      "node-2-1": {
+         "title": "I offer right of cancellation",
+         "type": "boolean",
+         "_iub_parent": "node-2",
+         "_iub_position": 1
+      },
+
+      "node-2-1.min": {
+         "title": "Min",
+         "type": "number",
+         "default": 3,
+         "_iub_min": 1,
+         "_iub_max": "node-2-1.max",
+         "_iub_parent": "node-2-1",
+         "_iub_position": 1
+      },
+
+      "node-2-1.max": {
+         "title": "Max",
+         "type": "number",
+         "default": 10,
+         "_iub_parent": "node-2-1",
+         "_iub_position": 2
+      },
+
+      "node-2-2": {
+         "title": "node-2-2-title",
+         "type": "boolean",
+         "_iub_parent": "node-2",
+         "_iub_position": 2
+      },
+
+      "node-2-3": {
+         "title": "Do you need a permissive licence for user content (i.e.: leaving all rights to user)",
+         "type": "boolean",
+         "_iub_parent": "node-2",
+         "_iub_position": 3
+      },
+
+      "node-2-3-1": {
+         "title": "node-2-3-1-title",
+         "type": "string",
+         "enum": [
+            "node-2-3-1-choice-1-value",
+            "node-2-3-1-choice-2-value"
+         ],
+         "default": "node-2-3-1-choice-1-value",
+         "_iub_labels": [
+            "node-2-3-1-choice-1-label",
+            "node-2-3-1-choice-2-label"
+         ],
+         "_iub_parent": "node-2-3",
+         "_iub_validation": "required",
+         "_iub_position": 1
+      },
+
+      "node-3-1": {
+         "title": "node-3-1-title",
+         "type": "string",
+         "enum": [
+            "node-3-1-choice-1-value",
+            "node-3-1-choice-2-value"
+         ],
+         "_iub_labels": [
+            "node-3-1-choice-1-label",
+            "node-3-1-choice-2-label"
+         ],
+         "_iub_triggering_value": "node-3-1-choice-1-value",
+         "_iub_parent": "node-3",
+         "_iub_validation": "required",
+         "_iub_position": 1
+      },
+
+      "node-3-2": {
+         "title": "node-3-2-title",
+         "type": "boolean",
+         "_iub_parent": "node-3",
+         "_iub_position": 2
+      },
+
+      "node-3-3": {
+         "title": "node-3-3-title",
+         "type": "boolean",
+         "_iub_parent": "node-3",
+         "_iub_position": 3
+      },
+
+      "node-3-4": {
+         "title": "node-3-4 title",
+         "type": "boolean",
+         "_iub_parent": "node-3",
+         "_iub_position": 4
+      },
+
+      "node-3-5": {
+         "title": "node-3-5-title",
+         "type": "boolean",
+         "_iub_parent": "node-3",
+         "_iub_position": 5
+      },
+
+      "node-3-5-1": {
+         "title": "node-3-5-1-title",
+         "type": "string",
+         "enum": [
+            "node-3-5-1-choice-1-value",
+            "node-3-5-1-choice-2-value"
+         ],
+         "_iub_labels": [
+            "node-3-5-1-choice-1-label",
+            "node-3-5-1-choice-2-label"
+         ],
+         "_iub_parent": "node-3-5",
+         "_iub_position": 1
+      },
+
+      "node-3-1-1": {
+         "title": "node-3-1-1-title",
+         "type": "boolean",
+         "_iub_parent": "node-3-1",
+         "_iub_position": 1
+      }
+   }
+}

@@ -4,7 +4,8 @@
   "scripts": {
     "demo": "serve",
     "build": "browserify -t brfs src/main.js -o build/bundle.js",
-    "build-watch": "watchify -t brfs src/main.js -o build/bundle.js -v"
+    "build-watch": "watchify -t brfs src/main.js -o build/bundle.js -v",
+    "test": "karma start --single-run"
   },
   "dependencies": {
     "brfs": "^1.4.3",
@@ -13,7 +14,15 @@
     "jquery": "^3.2.1",
     "underscore": "^1.8.3"
   },
-  "devDependencies": {    
+  "devDependencies": {
+    "browserify": "^14.4.0",
+    "jasmine": "^2.6.0",
+    "karma": "^1.7.0",
+    "karma-browserify": "^5.1.1",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-cli": "^1.0.1",
+    "karma-jasmine": "^1.1.0",
+    "karma-verbose-reporter": "0.0.6",
     "serve": "^6.0.6",
     "watchify": "^3.9.0"
   }

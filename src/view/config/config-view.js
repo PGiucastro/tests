@@ -13,6 +13,14 @@ class ConfigView {
       throw "Abstract";
    }
 
+   validate() {
+      throw "Abstract";
+   }
+
+   _removeErrors() {
+      this._root.find("input, select").removeClass("error");
+   }
+
    _behaviour() {
       this._initExpander();
 
@@ -26,7 +34,7 @@ class ConfigView {
    }
 
    _triggerConfigUpdate() {
-      this._eventHub.trigger("config-updated", [this._nodeViewId, this.getModel()]);
+      this._eventHub.trigger("config-has-been-updated", [this._nodeViewId, this.getModel()]);
    }
 
    _initExpander() {

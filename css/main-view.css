@@ -1,0 +1,50 @@
+.main-view {
+   padding-top: 60px;
+   position: relative;
+}
+
+.main-view input.error,
+.main-view select.error {
+   border-color: red;
+   background: pink;
+}
+
+.main-view header.main-header {
+   background: deepskyblue;
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   z-index: 2;
+   padding: 15px 30px;
+}
+
+.main-view header button {
+
+}
+
+.main-view header .save {
+   margin-left: 10px;
+}
+
+.main-view .loading {
+   background: yellow;
+   text-align: center;
+   padding: 10px;
+}
+
+.main-view .no-nodes-yet {
+   display: none;
+   text-align: center;
+   padding: 10px;
+}
+
+.main-view .list {
+   margin: 0;
+   padding: 30px 30px 0px 30px;
+}
+
+footer {
+   padding: 30px 30px;
+   padding-top: 0;
+}

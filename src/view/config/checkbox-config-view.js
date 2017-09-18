@@ -14,10 +14,12 @@ class CheckboxConfigView extends ConfigView {
       return this._root;
    }
 
-   getModel() {
-      return {
+   validate() {
+      return true;
+   }
 
-      };
+   getModel() {
+      return {};
    }
 }
 

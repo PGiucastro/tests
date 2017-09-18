@@ -1,9 +1,53 @@
 .node-view {
    border: 1px solid #ccc;
    margin: 0;
-   margin-bottom: 35px;
-   padding: 20px;
+   margin-bottom: 70px;
+   padding: 30px;
    position: relative;
+   border-radius: 5px;
+   overflow: hidden;
+}
+
+.node-view.collapsed {
+   height: 12px;
+}
+
+.node-view .node-view {
+   background: lightgoldenrodyellow;
+   margin-bottom: 0px;
+   margin-top: 30px;
+}
+
+.node-view .node-view .node-view {
+   background: #f9f99d;
+}
+
+.node-view .node-view .node-view .node-view {
+   background: #f9f978;
+}
+
+.node-view .node-view .node-view .node-view .node-view {
+   background: #ffff58;
+}
+
+.node-view .name-label {
+   position: absolute;
+   left: 30px;
+   top: 24px;
+   font-size: 20px;
+   font-weight: bold;
+}
+
+.node-view .buttons {
+   text-align: right;
+   background: #eee;
+   padding: 20px 30px;
+   margin: -30px;
+   margin-bottom: 20px;
+}
+
+.node-view .buttons button {
+   margin-left: 10px;
 }
 
 .node-view .debugger {
@@ -16,10 +60,10 @@
    color: lime;
    font-family: monospace;
    position: absolute;
-   top:0;
+   top: 70px;
    right: 0;
    overflow-x: auto;
-   height: 215px;
+   height: 245px;
 }
 
 .node-view .input-wrapper {
@@ -45,7 +89,7 @@
 }
 
 .node-view .clauses {
-   margin-top: 20px;
+   padding-top: 20px;
    clear: both;
 }
 
@@ -53,13 +97,23 @@
    cursor: pointer;
    color: brown;
    font-weight: bold;
+   font-size: 16px;
 }
 
 .node-view .clauses .container {
    display: none;
 }
 
-.node-view .buttons {
-   margin-top: 20px;
-   text-align: right;
+.node-view .node-views, 
+.node-view .value-views {
+   display: none;
+   margin-top: 30px;
+   clear: both;
+}
+
+.node-view .node-views h2,
+.node-view .value-views h2 {
+   margin: 0px;
+   font-size: 20px;
+   margin-bottom: -15px;
 }

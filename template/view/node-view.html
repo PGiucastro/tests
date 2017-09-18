@@ -1,5 +1,16 @@
 <div class="node-view" data-node-view-id="<%= id %>">
 
+   <span class="name-label"></span>
+
+   <div class="buttons">
+      <button class="up">Up</button>
+      <button class="down">Down</button>
+      <button class="add-child-node">Add child node</button>
+      <button class="add-value-input">Add value input</button>
+      <button class="reparent">Reparent</button>
+      <button class="delete">Delete</button>
+   </div>
+
    <div class="debugger"></div>
 
    <div class="left">
@@ -19,15 +30,8 @@
             <option value="number">number</option>
          </select>
       </div>
-      
-      <div class="config"></div>
 
-      <div class="input-wrapper">
-         <label>Parent</label>
-         <select class='parent'>
-            <option>-</option>
-         </select>
-      </div>
+      <div class="config"></div>
 
    </div>
 
@@ -55,8 +59,14 @@
       <div class="container"></div>   
    </div>
 
-   <div class="buttons">
-      <button>Delete</button>
+   <div class="value-views">
+      <h2>Value Inputs</h2>
+      <div class="container"></div>
+   </div>
+
+   <div class="node-views">
+      <h2>Child Nodes</h2>
+      <div class="container"></div>
    </div>
 
 </div>
