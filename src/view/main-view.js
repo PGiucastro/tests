@@ -27,7 +27,7 @@ class MainView {
 
    render() {
 
-      $.when($.get("/mock-data/abstract-schema.json"), $.get("/mock-data/clauses.json"))
+      $.when($.get("/mock-data/schema.json"), $.get("/mock-data/clauses.json"))
          .then((schema, clauses) => {
             setTimeout(() => { // TODO: remove timeout
                var nodes = schema[0].properties;

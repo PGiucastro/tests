@@ -10,17 +10,20 @@
          "type": "boolean",
          "_iub_position": 4
       },
+      
       "user_allowed_to_add_contents": {
          "title": "Do you allow user to add content?",
          "type": "boolean",
          "_iub_group_validation": "at-least-one-checkbox-selected",
          "_iub_position": 2
       },
+      
       "paid_goods_and_or_services": {
          "title": "Are you providing paid goods and/or paid services in your application?",
          "type": "boolean",
          "_iub_position": 3
       },
+      
       "user_registration_offered": {
          "title": "Are you offering user registration on your application?",
          "type": "boolean",
@@ -33,6 +36,7 @@
          "_iub_parent": "user_allowed_to_add_contents",
          "_iub_position": 1
       },
+      
       "right_of_cancellation.min_days": {
          "title": "Min",
          "type": "number",
@@ -42,6 +46,7 @@
          "_iub_parent": "right_of_cancellation",
          "_iub_position": 1
       },
+      
       "right_of_cancellation.max_days": {
          "title": "Max",
          "type": "number",
@@ -49,19 +54,22 @@
          "_iub_parent": "right_of_cancellation",
          "_iub_position": 2
       },
+      
       "user_generated_content_for_apple_apps_possible": {
          "title": "Are you making user generated content for Apple apps possible?",
          "type": "boolean",
          "_iub_parent": "user_allowed_to_add_contents",
          "_iub_position": 2
       },
+      
       "permissive_licence_for_user_content": {
          "title": "Do you need a permissive licence for user content (i.e.: leaving all rights to user)",
          "type": "boolean",
          "_iub_parent": "user_allowed_to_add_contents",
          "_iub_position": 3
       },
-      "permissive_licence_for_user_content_choice": {
+      
+      "permissive_licence_for_user_content.permissive_licence_for_user_content_choice": {
          "title": "Make a choice",
          "type": "string",
          "enum": [
@@ -77,7 +85,8 @@
          "_iub_validation": "required",
          "_iub_position": 1
       },
-      "offered_type": {
+      
+      "paid_goods_and_or_services.offered_type": {
          "title": "What do you offer?",
          "type": "string",
          "enum": [
@@ -88,17 +97,18 @@
             "Goods",
             "Services"
          ],
-         "_iub_triggering_value": "goods",
          "_iub_parent": "paid_goods_and_or_services",
          "_iub_validation": "required",
          "_iub_position": 1
       },
+      
       "trial_offered": {
          "title": "Trail offered?",
          "type": "boolean",
          "_iub_parent": "paid_goods_and_or_services",
          "_iub_position": 2
       },
+      
       "in_app_purchase_offered": {
          "title": "In-app purchase offered?",
          "type": "boolean",
@@ -111,13 +121,15 @@
          "_iub_parent": "paid_goods_and_or_services",
          "_iub_position": 4
       },
+      
       "recurring_subscription_offered": {
          "title": "Recurring subscription offered?",
          "type": "boolean",
          "_iub_parent": "paid_goods_and_or_services",
          "_iub_position": 5
       },
-      "automatic_renewal": {
+      
+      "recurring_subscription_offered.automatic_renewal": {
          "title": "Do you offer automatic renewal?",
          "type": "string",
          "enum": [
@@ -131,6 +143,7 @@
          "_iub_parent": "recurring_subscription_offered",
          "_iub_position": 1
       },
+      
       "alcoholic_goods": {
          "title": "Are you selling alcoholic goods?",
          "type": "boolean",
