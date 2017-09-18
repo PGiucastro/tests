@@ -371,12 +371,6 @@ class NodeView {
          var trg = $(e.target);
          if (trg.is("input, select")) {
             trg.removeClass("error");
-         } else if (trg.is(".buttons") || trg.is(".name-label")) {
-            if (!this._root[0].style.height || this._root[0].style.height === "auto") {
-               this._root.height("12");
-            } else {
-               this._root.css("height", "auto");
-            }
          }
       });
 
