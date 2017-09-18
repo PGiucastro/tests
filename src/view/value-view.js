@@ -30,6 +30,10 @@ class ValueView extends NodeView {
    _loadModelType() {
       this._typeInput.val(this._getSelectTypeFromModel() || "-");
    }
+
+   _getNameForLabel() {
+      return this.getSchemaName();
+   }
 }
 
 module.exports = ValueView;
