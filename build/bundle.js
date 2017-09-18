@@ -13088,9 +13088,15 @@ class NodeView {
       })();
 
       this._root.click((e) => {
+         e.stopPropagation(); // this prevents the event from being fired when clicking on child nodes
          var trg = $(e.target);
+
          if (trg.is("input, select")) {
             trg.removeClass("error");
+         }
+
+         if (trg.is(".buttons") || trg.is(".name-label")) {
+            this._root.toggleClass("collapsed");
          }
       });
 

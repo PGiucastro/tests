@@ -8,6 +8,10 @@
    overflow: hidden;
 }
 
+.node-view.collapsed {
+   height: 12px;
+}
+
 .node-view .node-view {
    background: lightgoldenrodyellow;
    margin-bottom: 0px;
