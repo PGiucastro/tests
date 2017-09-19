@@ -15,8 +15,7 @@
          "title": "Do you allow user to add content?",
          "type": "boolean",
          "_iub_group_validation": "at-least-one-checkbox-selected",
-         "_iub_position": 2,
-         "_iub_children_exclusive_behaviour": true
+         "_iub_position": 2
       },
 
       "paid_goods_and_or_services": {
