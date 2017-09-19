@@ -276,6 +276,7 @@ class NodeView {
       this._titleInput_EN = this._root.find(".title_en");
       this._titleInput_DE = this._root.find(".title_de");
       this._typeInput = this._root.find(".type");
+      this._childrenExclusiveBehaviourCheckbox = this._root.find(".exclusive-behaviour");
 
       this._upButton = this._root.find("button.up");
       this._downButton = this._root.find("button.down");
@@ -409,6 +410,15 @@ class NodeView {
          this._renderConfigView(configType);
       });
 
+      this._childrenExclusiveBehaviourCheckbox.click((e) => {
+         var trg = $(e.target);
+         if (trg.is(":checked")) {
+            this._model._iub_children_exclusive_behaviour = true;
+         } else {
+            delete this._model._iub_children_exclusive_behaviour;
+         }
+      });
+
       this._deleteButton.click((e) => {
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
@@ -505,6 +515,7 @@ class NodeView {
       this._titleInput_IT.val(this._model.title_it);
       this._titleInput_EN.val(this._model.title);
       this._titleInput_DE.val(this._model.title_de);
+      this._childrenExclusiveBehaviourCheckbox.attr("checked", this._model._iub_children_exclusive_behaviour);
       this._loadModelType();
    }
 

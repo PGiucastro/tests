@@ -81,6 +81,10 @@
    box-sizing: border-box;
 }
 
+.node-view input[type="checkbox"] {
+   width: auto;
+}
+
 .node-view .left {
    float: left;
    width: 33%;

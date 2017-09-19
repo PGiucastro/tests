@@ -13,6 +13,7 @@ class ValueView extends NodeView {
       this._clausesSection.remove();
       this._nodeViewsSection.remove();
       this._valueViewsSection.remove();
+      this._childrenExclusiveBehaviourCheckbox.parent().remove();
    }
 
    _getTypeOptionsToRemove() {
