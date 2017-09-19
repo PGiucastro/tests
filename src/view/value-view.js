@@ -15,24 +15,12 @@ class ValueView extends NodeView {
       this._valueViewsSection.remove();
    }
 
-   getSchemaName() {
-      return this.getParentName() + "." + this.getName();
-   }
-
    _getTypeOptionsToRemove() {
       return ["checkbox"];
    }
 
-   _parseName(name) {
-      return name.split(".")[1];
-   }
-
    _loadModelType() {
       this._typeInput.val(this._getSelectTypeFromModel() || "-");
-   }
-
-   _getNameForLabel() {
-      return this.getSchemaName();
    }
 }
 

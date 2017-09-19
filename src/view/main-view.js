@@ -270,8 +270,8 @@ class MainView {
          var parentName = view.getParentName();
          var parentId;
          if (parentName) {
-               parentId = this._getViewByName(parentName).getId();
-            }
+            parentId = this._getViewByName(parentName).getId();
+         }
          view.setParentId(parentId);
       }
    }

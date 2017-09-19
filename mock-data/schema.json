@@ -147,7 +147,7 @@
       "alcoholic_goods": {
          "title": "Are you selling alcoholic goods?",
          "type": "boolean",
-         "_iub_parent": "offered_type",
+         "_iub_parent": "paid_goods_and_or_services.offered_type",
          "_iub_position": 1
       }
    }

@@ -13,7 +13,7 @@ class NodeView {
       this._rendered = false;
       this._id = id;
       this._parentId;
-      this._name = this._parseName(name);
+      this._name = name;
       this._model = model;
       this._clauses = clauses;
 
@@ -60,10 +60,6 @@ class NodeView {
 
    getName() {
       return this._name;
-   }
-
-   getSchemaName() {
-      return this.getName();
    }
 
    getModel() {
@@ -390,7 +386,7 @@ class NodeView {
 
       this._nameInput.on("keyup", () => {
          this._name = this._nameInput.val();
-         this._nameLabel.text(this._getNameForLabel());
+         this._nameLabel.text(this._name);
          this._eventHub.trigger("node-name-has-been-updated", [this._id, this._name]);
       });
 
@@ -439,10 +435,6 @@ class NodeView {
       this._eventHub.on("config-has-been-updated", this._onConfigUpdatedBound);
 
       new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
-   }
-   
-   _getNameForLabel() {
-      return this._name;
    }
 
    _removeErrors() {
@@ -508,7 +500,7 @@ class NodeView {
    }
 
    _loadModelData() {
-      this._nameLabel.text(this._getNameForLabel());
+      this._nameLabel.text(this._name);
       this._nameInput.val(this._name);
       this._titleInput_IT.val(this._model.title_it);
       this._titleInput_EN.val(this._model.title);
@@ -559,10 +551,6 @@ class NodeView {
 
    _getTypeOptionsToRemove() {
       return ["number", "text", "radio"];
-   }
-
-   _parseName(name) {
-      return name;
    }
 
    _moveNodeViewUp(node) {
