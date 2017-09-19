@@ -31,7 +31,6 @@ class NodeView {
 
       this._nodeViewsOrderManager = new NodesOrderManager([]);
       this._valueViewsOrderManager = new NodesOrderManager([]);
-
    }
 
    getPosition() {
@@ -293,9 +292,15 @@ class NodeView {
       this._valueViewsSection = this._root.find(".value-views");
       this._valueViewsContainer = this._valueViewsSection.find(".container");
 
+
       this._loadModelData();
-      this._renderSubViews();
       this._removeTypeOptions();
+
+      var configType = this._typeInput.val();
+
+      this._renderConfigView(configType);
+      this._renderClauses();
+
       this._behaviour();
 
       this._rendered = true;
@@ -304,6 +309,7 @@ class NodeView {
    }
 
    validate() {
+
       var valid = true;
 
       this._removeErrors();
@@ -483,14 +489,13 @@ class NodeView {
       }
    }
 
-   _renderSubViews() {
-      var configType = this._typeInput.val();
-      this._renderConfigView(configType);
+   _renderClauses() {
       this._clausesView = new ClausesView(this._clauses);
       this._clausesContainer.append(this._clausesView.render());
    }
 
    _renderConfigView(type) {
+
       if (this._configView) {
          this._deleteCurrentConfigDataFromModel();
       }

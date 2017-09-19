@@ -23,6 +23,10 @@ class ValueView extends NodeView {
    _loadModelType() {
       this._typeInput.val(this._getSelectTypeFromModel() || "-");
    }
+
+   _renderClauses(type) {
+      // does nothing as a value node has no clauses
+   }
 }
 
 module.exports = ValueView;
