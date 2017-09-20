@@ -12394,8 +12394,7 @@ class Expander {
       var label;
       this._trigger.text(this._label + " " + (this._initiallyExpanded ? "[-]" : "[+]"));
 
-      this._trigger.click((e) => {
-         e.preventDefault();
+      this._trigger.click(() => {
          label = this._trigger.text();
 
          if (label.indexOf("[-]") > -1) {
@@ -12619,7 +12618,9 @@ class MainView {
       var parent = this._getViewById(parentId);
       var previousNode;
       var nextNode;
+      
       node.render();
+      
       if (parent) {
          if (type === "node-view") {
             parent.appendNodeView(node);
@@ -12837,7 +12838,7 @@ class NodeView {
          view.getDomNode().insertBefore(nextNode.getDomNode());
       }
 
-      this._nodeViewsSection.show();
+      this._handleNodeViewsSectionVisibility();
       console.log(this._name + " now references " + this._nodeViews.length + " nodes");
    }
 
@@ -12860,7 +12861,7 @@ class NodeView {
          view.getDomNode().insertBefore(nextNode.getDomNode());
       }
 
-      this._valueViewsSection.show();
+      this._handleValueViewsSectionVisibility();
       console.log(this._name + " now references " + this._valueViews.length + " values");
    }
 
@@ -13075,7 +13076,6 @@ class NodeView {
       })();
 
       this._root.click((e) => {
-         e.preventDefault();
          e.stopPropagation(); // this prevents the event from being fired when clicking on child nodes
          var trg = $(e.target);
 
@@ -13124,7 +13124,6 @@ class NodeView {
       });
 
       this._childrenExclusiveBehaviourCheckbox.click((e) => {
-         e.preventDefault();
          var trg = $(e.target);
          if (trg.is(":checked")) {
             this._model._iub_children_exclusive_behaviour = true;
@@ -13169,15 +13168,19 @@ class NodeView {
       this._root.find("input, select").removeClass("error");
    }
 
-   _handleNodeViewsSectionVisibility() {
+   _handleNodeViewsSectionVisibility() {      
       if (this._nodeViews.length === 0) {
-         this._nodeViewsSection.hide();
+         this._nodeViewsSection.css("display", "none");
+      } else {
+         this._nodeViewsSection.css("display", "block");
       }
    }
 
    _handleValueViewsSectionVisibility() {
       if (this._valueViews.length === 0) {
-         this._valueViewsSection.hide();
+         this._valueViewsSection.css("display", "none");
+      } else {
+         this._valueViewsSection.css("display", "block");
       }
    }
 
