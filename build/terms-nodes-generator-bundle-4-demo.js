@@ -12040,8 +12040,9 @@ class ClausesView {
 
    _createCheckboxesHTML() {
       var html = "";
-      for (var key in this._clauses) {
-         html += `<label><input name="${key}" type="checkbox" />${key}</label>`;
+      for (var i = 0, len = this._clauses.length; i < len; i++) {
+         let c = this._clauses[i];
+         html += `<label><input name="${c}" type="checkbox" />${c}</label>`;
       }
       return html;
    }
