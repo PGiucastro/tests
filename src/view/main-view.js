@@ -29,6 +29,18 @@ class MainView {
       return new MainView($({}));
    }
 
+   getSchema() {
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         let node = this._nodeViews[i];
+         if (node.validate() === false) {
+            scrolling.scrollToNode(node);
+            return false;
+         }
+      }
+      var sb = new SchemaBuilder(this._nodeViews);
+      return sb.build();
+   }
+
    render(schema, clauses) {
 
       var nodes = schema.properties;
@@ -61,16 +73,7 @@ class MainView {
 
       this._saveButton.click((e) => {
          e.preventDefault();
-         for (var i = 0; i < this._nodeViews.length; i++) {
-            let node = this._nodeViews[i];
-            if (node.validate() === false) {
-               scrolling.scrollToNode(node);
-               return;
-            }
-         }
-         var sb = new SchemaBuilder(this._nodeViews);
-         var json = sb.build();
-         console.log(JSON.stringify(json, null, "   "));
+         console.log(JSON.stringify(this.getSchema(), null, "   "));
       });
 
       this._addButton.click((e) => {
@@ -205,9 +208,9 @@ class MainView {
       var parent = this._getViewById(parentId);
       var previousNode;
       var nextNode;
-      
+
       node.render();
-      
+
       if (parent) {
          if (type === "node-view") {
             parent.appendNodeView(node);
