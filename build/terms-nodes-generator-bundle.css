@@ -1,5 +1,4 @@
 .main-view {
-  padding-top: 60px;
   position: relative; }
 
 .main-view input.error,
@@ -9,15 +8,13 @@
 
 .main-view header.main-header {
   background: deepskyblue;
-  position: fixed;
-  top: 0;
-  left: 0;
   width: 100%;
   z-index: 2;
   padding: 15px 30px; }
 
 .main-view header .save {
-  margin-left: 10px; }
+  margin-left: 10px;
+  visibility: hidden; }
 
 .main-view .loading {
   background: yellow;

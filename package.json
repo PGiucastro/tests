@@ -7,7 +7,8 @@
     "build-4-demo": "browserify -t brfs src/main-4-demo.js -o build/terms-nodes-generator-bundle-4-demo.js",    
     "build-4-demo-watch": "watchify -t brfs src/main-4-demo.js -o build/terms-nodes-generator-bundle-4-demo.js -v",    
     "build": "browserify -t brfs src/main.js -o build/terms-nodes-generator-bundle.js",
-    "test": "karma start --single-run"
+    "test": "karma start --single-run",
+    "dist": "npm run build && npm run sass"
   },
   "dependencies": {
     "jquery": "^3.2.1",
