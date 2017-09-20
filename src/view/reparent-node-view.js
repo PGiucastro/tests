@@ -61,10 +61,12 @@ class ReparentNodeView {
       });
 
       this._closeButton.click((e) => {
+         e.preventDefault();
          this.hide();
       });
 
       this._executeButton.click((e) => {
+         e.preventDefault();
          let newParentName = this._select.val();
          let currentParentName = this._node.getParentName();
          if (!currentParentName && newParentName === "-") {

@@ -11807,8 +11807,7 @@ return jQuery;
 const $ = require('jquery');
 const MainView = require('./view/main-view');
 
-var list = new MainView($({})).render();
-$("body").append(list);
+window.TermsNodesGenerator = MainView;
 },{"./view/main-view":16,"jquery":1}],4:[function(require,module,exports){
 class NodesOrderManager {
 
@@ -12395,7 +12394,8 @@ class Expander {
       var label;
       this._trigger.text(this._label + " " + (this._initiallyExpanded ? "[-]" : "[+]"));
 
-      this._trigger.click(() => {
+      this._trigger.click((e) => {
+         e.preventDefault();
          label = this._trigger.text();
 
          if (label.indexOf("[-]") > -1) {
@@ -12439,36 +12439,34 @@ class MainView {
       this._noNodesYet = this._root.find(".no-nodes-yet");
    }
 
-   render() {
+   static build() {
+      return new MainView($({}));
+   }
 
-      $.when($.get("/mock-data/schema.json"), $.get("/mock-data/clauses.json"))
-         .then((schema, clauses) => {
-            setTimeout(() => { // TODO: remove timeout
-               var nodes = schema[0].properties;
+   render(schema, clauses) {
 
-               this._loader.hide();
-               this._clausesModel = clauses[0];
+      var nodes = schema.properties;
 
-               for (var name in nodes) {
-                  let type = this._getTypeByModel(nodes[name]);
-                  this._buildNode(type, String(this._getNextId()), name, nodes[name]);
-               }
+      this._loader.hide();
+      this._clausesModel = clauses;
 
-               this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
+      for (var name in nodes) {
+         let type = this._getTypeByModel(nodes[name]);
+         this._buildNode(type, String(this._getNextId()), name, nodes[name]);
+      }
 
-               for (var i = 0; i < this._nodeViews.length; i++) {
-                  let type = this._getTypeByModel(this._nodeViews[i].getModel());
-                  this._renderNode(type, this._nodeViews[i]);
-               }
+      this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
 
-               this._handleNoNodesYetMessage();
-               this._behaviour();
-            }, 300);
-         });
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         let type = this._getTypeByModel(this._nodeViews[i].getModel());
+         this._renderNode(type, this._nodeViews[i]);
+      }
 
       this._reparentNodeview = new ReparentNodeView(this._eventHub);
       this._root.append(this._reparentNodeview.render());
       this._reparentNodeview.hide();
+      this._handleNoNodesYetMessage();
+      this._behaviour();
 
       return this._root;
    }
@@ -12476,6 +12474,7 @@ class MainView {
    _behaviour() {
 
       this._saveButton.click((e) => {
+         e.preventDefault();
          for (var i = 0; i < this._nodeViews.length; i++) {
             let node = this._nodeViews[i];
             if (node.validate() === false) {
@@ -12489,6 +12488,7 @@ class MainView {
       });
 
       this._addButton.click((e) => {
+         e.preventDefault();
          var newNode = this._buildNode("node-view", String(this._getNextId()), "", {});
          this._renderNode("node-view", newNode);
          this._handleNoNodesYetMessage();
@@ -13075,6 +13075,7 @@ class NodeView {
       })();
 
       this._root.click((e) => {
+         e.preventDefault();
          e.stopPropagation(); // this prevents the event from being fired when clicking on child nodes
          var trg = $(e.target);
 
@@ -13087,11 +13088,13 @@ class NodeView {
          }
       });
 
-      this._upButton.click(() => {
+      this._upButton.click((e) => {
+         e.preventDefault();
          this._moveUp(this);
       });
 
-      this._downButton.click(() => {
+      this._downButton.click((e) => {
+         e.preventDefault();
          this._moveDown(this);
       });
 
@@ -13121,6 +13124,7 @@ class NodeView {
       });
 
       this._childrenExclusiveBehaviourCheckbox.click((e) => {
+         e.preventDefault();
          var trg = $(e.target);
          if (trg.is(":checked")) {
             this._model._iub_children_exclusive_behaviour = true;
@@ -13130,6 +13134,7 @@ class NodeView {
       });
 
       this._deleteButton.click((e) => {
+         e.preventDefault();
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
             this._removeFromPositionManager(this);
@@ -13138,15 +13143,18 @@ class NodeView {
          }
       });
 
-      this._reparentButton.click(() => {
+      this._reparentButton.click((e) => {
+         e.preventDefault();
          this._eventHub.trigger("please-show-reparent-node-view", [this]);
       });
 
       this._addNodeViewButton.click((e) => {
+         e.preventDefault();
          this._eventHub.trigger("please-create-child-node", ["node-view", this.getId(), this.getName()]);
       });
 
       this._addValueViewButton.click((e) => {
+         e.preventDefault();
          this._eventHub.trigger("please-create-child-node", ["value-view", this.getId(), this.getName()]);
       });
 
@@ -13383,10 +13391,12 @@ class ReparentNodeView {
       });
 
       this._closeButton.click((e) => {
+         e.preventDefault();
          this.hide();
       });
 
       this._executeButton.click((e) => {
+         e.preventDefault();
          let newParentName = this._select.val();
          let currentParentName = this._node.getParentName();
          if (!currentParentName && newParentName === "-") {

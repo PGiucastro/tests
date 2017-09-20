@@ -133,7 +133,7 @@ class NodeView {
          view.getDomNode().insertBefore(nextNode.getDomNode());
       }
 
-      this._nodeViewsSection.show();
+      this._handleNodeViewsSectionVisibility();
       console.log(this._name + " now references " + this._nodeViews.length + " nodes");
    }
 
@@ -156,7 +156,7 @@ class NodeView {
          view.getDomNode().insertBefore(nextNode.getDomNode());
       }
 
-      this._valueViewsSection.show();
+      this._handleValueViewsSectionVisibility();
       console.log(this._name + " now references " + this._valueViews.length + " values");
    }
 
@@ -383,11 +383,13 @@ class NodeView {
          }
       });
 
-      this._upButton.click(() => {
+      this._upButton.click((e) => {
+         e.preventDefault();
          this._moveUp(this);
       });
 
-      this._downButton.click(() => {
+      this._downButton.click((e) => {
+         e.preventDefault();
          this._moveDown(this);
       });
 
@@ -426,6 +428,7 @@ class NodeView {
       });
 
       this._deleteButton.click((e) => {
+         e.preventDefault();
          var yes = window.confirm("Are you sure? This cannot be undone.");
          if (yes) {
             this._removeFromPositionManager(this);
@@ -434,15 +437,18 @@ class NodeView {
          }
       });
 
-      this._reparentButton.click(() => {
+      this._reparentButton.click((e) => {
+         e.preventDefault();
          this._eventHub.trigger("please-show-reparent-node-view", [this]);
       });
 
       this._addNodeViewButton.click((e) => {
+         e.preventDefault();
          this._eventHub.trigger("please-create-child-node", ["node-view", this.getId(), this.getName()]);
       });
 
       this._addValueViewButton.click((e) => {
+         e.preventDefault();
          this._eventHub.trigger("please-create-child-node", ["value-view", this.getId(), this.getName()]);
       });
 
@@ -457,15 +463,19 @@ class NodeView {
       this._root.find("input, select").removeClass("error");
    }
 
-   _handleNodeViewsSectionVisibility() {
+   _handleNodeViewsSectionVisibility() {      
       if (this._nodeViews.length === 0) {
-         this._nodeViewsSection.hide();
+         this._nodeViewsSection.css("display", "none");
+      } else {
+         this._nodeViewsSection.css("display", "block");
       }
    }
 
    _handleValueViewsSectionVisibility() {
       if (this._valueViews.length === 0) {
-         this._valueViewsSection.hide();
+         this._valueViewsSection.css("display", "none");
+      } else {
+         this._valueViewsSection.css("display", "block");
       }
    }
 
