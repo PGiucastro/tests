@@ -23,7 +23,7 @@ class RadioConfigView extends ConfigView {
 
       var defaultValue = this._defaultInput.val();
       var validation = this._validationSelect.val();
-      
+
       if (defaultValue) {
          this._model.default = defaultValue;
       } else {
@@ -39,7 +39,7 @@ class RadioConfigView extends ConfigView {
       this._model.enum = [];
       this._model._iub_labels = [];
 
-      var radios = this._radios.find(".form-group");
+      var radios = this._radios.find(".choice-box");
 
       for (var i = 0; i < radios.length; i++) {
          var radio = $(radios[i]);
@@ -87,7 +87,7 @@ class RadioConfigView extends ConfigView {
          if (trg.is(".add-choice")) {
             this._appendRadio();
          } else if (trg.is(".remove-choice")) {
-            this._removeRadio(trg.parents(".form-group"));
+            this._removeRadio(trg.parents(".choice-box"));
          }
       });
 

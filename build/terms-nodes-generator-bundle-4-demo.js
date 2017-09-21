@@ -11978,7 +11978,7 @@ module.exports = {
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <button class=\"expand btn\"></button>\n\n   <section>\n      <div class=\"form-group\">\n         <label>Default</label>\n         <input type='text' class='default form-control' />\n      </div>\n\n      <div class=\"form-group\">\n         <label>Min</label>\n         <input type='text' class='min form-control' />\n      </div>\n\n      <div class=\"form-group\">\n         <label>Max</label>\n         <input type='text' class='max form-control' />\n      </div>\n   </section>\n\n</div>",
    "text-config-view": "<div class=\"config-view text-config-view\">\n\n   <button class=\"expand btn\"></button>\n\n   <section>\n\n      <div class=\"form-group\">\n         <label>Validation type</label>\n         <select class=\"validation form-control\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"form-group\">\n         <label>Default</label>\n         <input type='text' class='default form-control' />\n      </div>\n   </section>\n\n</div>",
-   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <button class=\"expand btn\"></button>\n\n   <div class=\"prototype\" style=\"display: none\">\n      <div class=\"form-group\">\n         <label>Label</label>\n         <input type=\"text\" class=\"choice-label form-control\" />\n      </div>\n      <div class=\"form-group\">\n         <label>Value</label>\n         <input type=\"text\" class=\"choice-value form-control\" />\n      </div>    \n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"form-group\">\n         <label>Default</label>\n         <input type=\"text\" class=\"default form-control\" />\n      </div>\n\n      <div class=\"form-group\">\n         <label>Validation type</label>\n         <select class=\"validation form-control\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"radios\"></div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n   </section>\n\n\n\n</div>",
+   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <button class=\"expand btn\"></button>\n\n   <div class=\"prototype choice-box\" style=\"display: none\">\n      <div class=\"form-group\">\n         <label>Label</label>\n         <input type=\"text\" class=\"choice-label form-control\" />\n      </div>\n      <div class=\"form-group\">\n         <label>Value</label>\n         <input type=\"text\" class=\"choice-value form-control\" />\n      </div>    \n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"form-group\">\n         <label>Default</label>\n         <input type=\"text\" class=\"default form-control\" />\n      </div>\n\n      <div class=\"form-group\">\n         <label>Validation type</label>\n         <select class=\"validation form-control\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"radios\"></div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n   </section>\n\n\n\n</div>",
    "reparent-node-view": "<div class=\"reparent-node-view\">\n\n   <span class=\"close\">Close (Esc)</span>\n\n   <div class=\"warning bg-warning\"></div>\n\n   <div class=\"form-group\">\n      <label>Choose the new parent</label>\n      <select class=\"form-control\"></select>\n   </div>\n\n   <button class=\"btn\">Reparent</button>\n\n</div>"
 };
 },{}],7:[function(require,module,exports){
@@ -12248,7 +12248,7 @@ class RadioConfigView extends ConfigView {
 
       var defaultValue = this._defaultInput.val();
       var validation = this._validationSelect.val();
-      
+
       if (defaultValue) {
          this._model.default = defaultValue;
       } else {
@@ -12264,7 +12264,7 @@ class RadioConfigView extends ConfigView {
       this._model.enum = [];
       this._model._iub_labels = [];
 
-      var radios = this._radios.find(".form-group");
+      var radios = this._radios.find(".choice-box");
 
       for (var i = 0; i < radios.length; i++) {
          var radio = $(radios[i]);
@@ -12312,7 +12312,7 @@ class RadioConfigView extends ConfigView {
          if (trg.is(".add-choice")) {
             this._appendRadio();
          } else if (trg.is(".remove-choice")) {
-            this._removeRadio(trg.parents(".form-group"));
+            this._removeRadio(trg.parents(".choice-box"));
          }
       });
 
