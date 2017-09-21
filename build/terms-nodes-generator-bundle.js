@@ -11965,13 +11965,13 @@ module.exports = SchemaBuilder;
 
 
 module.exports = {
-   "main-view": "<div class=\"main-view\">\n   \n   <header class=\"main-header\">\n      <button class=\"add\">Add new node</button>\n      <button class=\"save\">Save schema</button>\n   </header>\n   \n   <div class=\"loading\">Loading...</div>\n   \n   <div class=\"no-nodes-yet\">No nodes yet :(</div>\n   \n   <div class=\"list\"></div>\n   \n   <footer>\n      <a href=\"#\">Back to top ↑</a>\n   </footer>\n</div>",
-   "node-view": "<div class=\"node-view\" data-node-view-id=\"<%= id %>\">\n\n   <span class=\"name-label\"></span>\n\n   <div class=\"buttons\">\n      <button class=\"up\">Up</button>\n      <button class=\"down\">Down</button>\n      <button class=\"add-child-node\">Add child node</button>\n      <button class=\"add-value-input\">Add value input</button>\n      <button class=\"reparent\">Reparent</button>\n      <button class=\"delete\">Delete</button>\n   </div>\n\n   <div class=\"debugger\"></div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Name</label>\n         <input type='text' class='name' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Type</label>\n         <select class='type'>\n            <option value=\"-\">-</option>\n            <option value=\"checkbox\">checkbox</option>\n            <option value=\"radio\">radio</option>\n            <option value=\"text\">text</option>\n            <option value=\"number\">number</option>\n         </select>\n      </div>\n\n      <div class=\"config\"></div>\n\n   </div>\n\n   <div class=\"left\">\n\n      <div class=\"input-wrapper\">\n         <label>Title (IT)</label>\n         <input type='text' class='title_it' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (EN)</label>\n         <input type='text' class='title_en' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Title (DE)</label>\n         <input type='text' class='title_de' />\n      </div>\n\n   </div>\n\n   <div class=\"left\">\n      <div class=\"input-wrapper\">\n         <label>\n            <input type='checkbox' class='exclusive-behaviour' />\n            Child nodes will show exclusive behaviour</label>\n      </div>\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand\"></span>\n      <div class=\"container\"></div>   \n   </div>\n\n   <div class=\"value-views\">\n      <h2>Value Inputs</h2>\n      <div class=\"container\"></div>\n   </div>\n\n   <div class=\"node-views\">\n      <h2>Child Nodes</h2>\n      <div class=\"container\"></div>\n   </div>\n\n</div>",
+   "main-view": "<div class=\"main-view\">\n\n   <header class=\"main-header mb-5\">\n      <button class=\"add btn btn-primary\">Add new node</button>\n      <button class=\"save btn btn-primary\">Save schema</button>\n   </header>\n\n   <div class=\"no-nodes-yet alert alert-warning\">there are no nodes yet</div>\n\n   <div class=\"list\"></div>\n\n</div>",
+   "node-view": "<div class=\"node-view container-fluid mb-5 pb-3 border border-secondary rounded\" data-node-view-id=\"<%= id %>\">\n\n   <nav class=\"row bg-light pt-2 pb-2 border border-secondary border-top-0 border-left-0 border-right-0\">\n\n      <div class=\"col-6\">\n         <h5 class=\"name-label font-weight-bold mb-0 text-truncate\"></h5>\n      </div>\n\n      <div class=\"buttons text-right col-6\">\n         <button class=\"up btn btn-secondary\">Up</button>\n         <button class=\"down btn btn-secondary\">Down</button>\n         <button class=\"add-child-node btn btn-secondary\">Add child node</button>\n         <button class=\"add-value-input btn btn-secondary\">Add value input</button>\n         <button class=\"reparent btn btn-secondary\">Reparent</button>\n         <button class=\"delete btn btn-secondary\">Delete</button>\n      </div>\n\n   </nav>\n\n   <div class=\"debugger row\"></div>\n\n   <div class=\"row mt-3\">\n\n      <div class=\"col\">\n         <div class=\"form-group\">\n            <label>Name</label>\n            <input type='text' class='name form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Type</label>\n            <select class='type form-control'>\n               <option value=\"-\">-</option>\n               <option value=\"checkbox\">checkbox</option>\n               <option value=\"radio\">radio</option>\n               <option value=\"text\">text</option>\n               <option value=\"number\">number</option>\n            </select>\n         </div>\n\n         <div class=\"config\"></div>\n      </div>\n\n      <div class=\"col\">\n         <div class=\"form-group\">\n            <label>Title (IT)</label>\n            <input type='text' class='title_it form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Title (EN)</label>\n            <input type='text' class='title_en form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Title (DE)</label>\n            <input type='text' class='title_de form-control' />\n         </div>\n      </div>\n\n      <div class=\"col\">\n         <div class=\"form-check\">\n            <label class=\"form-check-label\">\n               <input type='checkbox' class='exclusive-behaviour form-check-input' />\n               Child nodes will show an exclusive behaviour (only one can be selected at a time)</label>\n         </div>\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <span class=\"expand btn btn-secondary\"></span>\n      <div class=\"box mt-3 border border-secondary px-3 pt-3 pb-1 rounded\"></div>\n   </div>\n\n   <div class=\"value-views mt-4\">\n      <div class=\"box\"></div>\n   </div>\n\n   <div class=\"node-views mt-4\">\n      <div class=\"box\"></div>\n   </div>\n\n</div>",
    "clauses-view": "<div class=\"clauses-view\">\n   <%= html %>\n</div>",
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
-   "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Min</label>\n         <input type='text' class='min' />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Max</label>\n         <input type='text' class='max' />\n      </div>\n   </section>\n   \n</div>",
-   "text-config-view": "<div class=\"config-view text-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <section>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type='text' class='default' />\n      </div>\n   </section>\n\n</div>",
-   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand\"></header>\n\n   <div class=\"input-wrapper prototype\" style=\"display: none\">\n      <label>Label</label>\n      <input type=\"text\" class=\"label\" />\n      <label>Value</label>\n      <input type=\"text\" class=\"value\" />\n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"input-wrapper\">\n         <label>Default</label>\n         <input type=\"text\" class=\"default\" />\n      </div>\n\n      <div class=\"input-wrapper\">\n         <label>Validation type</label>\n         <select class=\"validation\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"radios\"></div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n   </section>\n\n\n\n</div>",
+   "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <header class=\"expand btn btn-secondary\"></header>\n\n   <section class=\"mt-3 border border-secondary px-3 pt-3 pb-1 rounded\">\n      <div class=\"form-group\">\n         <label>Default</label>\n         <input type='text' class='default form-control' />\n      </div>\n\n      <div class=\"form-group\">\n         <label>Min</label>\n         <input type='text' class='min form-control' />\n      </div>\n\n      <div class=\"form-group\">\n         <label>Max</label>\n         <input type='text' class='max form-control' />\n      </div>\n   </section>\n\n</div>",
+   "text-config-view": "<div class=\"config-view text-config-view\">\n\n   <header class=\"expand btn btn-secondary\"></header>\n\n   <section class=\"mt-3 border border-secondary px-3 pt-3 pb-1 rounded\">\n\n      <div class=\"form-group\">\n         <label>Validation type</label>\n         <select class=\"validation form-control\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"form-group\">\n         <label>Default</label>\n         <input type='text' class='default form-control' />\n      </div>\n   </section>\n\n</div>",
+   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <header class=\"expand btn btn-secondary\"></header>\n\n   <div class=\"form-group prototype\" style=\"display: none\">\n      <label>Label</label>\n      <input type=\"text\" class=\"label form-control\" />\n      <label>Value</label>\n      <input type=\"text\" class=\"value form-control\" />\n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section class=\"mt-3 border border-secondary px-3 pt-3 pb-1 rounded\">\n      <div class=\"form-group\">\n         <label>Default</label>\n         <input type=\"text\" class=\"default form-control\" />\n      </div>\n\n      <div class=\"form-group\">\n         <label>Validation type</label>\n         <select class=\"validation form-control\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"radios\"></div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n   </section>\n\n\n\n</div>",
    "reparent-node-view": "<div class=\"reparent-node-view\">\n   \n   <span class=\"close\">Close (Esc)</span>\n\n   <div class=\"warning\"></div>\n\n   <label>Choose the new parent</label>\n   <select></select>\n\n   <button>Reparent</button>\n\n</div>"
 };
 },{}],7:[function(require,module,exports){
@@ -12006,8 +12006,9 @@ const templates = require('./../templates');
 
 class ClausesView {
 
-   constructor(clauses) {
+   constructor(clauses, selectedClauses) {
       this._clauses = clauses;
+      this._selectedClauses = selectedClauses;
    }
 
    render() {
@@ -12033,8 +12034,18 @@ class ClausesView {
 
    _createCheckboxesHTML() {
       var html = "";
-      for (var key in this._clauses) {
-         html += `<label><input name="${key}" type="checkbox" />${key}</label>`;
+      for (var i = 0, len = this._clauses.length; i < len; i++) {
+         let c = this._clauses[i];
+         let checkedAttribute;
+         if (this._selectedClauses) {
+            checkedAttribute = this._selectedClauses.indexOf(c) > -1 ? "checked" : "";
+         }
+         html += `<div class="form-check">
+                     <label class="form-check-label">
+                        <input name="${c}" type="checkbox" ${checkedAttribute} class="form-check-input" />
+                        ${c}
+                     </label>
+                  </div>`;
       }
       return html;
    }
@@ -12246,7 +12257,7 @@ class RadioConfigView extends ConfigView {
       this._model.enum = [];
       this._model._iub_labels = [];
 
-      var radios = this._radios.find(".input-wrapper");
+      var radios = this._radios.find(".form-group");
 
       for (var i = 0; i < radios.length; i++) {
          var radio = $(radios[i]);
@@ -12294,7 +12305,7 @@ class RadioConfigView extends ConfigView {
          if (trg.is(".add-choice")) {
             this._appendRadio();
          } else if (trg.is(".remove-choice")) {
-            this._removeRadio(trg.parents(".input-wrapper"));
+            this._removeRadio(trg.parents(".form-group"));
          }
       });
 
@@ -12433,7 +12444,6 @@ class MainView {
       this._root = $(templates["main-view"]);
       this._addButton = this._root.find("button.add");
       this._saveButton = this._root.find("button.save");
-      this._loader = this._root.find(".loading");
       this._list = this._root.find(".list");
       this._noNodesYet = this._root.find(".no-nodes-yet");
    }
@@ -12458,7 +12468,6 @@ class MainView {
 
       var nodes = schema.properties;
 
-      this._loader.hide();
       this._clausesModel = clauses;
 
       for (var name in nodes) {
@@ -12994,11 +13003,11 @@ class NodeView {
       this._clausesExpansionButton = this._root.find(".clauses .expand");
       this._configSection = this._root.find(".config");
       this._clausesSection = this._root.find(".clauses");
-      this._clausesContainer = this._clausesSection.find(".container");
+      this._clausesContainer = this._clausesSection.find(".box");
       this._nodeViewsSection = this._root.find(".node-views");
-      this._nodeViewsContainer = this._nodeViewsSection.find(".container");
+      this._nodeViewsContainer = this._nodeViewsSection.find(".box");
       this._valueViewsSection = this._root.find(".value-views");
-      this._valueViewsContainer = this._valueViewsSection.find(".container");
+      this._valueViewsContainer = this._valueViewsSection.find(".box");
 
 
       this._loadModelData();
@@ -13164,7 +13173,7 @@ class NodeView {
 
       this._eventHub.on("config-has-been-updated", this._onConfigUpdatedBound);
 
-      new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
+      new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .box"), "Clauses", false).init();
    }
 
    _removeErrors() {
@@ -13208,7 +13217,7 @@ class NodeView {
    }
 
    _renderClauses() {
-      this._clausesView = new ClausesView(this._clauses);
+      this._clausesView = new ClausesView(this._clauses, this._model.clauses);
       this._clausesContainer.append(this._clausesView.render());
    }
 

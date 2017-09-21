@@ -39,7 +39,7 @@ class RadioConfigView extends ConfigView {
       this._model.enum = [];
       this._model._iub_labels = [];
 
-      var radios = this._radios.find(".input-wrapper");
+      var radios = this._radios.find(".form-group");
 
       for (var i = 0; i < radios.length; i++) {
          var radio = $(radios[i]);
@@ -87,7 +87,7 @@ class RadioConfigView extends ConfigView {
          if (trg.is(".add-choice")) {
             this._appendRadio();
          } else if (trg.is(".remove-choice")) {
-            this._removeRadio(trg.parents(".input-wrapper"));
+            this._removeRadio(trg.parents(".form-group"));
          }
       });
 

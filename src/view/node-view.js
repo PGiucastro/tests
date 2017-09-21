@@ -286,11 +286,11 @@ class NodeView {
       this._clausesExpansionButton = this._root.find(".clauses .expand");
       this._configSection = this._root.find(".config");
       this._clausesSection = this._root.find(".clauses");
-      this._clausesContainer = this._clausesSection.find(".container");
+      this._clausesContainer = this._clausesSection.find(".box");
       this._nodeViewsSection = this._root.find(".node-views");
-      this._nodeViewsContainer = this._nodeViewsSection.find(".container");
+      this._nodeViewsContainer = this._nodeViewsSection.find(".box");
       this._valueViewsSection = this._root.find(".value-views");
-      this._valueViewsContainer = this._valueViewsSection.find(".container");
+      this._valueViewsContainer = this._valueViewsSection.find(".box");
 
 
       this._loadModelData();
@@ -456,7 +456,7 @@ class NodeView {
 
       this._eventHub.on("config-has-been-updated", this._onConfigUpdatedBound);
 
-      new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .container"), "Clauses", false).init();
+      new Expander(this._root.find(".clauses .expand"), this._root.find(".clauses .box"), "Clauses", false).init();
    }
 
    _removeErrors() {
@@ -500,7 +500,7 @@ class NodeView {
    }
 
    _renderClauses() {
-      this._clausesView = new ClausesView(this._clauses);
+      this._clausesView = new ClausesView(this._clauses, this._model.clauses);
       this._clausesContainer.append(this._clausesView.render());
    }
 

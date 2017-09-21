@@ -1,24 +1,24 @@
 <div class="config-view radio-config-view">
 
-   <header class="expand"></header>
+   <header class="expand btn btn-secondary"></header>
 
-   <div class="input-wrapper prototype" style="display: none">
+   <div class="form-group prototype" style="display: none">
       <label>Label</label>
-      <input type="text" class="label" />
+      <input type="text" class="label form-control" />
       <label>Value</label>
-      <input type="text" class="value" />
+      <input type="text" class="value form-control" />
       <span class="remove-choice">remove (-)</span>
    </div>
 
-   <section>
-      <div class="input-wrapper">
+   <section class="mt-3 border border-secondary px-3 pt-3 pb-1 rounded">
+      <div class="form-group">
          <label>Default</label>
-         <input type="text" class="default" />
+         <input type="text" class="default form-control" />
       </div>
 
-      <div class="input-wrapper">
+      <div class="form-group">
          <label>Validation type</label>
-         <select class="validation">
+         <select class="validation form-control">
             <option value="-">-</option>
             <option value="required">required</option>
          </select>

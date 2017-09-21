@@ -4,6 +4,7 @@
   "scripts": {
     "demo": "serve --port",
     "sass": "node-sass css/main.scss build/terms-nodes-generator-bundle.css",
+    "sass-watch": "node-sass -w css/main.scss build/terms-nodes-generator-bundle.css",
     "build-4-demo": "browserify -t brfs src/main-4-demo.js -o build/terms-nodes-generator-bundle-4-demo.js",    
     "build-4-demo-watch": "watchify -t brfs src/main-4-demo.js -o build/terms-nodes-generator-bundle-4-demo.js -v",    
     "build": "browserify -t brfs src/main.js -o build/terms-nodes-generator-bundle.js",

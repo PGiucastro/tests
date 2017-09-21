@@ -4,8 +4,9 @@ const templates = require('./../templates');
 
 class ClausesView {
 
-   constructor(clauses) {
+   constructor(clauses, selectedClauses) {
       this._clauses = clauses;
+      this._selectedClauses = selectedClauses;
    }
 
    render() {
@@ -33,7 +34,16 @@ class ClausesView {
       var html = "";
       for (var i = 0, len = this._clauses.length; i < len; i++) {
          let c = this._clauses[i];
-         html += `<label><input name="${c}" type="checkbox" />${c}</label>`;
+         let checkedAttribute;
+         if (this._selectedClauses) {
+            checkedAttribute = this._selectedClauses.indexOf(c) > -1 ? "checked" : "";
+         }
+         html += `<div class="form-check">
+                     <label class="form-check-label">
+                        <input name="${c}" type="checkbox" ${checkedAttribute} class="form-check-input" />
+                        ${c}
+                     </label>
+                  </div>`;
       }
       return html;
    }

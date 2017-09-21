@@ -20,7 +20,6 @@ class MainView {
       this._root = $(templates["main-view"]);
       this._addButton = this._root.find("button.add");
       this._saveButton = this._root.find("button.save");
-      this._loader = this._root.find(".loading");
       this._list = this._root.find(".list");
       this._noNodesYet = this._root.find(".no-nodes-yet");
    }
@@ -45,7 +44,6 @@ class MainView {
 
       var nodes = schema.properties;
 
-      this._loader.hide();
       this._clausesModel = clauses;
 
       for (var name in nodes) {

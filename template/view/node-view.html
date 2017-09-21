@@ -1,80 +1,84 @@
-<div class="node-view" data-node-view-id="<%= id %>">
+<div class="node-view container-fluid mb-5 pb-3 border border-secondary rounded" data-node-view-id="<%= id %>">
 
-   <span class="name-label"></span>
+   <nav class="row bg-light pt-2 pb-2 border border-secondary border-top-0 border-left-0 border-right-0">
 
-   <div class="buttons">
-      <button class="up">Up</button>
-      <button class="down">Down</button>
-      <button class="add-child-node">Add child node</button>
-      <button class="add-value-input">Add value input</button>
-      <button class="reparent">Reparent</button>
-      <button class="delete">Delete</button>
-   </div>
-
-   <div class="debugger"></div>
-
-   <div class="left">
-
-      <div class="input-wrapper">
-         <label>Name</label>
-         <input type='text' class='name' />
+      <div class="col-6">
+         <h5 class="name-label font-weight-bold mb-0 text-truncate"></h5>
       </div>
 
-      <div class="input-wrapper">
-         <label>Type</label>
-         <select class='type'>
-            <option value="-">-</option>
-            <option value="checkbox">checkbox</option>
-            <option value="radio">radio</option>
-            <option value="text">text</option>
-            <option value="number">number</option>
-         </select>
+      <div class="buttons text-right col-6">
+         <button class="up btn btn-secondary">Up</button>
+         <button class="down btn btn-secondary">Down</button>
+         <button class="add-child-node btn btn-secondary">Add child node</button>
+         <button class="add-value-input btn btn-secondary">Add value input</button>
+         <button class="reparent btn btn-secondary">Reparent</button>
+         <button class="delete btn btn-secondary">Delete</button>
       </div>
 
-      <div class="config"></div>
+   </nav>
 
-   </div>
+   <div class="debugger row"></div>
 
-   <div class="left">
+   <div class="row mt-3">
 
-      <div class="input-wrapper">
-         <label>Title (IT)</label>
-         <input type='text' class='title_it' />
+      <div class="col">
+         <div class="form-group">
+            <label>Name</label>
+            <input type='text' class='name form-control' />
+         </div>
+
+         <div class="form-group">
+            <label>Type</label>
+            <select class='type form-control'>
+               <option value="-">-</option>
+               <option value="checkbox">checkbox</option>
+               <option value="radio">radio</option>
+               <option value="text">text</option>
+               <option value="number">number</option>
+            </select>
+         </div>
+
+         <div class="config"></div>
       </div>
 
-      <div class="input-wrapper">
-         <label>Title (EN)</label>
-         <input type='text' class='title_en' />
+      <div class="col">
+         <div class="form-group">
+            <label>Title (IT)</label>
+            <input type='text' class='title_it form-control' />
+         </div>
+
+         <div class="form-group">
+            <label>Title (EN)</label>
+            <input type='text' class='title_en form-control' />
+         </div>
+
+         <div class="form-group">
+            <label>Title (DE)</label>
+            <input type='text' class='title_de form-control' />
+         </div>
       </div>
 
-      <div class="input-wrapper">
-         <label>Title (DE)</label>
-         <input type='text' class='title_de' />
+      <div class="col">
+         <div class="form-check">
+            <label class="form-check-label">
+               <input type='checkbox' class='exclusive-behaviour form-check-input' />
+               Child nodes will show an exclusive behaviour (only one can be selected at a time)</label>
+         </div>
       </div>
 
-   </div>
-
-   <div class="left">
-      <div class="input-wrapper">
-         <label>
-            <input type='checkbox' class='exclusive-behaviour' />
-            Child nodes will show exclusive behaviour</label>
-      </div>
    </div>
 
    <div class="clauses">
-      <span class="expand"></span>
-      <div class="container"></div>   
+      <span class="expand btn btn-secondary"></span>
+      <div class="box mt-3 border border-secondary px-3 pt-3 pb-1 rounded"></div>
    </div>
 
-   <div class="value-views">
-      <h2>Value Inputs</h2>
-      <div class="container"></div>
+   <div class="value-views mt-4">
+      <div class="box"></div>
    </div>
 
-   <div class="node-views">
-      <h2>Child Nodes</h2>
-      <div class="container"></div>
+   <div class="node-views mt-4">
+      <div class="box"></div>
    </div>
 
 </div>

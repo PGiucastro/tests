@@ -1,15 +1,10 @@
 .node-view {
-   border: 1px solid #ccc;
-   margin: 0;
-   margin-bottom: 70px;
-   padding: 30px;
    position: relative;
-   border-radius: 5px;
    overflow: hidden;
 }
 
 .node-view.collapsed {
-   height: 10px;
+   height: 56px;
 }
 
 .node-view .node-view {
@@ -30,94 +25,34 @@
    background: #ffff58;
 }
 
+.node-view  input.error,
+.node-view  select.error {
+   background: pink;
+}
+
 .node-view .name-label {
-   position: absolute;
-   left: 30px;
-   top: 24px;
-   font-size: 20px;
-   font-weight: bold;
-}
-
-.node-view .buttons {
-   text-align: right;
-   background: #eee;
-   padding: 20px 30px;
-   margin: -30px;
-   margin-bottom: 20px;
-}
-
-.node-view .buttons button {
-   margin-left: 10px;
+   line-height: 38px;
 }
 
 .node-view .debugger {
    background: black;
    color: lime;
-   width: 33%;
+   display: block;
+   display: block;
    box-sizing: border-box;
    white-space: pre;
    padding: 10px;
    color: lime;
    font-family: monospace;
-   position: absolute;
-   top: 70px;
-   right: 0;
    overflow-x: auto;
    height: 245px;
 }
 
-.node-view .input-wrapper {
-   padding-bottom: 20px;
-}
-
-.node-view .input-wrapper label {
-   margin-bottom: 6px;
-   display: block;
-}
-
-.node-view input,
-.node-view select {
-   width: 100%;
-   box-sizing: border-box;
-}
-
-.node-view input[type="checkbox"] {
-   width: auto;
-}
-
-.node-view .left {
-   float: left;
-   width: 33%;
-   padding-right: 50px;
-   box-sizing: border-box;
-}
-
-.node-view .clauses {
-   padding-top: 20px;
-   clear: both;
-}
-
-.node-view .clauses .expand {
-   cursor: pointer;
-   color: brown;
-   font-weight: bold;
-   font-size: 16px;
-}
-
-.node-view .clauses .container {
+.node-view .clauses .box {
    display: none;
 }
 
 .node-view .node-views, 
 .node-view .value-views {
    display: none;
-   margin-top: 30px;
-   clear: both;
-}
-
-.node-view .node-views h2,
-.node-view .value-views h2 {
-   margin: 0px;
-   font-size: 20px;
-   margin-bottom: -15px;
 }
