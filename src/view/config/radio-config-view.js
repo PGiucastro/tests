@@ -43,8 +43,8 @@ class RadioConfigView extends ConfigView {
 
       for (var i = 0; i < radios.length; i++) {
          var radio = $(radios[i]);
-         this._model.enum.push(radio.find(".value").val());
-         this._model._iub_labels.push(radio.find(".label").val());
+         this._model.enum.push(radio.find(".choice-value").val());
+         this._model._iub_labels.push(radio.find(".choice-label").val());
       }
 
       return this._model;
@@ -59,7 +59,7 @@ class RadioConfigView extends ConfigView {
 
       for (var i = 0; i < inputs.length; i++) {
          let input = $(inputs[i]);
-         if (input.is(".value") && $.trim(input.val() !== "")) {
+         if (input.is(".choice-value") && $.trim(input.val() !== "")) {
             radioValues.push(input.val());
          }
          if ($.trim(input.val()) === "") {
@@ -106,8 +106,8 @@ class RadioConfigView extends ConfigView {
       radio.removeClass("prototype");
       this._radios.append(radio);
       if (data) {
-         radio.find(".label").val(data.label);
-         radio.find(".value").val(data.value);
+         radio.find(".choice-label").val(data.label);
+         radio.find(".choice-value").val(data.value);
       }
    }
 

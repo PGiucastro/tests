@@ -1,6 +1,9 @@
 .node-view {
    position: relative;
    overflow: hidden;
+   margin: 30px 0;
+   border: 1px solid #ccc;
+   padding: 30px;
 }
 
 .node-view.collapsed {
@@ -23,6 +26,15 @@
 
 .node-view .node-view .node-view .node-view .node-view {
    background: #ffff58;
+}
+
+.node-view nav {
+   margin-bottom: 30px;
+}
+
+.node-view nav .name-label {
+   font-weight: bold;
+   font-size: 18px;
 }
 
 .node-view  input.error,

@@ -1,27 +1,27 @@
-<div class="node-view container-fluid mb-5 pb-3 border border-secondary rounded" data-node-view-id="<%= id %>">
+<div class="node-view container-fluid" data-node-view-id="<%= id %>">
 
-   <nav class="row bg-light pt-2 pb-2 border border-secondary border-top-0 border-left-0 border-right-0">
+   <nav class="row">
 
-      <div class="col-6">
-         <h5 class="name-label font-weight-bold mb-0 text-truncate"></h5>
+      <div class="col-md-6">
+         <span class="name-label"></span>
       </div>
 
-      <div class="buttons text-right col-6">
-         <button class="up btn btn-secondary">Up</button>
-         <button class="down btn btn-secondary">Down</button>
-         <button class="add-child-node btn btn-secondary">Add child node</button>
-         <button class="add-value-input btn btn-secondary">Add value input</button>
-         <button class="reparent btn btn-secondary">Reparent</button>
-         <button class="delete btn btn-secondary">Delete</button>
+      <div class="buttons text-right col-md-6">
+         <button class="up btn">Up</button>
+         <button class="down btn">Down</button>
+         <button class="add-child-node btn">Add child node</button>
+         <button class="add-value-input btn">Add value input</button>
+         <button class="reparent btn">Reparent</button>
+         <button class="delete btn">Delete</button>
       </div>
 
    </nav>
 
    <div class="debugger row"></div>
 
-   <div class="row mt-3">
+   <div class="row">
 
-      <div class="col">
+      <div class="col-md-4">
          <div class="form-group">
             <label>Name</label>
             <input type='text' class='name form-control' />
@@ -41,7 +41,7 @@
          <div class="config"></div>
       </div>
 
-      <div class="col">
+      <div class="col-md-4">
          <div class="form-group">
             <label>Title (IT)</label>
             <input type='text' class='title_it form-control' />
@@ -58,10 +58,10 @@
          </div>
       </div>
 
-      <div class="col">
-         <div class="form-check">
-            <label class="form-check-label">
-               <input type='checkbox' class='exclusive-behaviour form-check-input' />
+      <div class="col-md-4">
+         <div class="checkbox">
+            <label>
+               <input type='checkbox' />
                Child nodes will show an exclusive behaviour (only one can be selected at a time)</label>
          </div>
       </div>
@@ -69,15 +69,15 @@
    </div>
 
    <div class="clauses">
-      <span class="expand btn btn-secondary"></span>
-      <div class="box mt-3 border border-secondary px-3 pt-3 pb-1 rounded"></div>
-   </div>
-
-   <div class="value-views mt-4">
+      <button class="expand btn"></button>
       <div class="box"></div>
    </div>
 
-   <div class="node-views mt-4">
+   <div class="value-views">
+      <div class="box"></div>
+   </div>
+
+   <div class="node-views">
       <div class="box"></div>
    </div>
 

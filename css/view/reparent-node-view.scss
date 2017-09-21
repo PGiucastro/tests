@@ -5,12 +5,16 @@
    width: 600px;
    margin-left: -300px;
    box-sizing: border-box;
-   background: #333;
-   padding: 30px;
+   padding: 50px;
    box-shadow: 0px 0px 54px 0px rgba(0,0,0,1);
-   color: white;
    border: 1px solid #ccc;
    border-radius: 6px;
+   background: white;
+}
+
+.warning {
+   padding: 10px;
+   margin-bottom: 20px;
 }
 
 .reparent-node-view .close {
@@ -18,22 +22,7 @@
    top: 15px;
    right: 15px;
    cursor: pointer;
-}
-
-.reparent-node-view .warning {
-   color: yellow;
-   margin-bottom: 20px;
-   margin-right: 100px;
-}
-
-.reparent-node-view label {
-   display: block;
-   margin-bottom: 6px;
-}
-
-.reparent-node-view select {
-   width: 100%;
-   box-sizing: border-box;
+   font-size: 14px;
 }
 
 .reparent-node-view button {

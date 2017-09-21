@@ -38,9 +38,9 @@ class ClausesView {
          if (this._selectedClauses) {
             checkedAttribute = this._selectedClauses.indexOf(c) > -1 ? "checked" : "";
          }
-         html += `<div class="form-check">
-                     <label class="form-check-label">
-                        <input name="${c}" type="checkbox" ${checkedAttribute} class="form-check-input" />
+         html += `<div class="checkbox">
+                     <label>
+                        <input name="${c}" type="checkbox" ${checkedAttribute} />
                         ${c}
                      </label>
                   </div>`;
