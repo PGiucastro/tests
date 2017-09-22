@@ -109,11 +109,18 @@ class MainView {
 
       this._eventHub.on("node-name-has-been-updated", (e, id, newName) => {
          var node;
-         for (var i = 0; i < this._nodeViews.length; i++) {
-            node = this._nodeViews[i];
-            if (node.getParentId() === id) {
-               node.setParentName(newName);
+         var valid = this._validateNodeName(id, newName);
+         if (valid) {
+            this._getViewById(id).setLastValidName(newName);
+            for (var i = 0; i < this._nodeViews.length; i++) {
+               node = this._nodeViews[i];
+               if (node.getParentId() === id) {
+                  node.setParentName(newName);
+               }
             }
+         } else {
+            this._getViewById(id).revertNameToLastValidOne();
+            alert("Name already in use");
          }
       });
 
@@ -164,6 +171,19 @@ class MainView {
 
          scrolling.scrollToNode(nodeToReparent);
       });
+   }
+
+   _validateNodeName(id, name) {
+      var node;
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         node = this._nodeViews[i];
+         if (node.getId() !== id) {
+            if (node.getName() === name) {
+               return false;
+            }
+         }
+      }
+      return true;
    }
 
    _buildNode(type, id, name, nodeModel) {

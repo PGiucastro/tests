@@ -11978,7 +11978,7 @@ module.exports = {
    "checkbox-config-view": "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>",
    "number-config-view": "<div class=\"config-view number-config-view\">\n\n   <button class=\"expand btn\"></button>\n\n   <section>\n      <div class=\"form-group\">\n         <label>Default</label>\n         <input type='text' name=\"default\" class='default form-control' />\n      </div>\n\n      <div class=\"form-group\">\n         <label>Min</label>\n         <input type='text' name=\"min\" class='min form-control' />\n      </div>\n\n      <div class=\"form-group\">\n         <label>Max</label>\n         <input type='text' name=\"max\" class='max form-control' />\n      </div>\n   </section>\n\n</div>",
    "text-config-view": "<div class=\"config-view text-config-view\">\n\n   <button class=\"expand btn\"></button>\n\n   <section>\n\n      <div class=\"form-group\">\n         <label>Validation type</label>\n         <select name=\"validation\" class=\"validation form-control\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"form-group\">\n         <label>Default</label>\n         <input type='text' name=\"default\" class='default form-control' />\n      </div>\n   </section>\n\n</div>",
-   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <button class=\"expand btn\"></button>\n\n   <div class=\"prototype choice-box\" style=\"display: none\">\n      <div class=\"form-group\">\n         <label>Label</label>\n         <input type=\"text\" name=\"choice-label\" class=\"choice-label form-control\" />\n      </div>\n      <div class=\"form-group\">\n         <label>Value</label>\n         <input type=\"text\" name=\"choice-value\" class=\"choice-value form-control\" />\n      </div>    \n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"form-group\">\n         <label>Default</label>\n         <input type=\"text\" name=\"default\" class=\"default form-control\" />\n      </div>\n\n      <div class=\"form-group\">\n         <label>Validation type</label>\n         <select name=\"validation\" class=\"validation form-control\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"radios\"></div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n   </section>\n\n\n\n</div>",
+   "radio-config-view": "<div class=\"config-view radio-config-view\">\n\n   <button class=\"expand btn\"></button>\n\n   <div class=\"prototype choice-box\" style=\"display: none\">\n      <div class=\"form-group\">\n         <label>Label</label>\n         <input type=\"text\" name=\"choice-label\" class=\"choice-label form-control\" />\n      </div>\n      <div class=\"form-group\">\n         <label>Value</label>\n         <input type=\"text\" name=\"choice-value\" class=\"choice-value form-control\" />\n      </div>    \n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"form-group\">\n         <label>Default</label>\n         <input type=\"text\" name=\"default\" class=\"default form-control\" />\n      </div>\n\n      <div class=\"form-group\">\n         <label>Validation type</label>\n         <select name=\"validation\" class=\"validation form-control\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"radios\"></div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n   </section>\n\n</div>",
    "reparent-node-view": "<div class=\"reparent-node-view\">\n\n   <span class=\"close\">Close (Esc)</span>\n\n   <div class=\"warning bg-warning\"></div>\n\n   <div class=\"form-group\">\n      <label>Choose the new parent</label>\n      <select class=\"form-control\"></select>\n   </div>\n\n   <button class=\"btn\">Reparent</button>\n\n</div>"
 };
 },{}],7:[function(require,module,exports){
@@ -12545,11 +12545,18 @@ class MainView {
 
       this._eventHub.on("node-name-has-been-updated", (e, id, newName) => {
          var node;
-         for (var i = 0; i < this._nodeViews.length; i++) {
-            node = this._nodeViews[i];
-            if (node.getParentId() === id) {
-               node.setParentName(newName);
+         var valid = this._validateNodeName(id, newName);
+         if (valid) {
+            this._getViewById(id).setLastValidName(newName);
+            for (var i = 0; i < this._nodeViews.length; i++) {
+               node = this._nodeViews[i];
+               if (node.getParentId() === id) {
+                  node.setParentName(newName);
+               }
             }
+         } else {
+            this._getViewById(id).revertNameToLastValidOne();
+            alert("Name already in use");
          }
       });
 
@@ -12600,6 +12607,19 @@ class MainView {
 
          scrolling.scrollToNode(nodeToReparent);
       });
+   }
+
+   _validateNodeName(id, name) {
+      var node;
+      for (var i = 0; i < this._nodeViews.length; i++) {
+         node = this._nodeViews[i];
+         if (node.getId() !== id) {
+            if (node.getName() === name) {
+               return false;
+            }
+         }
+      }
+      return true;
    }
 
    _buildNode(type, id, name, nodeModel) {
@@ -12743,6 +12763,7 @@ class NodeView {
       this._id = id;
       this._parentId;
       this._name = name;
+      this._lastValidName = name;
       this._model = model;
       this._clauses = clauses;
 
@@ -12841,6 +12862,20 @@ class NodeView {
       } else {
          this._model._iub_parent = name;
       }
+   }
+
+   setName(name) {
+      this._name = name;
+      this._nameInput.val(this._name);
+      this._nameLabel.text(this._name);
+   }
+
+   setLastValidName(name) {
+      this._lastValidName = name;
+   }
+
+   revertNameToLastValidOne() {
+      this.setName(this._lastValidName);
    }
 
    appendNodeView(view) {
@@ -13192,7 +13227,7 @@ class NodeView {
       this._root.find("input, select").removeClass("error");
    }
 
-   _handleNodeViewsSectionVisibility() {      
+   _handleNodeViewsSectionVisibility() {
       if (this._nodeViews.length === 0) {
          this._nodeViewsSection.css("display", "none");
       } else {

@@ -14,6 +14,7 @@ class NodeView {
       this._id = id;
       this._parentId;
       this._name = name;
+      this._lastValidName = name;
       this._model = model;
       this._clauses = clauses;
 
@@ -112,6 +113,20 @@ class NodeView {
       } else {
          this._model._iub_parent = name;
       }
+   }
+
+   setName(name) {
+      this._name = name;
+      this._nameInput.val(this._name);
+      this._nameLabel.text(this._name);
+   }
+
+   setLastValidName(name) {
+      this._lastValidName = name;
+   }
+
+   revertNameToLastValidOne() {
+      this.setName(this._lastValidName);
    }
 
    appendNodeView(view) {
@@ -463,7 +478,7 @@ class NodeView {
       this._root.find("input, select").removeClass("error");
    }
 
-   _handleNodeViewsSectionVisibility() {      
+   _handleNodeViewsSectionVisibility() {
       if (this._nodeViews.length === 0) {
          this._nodeViewsSection.css("display", "none");
       } else {
