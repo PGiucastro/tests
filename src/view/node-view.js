@@ -545,7 +545,7 @@ class NodeView {
       this._titleInput_IT.val(this._model.title_it);
       this._titleInput_EN.val(this._model.title);
       this._titleInput_DE.val(this._model.title_de);
-      this._childrenExclusiveBehaviourCheckbox.attr("checked", this._model._iub_children_exclusive_behaviour);
+      this._childrenExclusiveBehaviourCheckbox.prop("checked", this._model._iub_children_exclusive_behaviour);
       this._loadModelType();
    }
 
