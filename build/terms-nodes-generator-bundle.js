@@ -12409,7 +12409,8 @@ class Expander {
       var label;
       this._trigger.text(this._label + " " + (this._initiallyExpanded ? "[-]" : "[+]"));
 
-      this._trigger.click(() => {
+      this._trigger.click((e) => {
+         
          label = this._trigger.text();
 
          if (label.indexOf("[-]") > -1) {
