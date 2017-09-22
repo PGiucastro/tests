@@ -6,6 +6,7 @@ class RadioConfigView extends ConfigView {
 
    constructor(nodeViewId, model, eventHub) {
       super(nodeViewId, model, eventHub);
+      this._counter = 0;
    }
 
    render() {
@@ -101,10 +102,13 @@ class RadioConfigView extends ConfigView {
    }
 
    _appendRadio(data) {
+      this._counter++;
       var radio = this._proto.clone();
       radio.show();
       radio.removeClass("prototype");
-      this._radios.append(radio);
+      radio.find(".choice-label").attr("name", "choice-label-" + this._counter);
+      radio.find(".choice-value").attr("name", "choice-value-" + this._counter);
+      this._radios.append(radio);;
       if (data) {
          radio.find(".choice-label").val(data.label);
          radio.find(".choice-value").val(data.value);
