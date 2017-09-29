@@ -5,8 +5,8 @@
     "demo": "serve --port",
     "sass": "node-sass css/main.scss build/terms-nodes-generator-bundle.css",
     "sass-watch": "node-sass -w css/main.scss build/terms-nodes-generator-bundle.css",
-    "build-4-demo": "browserify -t brfs src/main-4-demo.js -o build/terms-nodes-generator-bundle-4-demo.js",    
-    "build-4-demo-watch": "watchify -t brfs src/main-4-demo.js -o build/terms-nodes-generator-bundle-4-demo.js -v",    
+    "build-4-demo": "browserify -t brfs src/main-4-demo.js -o build/terms-nodes-generator-bundle-4-demo.js",
+    "build-4-demo-watch": "watchify -t brfs src/main-4-demo.js -o build/terms-nodes-generator-bundle-4-demo.js -v",
     "build": "browserify -t brfs src/main.js -o build/terms-nodes-generator-bundle.js",
     "test": "karma start --single-run",
     "dist": "npm run build && npm run sass && node script/dist.js"
@@ -15,7 +15,8 @@
     "jquery": "^3.2.1",
     "underscore": "^1.8.3"
   },
-  "devDependencies": {
+  "devDependencies": {      
+    "watchify": "^3.9.0",
     "brfs": "^1.4.3",
     "browserify": "^14.4.0",
     "browserify-fs": "^1.0.0",
@@ -27,7 +28,6 @@
     "karma-jasmine": "^1.1.0",
     "karma-verbose-reporter": "0.0.6",
     "node-sass": "^4.5.3",
-    "serve": "^6.0.6",
-    "watchify": "^3.9.0"
+    "serve": "^6.0.6"
   }
 }
