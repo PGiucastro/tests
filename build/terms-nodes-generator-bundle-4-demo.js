@@ -12458,13 +12458,24 @@ class MainView {
       this._saveButton = this._root.find("button.save");
       this._list = this._root.find(".list");
       this._noNodesYet = this._root.find(".no-nodes-yet");
+      this._nodeNamesAreConsistent = true;
    }
 
    static build() {
       return new MainView($({}));
    }
 
+   /**
+    * Validate all data and return a JSON schema in case data are valid.
+    * 
+    * @returns {Boolean}
+    */
    getSchema() {
+
+      if (!this._nodeNamesAreConsistent) {
+         return false;
+      }
+
       for (var i = 0; i < this._nodeViews.length; i++) {
          let node = this._nodeViews[i];
          if (node.validate() === false) {
@@ -12472,6 +12483,7 @@ class MainView {
             return false;
          }
       }
+
       var sb = new SchemaBuilder(this._nodeViews);
       return sb.build();
    }
@@ -12544,6 +12556,7 @@ class MainView {
       });
 
       this._eventHub.on("node-name-has-been-updated", (e, id, newName) => {
+         this._nodeNamesAreConsistent = true;
          var node;
          var valid = this._validateNodeName(id, newName);
          if (valid) {
@@ -12555,8 +12568,10 @@ class MainView {
                }
             }
          } else {
+            this._nodeNamesAreConsistent = false;
             this._getViewById(id).revertNameToLastValidOne();
-            alert("Name already in use");
+            alert("You have chosen a node name that is already in use.\n\
+                 The name has been reverted to its last valid value.");
          }
       });
 
@@ -13160,6 +13175,9 @@ class NodeView {
       this._nameInput.on("keyup", () => {
          this._name = this._nameInput.val();
          this._nameLabel.text(this._name);
+      });
+
+      this._nameInput.on("blur", () => {
          this._eventHub.trigger("node-name-has-been-updated", [this._id, this._name]);
       });
 

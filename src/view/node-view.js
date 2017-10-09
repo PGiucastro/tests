@@ -411,6 +411,9 @@ class NodeView {
       this._nameInput.on("keyup", () => {
          this._name = this._nameInput.val();
          this._nameLabel.text(this._name);
+      });
+
+      this._nameInput.on("blur", () => {
          this._eventHub.trigger("node-name-has-been-updated", [this._id, this._name]);
       });
 
