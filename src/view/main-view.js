@@ -22,7 +22,6 @@ class MainView {
       this._saveButton = this._root.find("button.save");
       this._list = this._root.find(".list");
       this._noNodesYet = this._root.find(".no-nodes-yet");
-      this._nodeNamesAreConsistent = true;
    }
 
    static build() {
@@ -35,10 +34,6 @@ class MainView {
     * @returns {Boolean}
     */
    getSchema() {
-
-      if (!this._nodeNamesAreConsistent) {
-         return false;
-      }
 
       for (var i = 0; i < this._nodeViews.length; i++) {
          let node = this._nodeViews[i];
@@ -120,7 +115,6 @@ class MainView {
       });
 
       this._eventHub.on("node-name-has-been-updated", (e, id, newName) => {
-         this._nodeNamesAreConsistent = true;
          var node;
          var valid = this._validateNodeName(id, newName);
          if (valid) {
@@ -132,7 +126,6 @@ class MainView {
                }
             }
          } else {
-            this._nodeNamesAreConsistent = false;
             this._getViewById(id).revertNameToLastValidOne();
             alert("You have chosen a node name that is already in use.\n\
                  The name has been reverted to its last valid value.");
