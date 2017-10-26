@@ -665,7 +665,6 @@ class MainView {
       this._saveButton = this._root.find("button.save");
       this._list = this._root.find(".list");
       this._noNodesYet = this._root.find(".no-nodes-yet");
-      this._nodeNamesAreConsistent = true;
    }
 
    static build() {
@@ -678,10 +677,6 @@ class MainView {
     * @returns {Boolean}
     */
    getSchema() {
-
-      if (!this._nodeNamesAreConsistent) {
-         return false;
-      }
 
       for (var i = 0; i < this._nodeViews.length; i++) {
          let node = this._nodeViews[i];
@@ -763,7 +758,6 @@ class MainView {
       });
 
       this._eventHub.on("node-name-has-been-updated", (e, id, newName) => {
-         this._nodeNamesAreConsistent = true;
          var node;
          var valid = this._validateNodeName(id, newName);
          if (valid) {
@@ -775,7 +769,6 @@ class MainView {
                }
             }
          } else {
-            this._nodeNamesAreConsistent = false;
             this._getViewById(id).revertNameToLastValidOne();
             alert("You have chosen a node name that is already in use.\n\
                  The name has been reverted to its last valid value.");
@@ -1622,6 +1615,8 @@ module.exports = NodeView;
 const $ = (typeof window !== "undefined" ? window['jQuery'] : typeof global !== "undefined" ? global['jQuery'] : null);
 const _ = (typeof window !== "undefined" ? window['_'] : typeof global !== "undefined" ? global['_'] : null);
 const templates = require('./../templates');
+const sameParentErrorMessage = "Please choose a new parent.";
+
 
 class ReparentNodeView {
 
@@ -1691,13 +1686,13 @@ class ReparentNodeView {
          let newParentName = this._select.val();
          let currentParentName = this._node.getParentName();
          if (!currentParentName && newParentName === "-") {
-            alert("Choosen a new parent");
+            alert(sameParentErrorMessage);
          } else {
             if (newParentName !== currentParentName) {
                this._eventHub.trigger("please-reparent-this-node-view", [this._node.getName(), currentParentName, newParentName]);
                this.hide();
             } else {
-               alert("Choosen a new parent");
+               alert(sameParentErrorMessage);
             }
          }
       });
