@@ -1,6 +1,8 @@
 const $ = require('jquery');
 const _ = require('underscore');
 const templates = require('./../templates');
+const sameParentErrorMessage = "Please choose a new parent.";
+
 
 class ReparentNodeView {
 
@@ -70,13 +72,13 @@ class ReparentNodeView {
          let newParentName = this._select.val();
          let currentParentName = this._node.getParentName();
          if (!currentParentName && newParentName === "-") {
-            alert("Choosen a new parent");
+            alert(sameParentErrorMessage);
          } else {
             if (newParentName !== currentParentName) {
                this._eventHub.trigger("please-reparent-this-node-view", [this._node.getName(), currentParentName, newParentName]);
                this.hide();
             } else {
-               alert("Choosen a new parent");
+               alert(sameParentErrorMessage);
             }
          }
       });
