@@ -18,6 +18,17 @@ module.exports = function(config) {
          require("karma-chrome-launcher")
       ],
 
+      webpack: {
+         module: {
+            rules: [
+               {
+                  test: /-view\.html$/,
+                  use: 'raw-loader'
+               }
+            ]
+         }
+      },
+
       // list of files / patterns to load in the browser
       files: [
 
