@@ -10,7 +10,6 @@ npm i
 ```cmd
 # How to build it
 npm run build        # single run
-npm run build-watch  # watch mode for developers
 ```
 
 ```cmd
