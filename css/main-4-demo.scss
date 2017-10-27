@@ -1,0 +1,25 @@
+@import "view/main-view.scss";
+@import "view/node-view.scss";
+@import "view/clauses-view.scss";
+@import "view/config/config-view.scss";
+@import "view/config/radio-config-view.scss";
+@import "view/reparent-node-view.scss";
+
+body {
+   font-family: arial;
+   font-size: 14px;
+   padding-top: 50px;
+}
+
+.main-view header.main-header {
+   position: fixed;
+   top: 0;
+   background: lime;
+   padding: 10px 30px;
+   width: 100%;
+   z-index: 2;
+}
+
+.main-view header .save {
+   visibility: visible;
+}

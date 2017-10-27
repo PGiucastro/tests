@@ -1,12 +1,10 @@
-var fs = require('fs');
-
 module.exports = {
-   "main-view": fs.readFileSync(__dirname + "/../template/view/main-view.html", "utf8"),
-   "node-view": fs.readFileSync(__dirname + "/../template/view/node-view.html", "utf8"),
-   "clauses-view": fs.readFileSync(__dirname + "/../template/view/clauses-view.html", "utf8"),
-   "checkbox-config-view": fs.readFileSync(__dirname + "/../template/view/config/checkbox-config-view.html", "utf8"),
-   "number-config-view": fs.readFileSync(__dirname + "/../template/view/config/number-config-view.html", "utf8"),
-   "text-config-view": fs.readFileSync(__dirname + "/../template/view/config/text-config-view.html", "utf8"),
-   "radio-config-view": fs.readFileSync(__dirname + "/../template/view/config/radio-config-view.html", "utf8"),
-   "reparent-node-view": fs.readFileSync(__dirname + "/../template/view/reparent-node-view.html", "utf8")
+   "main-view": require(__dirname + "/../template/view/main-view.html"),
+   "node-view": require(__dirname + "/../template/view/node-view.html"),
+   "clauses-view": require(__dirname + "/../template/view/clauses-view.html"),
+   "checkbox-config-view": require(__dirname + "/../template/view/config/checkbox-config-view.html"),
+   "number-config-view": require(__dirname + "/../template/view/config/number-config-view.html"),
+   "text-config-view": require(__dirname + "/../template/view/config/text-config-view.html"),
+   "radio-config-view": require(__dirname + "/../template/view/config/radio-config-view.html"),
+   "reparent-node-view": require(__dirname + "/../template/view/reparent-node-view.html")
 };
