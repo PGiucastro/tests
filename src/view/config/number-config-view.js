@@ -28,12 +28,11 @@ class NumberConfigView extends ConfigView {
    }
 
    validate() {
+      var valid = true;
+      var defaultValue = this._defaultInput.val();
       this._removeErrors();
 
-      var valid = true;
-      var model = this.getModel();
-
-      if (!parseInt(this._model.default)) {
+      if (defaultValue !== "" && !parseInt(defaultValue)) {
          valid = false;
          this._defaultInput.addClass("error");
       }
