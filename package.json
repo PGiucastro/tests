@@ -1,6 +1,7 @@
 {
   "name": "terms-nodes-generator",
   "version": "1.0.0",
+  "main": "./src/view/main-view",
   "scripts": {
     "demo": "serve --port",
     "sass": "node-sass css/main-4-demo.scss dist/demo/terms_nodes_generator.css && node-sass css/main-4-prod.scss dist/prod/terms_nodes_generator.css",
