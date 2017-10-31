@@ -50,7 +50,8 @@
   color: lime;
   font-family: monospace;
   overflow-x: auto;
-  height: 245px; }
+  height: 245px;
+  margin-bottom: 30px; }
 
 .node-view .clauses .box {
   display: none; }

@@ -7,12 +7,14 @@ const SchemaBuilder = require('./../schema-builder');
 const ReparentNodeView = require('./reparent-node-view');
 const NodesOrderManager = require('./../order/nodes-order-manager');
 const scrolling = require('./../utils/scrolling');
+const FORBIDDEN_NAME_ERROR_MESSAGE = "You have chosen a name that is forbidden or that is already in use.\n\The name has been reverted to its last valid value.";
 
 class MainView {
 
-   constructor(eventHub) {
+   constructor(eventHub, forbiddenNames) {
       this._lastUsedId = 0;
       this._eventHub = eventHub;
+      this._forbiddenNames = forbiddenNames;
       this._nodeViews = [];
       this._clausesModel = null;
       this._orderManager = new NodesOrderManager([]);
@@ -24,8 +26,8 @@ class MainView {
       this._noNodesYet = this._root.find(".no-nodes-yet");
    }
 
-   static build() {
-      return new MainView($({}));
+   static build(forbiddenNames) {
+      return new MainView($({}), forbiddenNames);
    }
 
    /**
@@ -127,8 +129,7 @@ class MainView {
             }
          } else {
             this._getViewById(id).revertNameToLastValidOne();
-            alert("You have chosen a node name that is already in use.\n\
-                 The name has been reverted to its last valid value.");
+            alert(FORBIDDEN_NAME_ERROR_MESSAGE);
          }
       });
 
@@ -183,6 +184,11 @@ class MainView {
 
    _validateNodeName(id, name) {
       var node;
+
+      if (this._forbiddenNames.indexOf($.trim(name).toLowerCase()) > -1) {
+         return false;
+      }
+
       for (var i = 0; i < this._nodeViews.length; i++) {
          node = this._nodeViews[i];
          if (node.getId() !== id) {

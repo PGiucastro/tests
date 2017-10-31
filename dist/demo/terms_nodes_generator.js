@@ -992,12 +992,14 @@ const SchemaBuilder = __webpack_require__(24);
 const ReparentNodeView = __webpack_require__(25);
 const NodesOrderManager = __webpack_require__(6);
 const scrolling = __webpack_require__(7);
+const FORBIDDEN_NAME_ERROR_MESSAGE = "You have chosen a name that is forbidden or that is already in use.\n\The name has been reverted to its last valid value.";
 
 class MainView {
 
-   constructor(eventHub) {
+   constructor(eventHub, forbiddenNames) {
       this._lastUsedId = 0;
       this._eventHub = eventHub;
+      this._forbiddenNames = forbiddenNames;
       this._nodeViews = [];
       this._clausesModel = null;
       this._orderManager = new NodesOrderManager([]);
@@ -1009,8 +1011,8 @@ class MainView {
       this._noNodesYet = this._root.find(".no-nodes-yet");
    }
 
-   static build() {
-      return new MainView($({}));
+   static build(forbiddenNames) {
+      return new MainView($({}), forbiddenNames);
    }
 
    /**
@@ -1112,8 +1114,7 @@ class MainView {
             }
          } else {
             this._getViewById(id).revertNameToLastValidOne();
-            alert("You have chosen a node name that is already in use.\n\
-                 The name has been reverted to its last valid value.");
+            alert(FORBIDDEN_NAME_ERROR_MESSAGE);
          }
       });
 
@@ -1168,6 +1169,11 @@ class MainView {
 
    _validateNodeName(id, name) {
       var node;
+
+      if (this._forbiddenNames.indexOf($.trim(name).toLowerCase()) > -1) {
+         return false;
+      }
+
       for (var i = 0; i < this._nodeViews.length; i++) {
          node = this._nodeViews[i];
          if (node.getId() !== id) {
@@ -1924,11 +1930,12 @@ module.exports = ReparentNodeView;
 
 const $ = __webpack_require__(0);
 const MainView = __webpack_require__(8);
+const forbiddenNames = ["iubenda", "mimmo", "jacopo"];
 
 $.when($.get("/mock-data/schema.json"), $.get("/mock-data/clauses.json"))
    .then((schema, clauses) => {
       setTimeout(() => {
-         $("body").append(new MainView($({})).render(schema[0], clauses[0]));
+         $("body").append(MainView.build(forbiddenNames).render(schema[0], clauses[0]));
       }, 300);
    });
 
