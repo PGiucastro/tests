@@ -13,12 +13,7 @@ module.exports = {
       rules: [
          {
             test: /-view\.html$/,
-            use: {
-               loader: 'raw-loader',
-               options: {
-                  modules: true
-               }
-            }
+            use: 'raw-loader'
          }
       ]
    },
