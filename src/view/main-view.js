@@ -9,8 +9,6 @@ const NodesOrderManager = require('./../order/nodes-order-manager');
 const scrolling = require('./../utils/scrolling');
 const FORBIDDEN_NAME_ERROR_MESSAGE = "You have chosen a name that is forbidden or that is already in use.\n\The name has been reverted to its last valid value.";
 
-alert("x");
-
 class MainView {
 
    constructor(eventHub, forbiddenNames) {
@@ -29,6 +27,8 @@ class MainView {
    }
 
    static build(forbiddenNames) {
+      
+alert("x");
       return new MainView($({}), forbiddenNames);
    }
 
