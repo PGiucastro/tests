@@ -27,8 +27,6 @@ class MainView {
    }
 
    static build(forbiddenNames) {
-      
-alert("x");
       return new MainView($({}), forbiddenNames);
    }
 
