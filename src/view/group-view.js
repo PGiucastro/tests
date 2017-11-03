@@ -8,7 +8,12 @@ class GroupView extends NodeView {
 
    constructor(id, name, model, clauses, eventHub) {
       super(id, name, model, clauses, eventHub);
-      this._name = "group-" + (++counter);
+      if (name) {
+         this._name = name;
+         counter = parseInt(name.split("-")[1]);
+      } else {
+         this._name = "group-" + (++counter);
+      }
    }
 
    render() {
@@ -27,7 +32,7 @@ class GroupView extends NodeView {
       this._typeInput.parent().remove();
 
    }
-   
+
    validate() {
       return true;
    }

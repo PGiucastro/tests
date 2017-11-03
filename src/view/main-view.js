@@ -312,6 +312,9 @@ class MainView {
          var parentName = view.getParentName();
          var parentId;
          if (parentName) {
+            if (!this._getViewByName(parentName)) {
+               debugger
+            }
             parentId = this._getViewByName(parentName).getId();
          }
          view.setParentId(parentId);
@@ -324,6 +327,9 @@ class MainView {
    }
 
    _getTypeByModel(model) {
+      if (model.type === "group") {
+         return "group-view";
+      }
       return model.type === "boolean" ? "node-view" : "value-view";
    }
 }

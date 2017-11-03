@@ -1292,6 +1292,9 @@ class MainView {
          var parentName = view.getParentName();
          var parentId;
          if (parentName) {
+            if (!this._getViewByName(parentName)) {
+               debugger
+            }
             parentId = this._getViewByName(parentName).getId();
          }
          view.setParentId(parentId);
@@ -1304,6 +1307,9 @@ class MainView {
    }
 
    _getTypeByModel(model) {
+      if (model.type === "group") {
+         return "group-view";
+      }
       return model.type === "boolean" ? "node-view" : "value-view";
    }
 }
@@ -1781,7 +1787,12 @@ class GroupView extends NodeView {
 
    constructor(id, name, model, clauses, eventHub) {
       super(id, name, model, clauses, eventHub);
-      this._name = "group-" + (++counter);
+      if (name) {
+         this._name = name;
+         counter = parseInt(name.split("-")[1]);
+      } else {
+         this._name = "group-" + (++counter);
+      }
    }
 
    render() {
@@ -1800,7 +1811,7 @@ class GroupView extends NodeView {
       this._typeInput.parent().remove();
 
    }
-   
+
    validate() {
       return true;
    }
