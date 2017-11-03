@@ -2,30 +2,26 @@ const _ = require('underscore');
 const $ = require('jquery');
 const NodeView = require('./node-view');
 
-class ValueView extends NodeView {
+class GroupView extends NodeView {
 
    render() {
       super.render();
-      this.getDomNode().addClass("value-view");
-      this._addNodeViewButton.remove();
+      this.getDomNode().addClass("group-view");
       this._addValueViewButton.remove();
-      this._reparentButton.remove();
-      this._addGroupButton.remove();
       this._clausesSection.remove();
       this._nodeViewsSection.remove();
-      this._valueViewsSection.remove();
    }
 
    _getTypeOptionsToRemove() {
-      return ["checkbox"];
+      return [];
    }
 
    _loadModelType() {
-      this._typeInput.val(this._getSelectTypeFromModel() || "-");
+
    }
 
    _renderClauses() {
-      // does nothing as a value node has no clauses
+      // does nothing as a group node has no clauses
    }
 }
 

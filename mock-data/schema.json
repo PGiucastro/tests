@@ -28,7 +28,6 @@
          "title": "Are you offering user registration on your application?",
          "type": "boolean",
          "_iub_position": 1,
-         "_iub_children_exclusive_behaviour": true,
          "clauses": [
             "acceptance_of_agreement_implicit",
             "acceptance_of_agreement_explicit",

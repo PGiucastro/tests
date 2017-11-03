@@ -290,7 +290,6 @@ class NodeView {
       this._titleInput_EN = this._root.find(".title_en");
       this._titleInput_DE = this._root.find(".title_de");
       this._typeInput = this._root.find(".type");
-      this._childrenExclusiveBehaviourCheckbox = this._root.find(".exclusive-behaviour");
 
       this._upButton = this._root.find("button.up");
       this._downButton = this._root.find("button.down");
@@ -298,6 +297,7 @@ class NodeView {
       this._addValueViewButton = this._root.find("button.add-value-input");
       this._reparentButton = this._root.find("button.reparent");
       this._deleteButton = this._root.find("button.delete");
+      this._addGroupButton = this._root.find("button.add-group");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
       this._configSection = this._root.find(".config");
       this._clausesSection = this._root.find(".clauses");
@@ -436,15 +436,6 @@ class NodeView {
          this._renderConfigView(configType);
       });
 
-      this._childrenExclusiveBehaviourCheckbox.click((e) => {
-         var trg = $(e.target);
-         if (trg.is(":checked")) {
-            this._model._iub_children_exclusive_behaviour = true;
-         } else {
-            delete this._model._iub_children_exclusive_behaviour;
-         }
-      });
-
       this._deleteButton.click((e) => {
          e.preventDefault();
          var yes = window.confirm("Are you sure? This cannot be undone.");
@@ -548,7 +539,6 @@ class NodeView {
       this._titleInput_IT.val(this._model.title_it);
       this._titleInput_EN.val(this._model.title);
       this._titleInput_DE.val(this._model.title_de);
-      this._childrenExclusiveBehaviourCheckbox.prop("checked", this._model._iub_children_exclusive_behaviour);
       this._loadModelType();
    }
 

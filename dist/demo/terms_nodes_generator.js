@@ -436,7 +436,6 @@ class NodeView {
       this._titleInput_EN = this._root.find(".title_en");
       this._titleInput_DE = this._root.find(".title_de");
       this._typeInput = this._root.find(".type");
-      this._childrenExclusiveBehaviourCheckbox = this._root.find(".exclusive-behaviour");
 
       this._upButton = this._root.find("button.up");
       this._downButton = this._root.find("button.down");
@@ -444,6 +443,7 @@ class NodeView {
       this._addValueViewButton = this._root.find("button.add-value-input");
       this._reparentButton = this._root.find("button.reparent");
       this._deleteButton = this._root.find("button.delete");
+      this._addGroupButton = this._root.find("button.add-group");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
       this._configSection = this._root.find(".config");
       this._clausesSection = this._root.find(".clauses");
@@ -582,15 +582,6 @@ class NodeView {
          this._renderConfigView(configType);
       });
 
-      this._childrenExclusiveBehaviourCheckbox.click((e) => {
-         var trg = $(e.target);
-         if (trg.is(":checked")) {
-            this._model._iub_children_exclusive_behaviour = true;
-         } else {
-            delete this._model._iub_children_exclusive_behaviour;
-         }
-      });
-
       this._deleteButton.click((e) => {
          e.preventDefault();
          var yes = window.confirm("Are you sure? This cannot be undone.");
@@ -694,7 +685,6 @@ class NodeView {
       this._titleInput_IT.val(this._model.title_it);
       this._titleInput_EN.val(this._model.title);
       this._titleInput_DE.val(this._model.title_de);
-      this._childrenExclusiveBehaviourCheckbox.prop("checked", this._model._iub_children_exclusive_behaviour);
       this._loadModelType();
    }
 
@@ -1320,7 +1310,7 @@ module.exports = "<div class=\"main-view\">\n\n   <header class=\"main-header\">
 /* 10 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"node-view container-fluid\" data-node-view-id=\"<%= id %>\">\n\n   <nav class=\"row\">\n\n      <div class=\"col-md-6\">\n         <span class=\"name-label\"></span>\n      </div>\n\n      <div class=\"buttons text-right col-md-6\">\n         <button class=\"up btn\">Up</button>\n         <button class=\"down btn\">Down</button>\n         <button class=\"add-child-node btn\">Add child node</button>\n         <button class=\"add-value-input btn\">Add value input</button>\n         <button class=\"reparent btn\">Reparent</button>\n         <button class=\"delete btn\">Delete</button>\n      </div>\n\n   </nav>\n\n   <div class=\"debugger row\"></div>\n\n   <div class=\"row\">\n\n      <div class=\"col-md-4\">\n         <div class=\"form-group\">\n            <label>Name</label>\n            <input name=\"name\" type='text' class='name form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Type</label>\n            <select name=\"type\" class='type form-control'>\n               <option value=\"-\">-</option>\n               <option value=\"checkbox\">checkbox</option>\n               <option value=\"radio\">radio</option>\n               <option value=\"text\">text</option>\n               <option value=\"number\">number</option>\n            </select>\n         </div>\n\n         <div class=\"config\"></div>\n      </div>\n\n      <div class=\"col-md-4\">\n         <div class=\"form-group\">\n            <label>Title (IT)</label>\n            <input name=\"title_it\" type='text' class='title_it form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Title (EN)</label>\n            <input name=\"title_en\" type='text' class='title_en form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Title (DE)</label>\n            <input name=\"title_de\" type='text' class='title_de form-control' />\n         </div>\n      </div>\n\n      <div class=\"col-md-4\">\n         <div class=\"checkbox\">\n            <label>\n               <input name=\"exclusive-behaviour\" class=\"exclusive-behaviour\" type='checkbox' />\n               Child nodes will show an exclusive behaviour (only one can be selected at a time)</label>\n         </div>\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <button class=\"expand btn\"></button>\n      <div class=\"box\"></div>\n   </div>\n\n   <div class=\"value-views\">\n      <div class=\"box\"></div>\n   </div>\n\n   <div class=\"node-views\">\n      <div class=\"box\"></div>\n   </div>\n\n</div>"
+module.exports = "<div class=\"node-view container-fluid\" data-node-view-id=\"<%= id %>\">\n\n   <nav class=\"row\">\n\n      <div class=\"col-md-6\">\n         <span class=\"name-label\"></span>\n      </div>\n\n      <div class=\"buttons text-right col-md-6\">\n         <button class=\"up btn\">Up</button>\n         <button class=\"down btn\">Down</button>\n         <button class=\"add-child-node btn\">Add child node</button>\n         <button class=\"add-value-input btn\">Add value input</button>\n         <button class=\"add-group btn\">Add group</button>\n         <button class=\"reparent btn\">Reparent</button>\n         <button class=\"delete btn\">Delete</button>\n      </div>\n\n   </nav>\n\n   <div class=\"debugger row\"></div>\n\n   <div class=\"row\">\n\n      <div class=\"col-md-4\">\n         <div class=\"form-group\">\n            <label>Name</label>\n            <input name=\"name\" type='text' class='name form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Type</label>\n            <select name=\"type\" class='type form-control'>\n               <option value=\"-\">-</option>\n               <option value=\"checkbox\">checkbox</option>\n               <option value=\"radio\">radio</option>\n               <option value=\"text\">text</option>\n               <option value=\"number\">number</option>\n            </select>\n         </div>\n\n         <div class=\"config\"></div>\n      </div>\n\n      <div class=\"col-md-4\">\n         <div class=\"form-group\">\n            <label>Title (IT)</label>\n            <input name=\"title_it\" type='text' class='title_it form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Title (EN)</label>\n            <input name=\"title_en\" type='text' class='title_en form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Title (DE)</label>\n            <input name=\"title_de\" type='text' class='title_de form-control' />\n         </div>\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <button class=\"expand btn\"></button>\n      <div class=\"box\"></div>\n   </div>\n\n   <div class=\"value-views\">\n      <div class=\"box\"></div>\n   </div>\n\n   <div class=\"node-views\">\n      <div class=\"box\"></div>\n   </div>\n\n</div>"
 
 /***/ }),
 /* 11 */
@@ -1746,10 +1736,10 @@ class ValueView extends NodeView {
       this._addNodeViewButton.remove();
       this._addValueViewButton.remove();
       this._reparentButton.remove();
+      this._addGroupButton.remove();
       this._clausesSection.remove();
       this._nodeViewsSection.remove();
       this._valueViewsSection.remove();
-      this._childrenExclusiveBehaviourCheckbox.parent().remove();
    }
 
    _getTypeOptionsToRemove() {
@@ -1760,7 +1750,7 @@ class ValueView extends NodeView {
       this._typeInput.val(this._getSelectTypeFromModel() || "-");
    }
 
-   _renderClauses(type) {
+   _renderClauses() {
       // does nothing as a value node has no clauses
    }
 }
