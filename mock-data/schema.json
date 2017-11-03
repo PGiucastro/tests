@@ -147,13 +147,6 @@
          ],
          "_iub_parent": "recurring_subscription_offered",
          "_iub_position": 1
-      },
-
-      "alcoholic_goods": {
-         "title": "Are you selling alcoholic goods?",
-         "type": "boolean",
-         "_iub_parent": "paid_goods_and_or_services.offered_type",
-         "_iub_position": 1
       }
    }
 }

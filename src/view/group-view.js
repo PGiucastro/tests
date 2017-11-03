@@ -20,7 +20,7 @@ class GroupView extends NodeView {
       this._clausesSection.remove();
       this._valueViewsSection.remove();
 
-      this._nameInput.val(this._name).attr("disabled", true);
+      this._nameInput.val(this._name).parent().hide();
       this._titleInput_IT.parent().remove();
       this._titleInput_EN.parent().remove();
       this._titleInput_DE.parent().remove();
