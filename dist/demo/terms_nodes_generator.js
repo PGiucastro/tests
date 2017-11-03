@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 26);
+/******/ 	return __webpack_require__(__webpack_require__.s = 27);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -443,7 +443,7 @@ class NodeView {
       this._addValueViewButton = this._root.find("button.add-value-input");
       this._reparentButton = this._root.find("button.reparent");
       this._deleteButton = this._root.find("button.delete");
-      this._addGroupButton = this._root.find("button.add-group");
+      this._addGroupViewButton = this._root.find("button.add-group");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
       this._configSection = this._root.find(".config");
       this._clausesSection = this._root.find(".clauses");
@@ -605,6 +605,11 @@ class NodeView {
       this._addValueViewButton.click((e) => {
          e.preventDefault();
          this._eventHub.trigger("please-create-child-node", ["value-view", this.getId(), this.getName()]);
+      });
+
+      this._addGroupViewButton.click((e) => {
+         e.preventDefault();
+         this._eventHub.trigger("please-create-child-node", ["group-view", this.getId(), this.getName()]);
       });
 
       this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);
@@ -977,9 +982,10 @@ const _ = __webpack_require__(2);
 const $ = __webpack_require__(0);
 const NodeView = __webpack_require__(4);
 const ValueView = __webpack_require__(23);
+const GroupView = __webpack_require__(24);
 const templates = __webpack_require__(1);
-const SchemaBuilder = __webpack_require__(24);
-const ReparentNodeView = __webpack_require__(25);
+const SchemaBuilder = __webpack_require__(25);
+const ReparentNodeView = __webpack_require__(26);
 const NodesOrderManager = __webpack_require__(6);
 const scrolling = __webpack_require__(7);
 const FORBIDDEN_NAME_ERROR_MESSAGE = "You have chosen a name that is forbidden or that is already in use.\n\The name has been reverted to its last valid value.";
@@ -1181,6 +1187,8 @@ class MainView {
          nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
       } else if (type === "value-view") {
          nodeView = new ValueView(id, name, nodeModel, this._clausesModel, this._eventHub);
+      } else if (type === "group-view") {
+         nodeView = new GroupView(id, name, nodeModel, this._clausesModel, this._eventHub);
       } else {
          throw `Unknown type [${type}]`;
       }
@@ -1219,10 +1227,12 @@ class MainView {
       node.render();
 
       if (parent) {
-         if (type === "node-view") {
+         if (type === "node-view" || type === "group-view") {
             parent.appendNodeView(node);
          } else if (type === "value-view") {
             parent.appendValueView(node);
+         } else {
+            throw "Type not handled";
          }
       } else {
          node.setMoveDownCommand(this._moveNodeDown.bind(this));
@@ -1735,8 +1745,8 @@ class ValueView extends NodeView {
       this.getDomNode().addClass("value-view");
       this._addNodeViewButton.remove();
       this._addValueViewButton.remove();
-      this._reparentButton.remove();
-      this._addGroupButton.remove();
+      this._addGroupViewButton.remove();
+      this._reparentButton.remove();      
       this._clausesSection.remove();
       this._nodeViewsSection.remove();
       this._valueViewsSection.remove();
@@ -1759,6 +1769,59 @@ module.exports = ValueView;
 
 /***/ }),
 /* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const _ = __webpack_require__(2);
+const $ = __webpack_require__(0);
+const NodeView = __webpack_require__(4);
+
+var counter = 0;
+
+class GroupView extends NodeView {
+
+   constructor(id, name, model, clauses, eventHub) {
+      super(id, name, model, clauses, eventHub);
+      this._name = "group-" + (++counter);
+   }
+
+   render() {
+      super.render();
+
+      this.getDomNode().addClass("group-view");
+
+      this._addValueViewButton.remove();
+      this._clausesSection.remove();
+      this._valueViewsSection.remove();
+
+      this._nameInput.val(this._name).attr("disabled", true);
+      this._titleInput_IT.parent().remove();
+      this._titleInput_EN.parent().remove();
+      this._titleInput_DE.parent().remove();
+      this._typeInput.parent().remove();
+
+   }
+   
+   validate() {
+      return true;
+   }
+
+   _getTypeOptionsToRemove() {
+      return [];
+   }
+
+   _loadModelType() {
+
+   }
+
+   _renderClauses() {
+      // does nothing as a group node has no clauses
+   }
+}
+
+module.exports = GroupView;
+
+/***/ }),
+/* 25 */
 /***/ (function(module, exports) {
 
 class SchemaBuilder {
@@ -1795,7 +1858,7 @@ class SchemaBuilder {
 module.exports = SchemaBuilder;
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const $ = __webpack_require__(0);
@@ -1915,7 +1978,7 @@ class ReparentNodeView {
 module.exports = ReparentNodeView;
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const $ = __webpack_require__(0);

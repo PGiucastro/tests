@@ -297,7 +297,7 @@ class NodeView {
       this._addValueViewButton = this._root.find("button.add-value-input");
       this._reparentButton = this._root.find("button.reparent");
       this._deleteButton = this._root.find("button.delete");
-      this._addGroupButton = this._root.find("button.add-group");
+      this._addGroupViewButton = this._root.find("button.add-group");
       this._clausesExpansionButton = this._root.find(".clauses .expand");
       this._configSection = this._root.find(".config");
       this._clausesSection = this._root.find(".clauses");
@@ -459,6 +459,11 @@ class NodeView {
       this._addValueViewButton.click((e) => {
          e.preventDefault();
          this._eventHub.trigger("please-create-child-node", ["value-view", this.getId(), this.getName()]);
+      });
+
+      this._addGroupViewButton.click((e) => {
+         e.preventDefault();
+         this._eventHub.trigger("please-create-child-node", ["group-view", this.getId(), this.getName()]);
       });
 
       this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);

@@ -8,6 +8,9 @@
   border: 1px solid #ccc;
   padding: 30px; }
 
+.node-view.group-view {
+  background: orange !important; }
+
 .node-view.collapsed {
   height: 94px; }
 

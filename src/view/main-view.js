@@ -2,6 +2,7 @@ const _ = require('underscore');
 const $ = require('jquery');
 const NodeView = require('./node-view');
 const ValueView = require('./value-view');
+const GroupView = require('./group-view');
 const templates = require('./../templates');
 const SchemaBuilder = require('./../schema-builder');
 const ReparentNodeView = require('./reparent-node-view');
@@ -206,6 +207,8 @@ class MainView {
          nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
       } else if (type === "value-view") {
          nodeView = new ValueView(id, name, nodeModel, this._clausesModel, this._eventHub);
+      } else if (type === "group-view") {
+         nodeView = new GroupView(id, name, nodeModel, this._clausesModel, this._eventHub);
       } else {
          throw `Unknown type [${type}]`;
       }
@@ -244,10 +247,12 @@ class MainView {
       node.render();
 
       if (parent) {
-         if (type === "node-view") {
+         if (type === "node-view" || type === "group-view") {
             parent.appendNodeView(node);
          } else if (type === "value-view") {
             parent.appendValueView(node);
+         } else {
+            throw `Unknown type [${type}]`;
          }
       } else {
          node.setMoveDownCommand(this._moveNodeDown.bind(this));

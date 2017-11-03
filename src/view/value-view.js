@@ -9,8 +9,8 @@ class ValueView extends NodeView {
       this.getDomNode().addClass("value-view");
       this._addNodeViewButton.remove();
       this._addValueViewButton.remove();
-      this._reparentButton.remove();
-      this._addGroupButton.remove();
+      this._addGroupViewButton.remove();
+      this._reparentButton.remove();      
       this._clausesSection.remove();
       this._nodeViewsSection.remove();
       this._valueViewsSection.remove();
