@@ -37,7 +37,7 @@ class GroupView extends NodeView {
    }
 
    _loadModelType() {
-
+      this._model.type = "group";
    }
 
    _renderClauses() {

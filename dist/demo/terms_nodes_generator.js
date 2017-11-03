@@ -1232,7 +1232,7 @@ class MainView {
          } else if (type === "value-view") {
             parent.appendValueView(node);
          } else {
-            throw "Type not handled";
+            throw `Unknown type [${type}]`;
          }
       } else {
          node.setMoveDownCommand(this._moveNodeDown.bind(this));
@@ -1810,7 +1810,7 @@ class GroupView extends NodeView {
    }
 
    _loadModelType() {
-
+      this._model.type = "group";
    }
 
    _renderClauses() {
