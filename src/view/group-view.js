@@ -23,6 +23,8 @@ class GroupView extends NodeView {
 
       this._addValueViewButton.remove();
       this._clausesSection.remove();
+      this._addGroupViewButton.remove();
+      
       this._valueViewsSection.remove();
 
       this._nameInput.val(this._name).parent().hide();
