@@ -9,7 +9,9 @@
   padding: 30px; }
 
 .node-view.group-view {
-  background: orange !important; }
+  background: deeppink !important; }
+  .node-view.group-view .name-label {
+    color: white; }
 
 .node-view.collapsed {
   height: 94px; }

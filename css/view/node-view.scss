@@ -7,7 +7,11 @@
 }
 
 .node-view.group-view {
-   background: orange !important;
+   background: deeppink !important;
+   
+   .name-label {
+      color: white;
+   }
 }
 
 .node-view.collapsed {

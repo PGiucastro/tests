@@ -142,27 +142,37 @@
          "_iub_position": 1,
          "_iub_title_it": "",
          "title": "a",
-         "_iub_title_en": "a"
+         "_iub_title_en": "a",
+         "clauses": [
+            "all_rights_remain_with_users"
+         ]
       },
       "b": {
          "_iub_parent": "group-1",
          "type": "boolean",
          "_iub_position": 2,
          "title": "b",
-         "_iub_title_en": "b"
+         "_iub_title_en": "b",
+         "clauses": [
+            "all_rights_remain_with_users",
+            "paid_services"
+         ]
       },
       "group-5": {
          "_iub_parent": "user_registration_offered",
          "type": "group",
          "_iub_position": 2
       },
-      "ccc": {
+      "c": {
          "_iub_parent": "group-5",
          "type": "boolean",
          "_iub_position": 1,
          "_iub_title_it": "",
-         "title": "ccc",
-         "_iub_title_en": "ccc"
+         "title": "c",
+         "_iub_title_en": "c",
+         "clauses": [
+            "acceptance_of_agreement_implicit"
+         ]
       }
    }
 }
