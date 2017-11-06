@@ -10,6 +10,8 @@
 
 .node-view.group-view {
   background: lightskyblue !important; }
+  .node-view.group-view .name-label {
+    visibility: hidden; }
 
 .node-view.collapsed {
   height: 94px; }
