@@ -33,8 +33,7 @@
 
 .node-view nav .name-label {
   font-weight: bold;
-  font-size: 18px;
-  display: block; }
+  font-size: 18px; }
 
 .node-view input.error,
 .node-view select.error {
