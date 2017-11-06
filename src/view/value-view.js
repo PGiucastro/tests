@@ -16,6 +16,10 @@ class ValueView extends NodeView {
       this._childrenExclusiveBehaviourCheckbox.parent().remove();
    }
 
+   _showTypeLabel() {
+      this._root.find(".type-label .type-value").css("display", "inline");
+   }
+
    _getTypeOptionsToRemove() {
       return ["checkbox"];
    }

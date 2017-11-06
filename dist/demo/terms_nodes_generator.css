@@ -28,6 +28,15 @@
 .node-view nav {
   margin-bottom: 30px; }
 
+.node-view nav .type-label em {
+  font-size: 16px;
+  font-style: normal;
+  background: brown;
+  color: white;
+  padding: 3px 6px;
+  display: none;
+  margin-right: 10px; }
+
 .node-view nav .name-label {
   font-weight: bold;
   font-size: 18px; }
