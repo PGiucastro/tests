@@ -433,9 +433,9 @@ class NodeView {
          var slagNewTitle = slug(newTitle).toLowerCase();
          this._model.title = newTitle;
          this._model._iub_title_en = newTitle;
-         if (slagCurrentTitle === this._name) {
+         if (!this._name ||slagCurrentTitle === this._name) {
             this._name = slagNewTitle;
-            this._nameInput.val(slagNewTitle);
+            this._nameInput.val(slagNewTitle).removeClass("error");
             this._nameLabel.text(slagNewTitle);
          }
       });
