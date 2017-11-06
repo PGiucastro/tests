@@ -7,11 +7,7 @@
 }
 
 .node-view.group-view {
-   background: deeppink !important;
-   
-   .name-label {
-      color: white;
-   }
+   background: lightskyblue !important;
 }
 
 .node-view.collapsed {
@@ -43,6 +39,7 @@
 .node-view nav .name-label {
    font-weight: bold;
    font-size: 18px;
+   display: block;
 }
 
 .node-view  input.error,
