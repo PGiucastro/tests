@@ -9,9 +9,7 @@
   padding: 30px; }
 
 .node-view.group-view {
-  background: deeppink !important; }
-  .node-view.group-view .name-label {
-    color: white; }
+  background: lightskyblue !important; }
 
 .node-view.collapsed {
   height: 94px; }
@@ -35,7 +33,8 @@
 
 .node-view nav .name-label {
   font-weight: bold;
-  font-size: 18px; }
+  font-size: 18px;
+  display: block; }
 
 .node-view input.error,
 .node-view select.error {
