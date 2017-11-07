@@ -32,7 +32,6 @@ class GroupView extends NodeView {
       this._titleInput_EN.parent().remove();
       this._titleInput_DE.parent().remove();
       this._typeInput.parent().remove();
-
    }
 
    validate() {

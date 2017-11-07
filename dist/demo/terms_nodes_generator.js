@@ -1913,6 +1913,7 @@ class ReparentNodeView {
       for (var i = 0; i < names.length; i++) {
          name = names[i];
          view = this._getViewByName(nodes, name);
+         console.log(name)
          if (view.canBeAParentNode() && view.getId() !== this._node.getId()) {
             option = $("<option />");
             option.attr("value", name);
