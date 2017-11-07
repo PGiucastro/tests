@@ -12,6 +12,8 @@
   background: lightskyblue !important; }
   .node-view.group-view .name-label {
     visibility: hidden; }
+  .node-view.group-view nav {
+    margin-bottom: 0; }
 
 .node-view.collapsed {
   height: 94px; }
@@ -36,6 +38,9 @@
 .node-view nav .name-label {
   font-weight: bold;
   font-size: 18px; }
+
+.node-view nav .buttons {
+  line-height: 37px; }
 
 .node-view input.error,
 .node-view select.error {

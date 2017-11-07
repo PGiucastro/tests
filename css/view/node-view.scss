@@ -12,6 +12,10 @@
    .name-label {
       visibility: hidden;
    }
+   
+   nav {
+      margin-bottom: 0;
+   }
 }
 
 .node-view.collapsed {
@@ -43,6 +47,10 @@
 .node-view nav .name-label {
    font-weight: bold;
    font-size: 18px;
+}
+
+.node-view nav .buttons {
+   line-height: 37px;
 }
 
 .node-view  input.error,

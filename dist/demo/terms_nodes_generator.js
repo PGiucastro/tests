@@ -1811,7 +1811,6 @@ class GroupView extends NodeView {
       this._titleInput_EN.parent().remove();
       this._titleInput_DE.parent().remove();
       this._typeInput.parent().remove();
-
    }
 
    validate() {
@@ -1913,7 +1912,6 @@ class ReparentNodeView {
       for (var i = 0; i < names.length; i++) {
          name = names[i];
          view = this._getViewByName(nodes, name);
-         console.log(name)
          if (view.canBeAParentNode() && view.getId() !== this._node.getId()) {
             option = $("<option />");
             option.attr("value", name);
