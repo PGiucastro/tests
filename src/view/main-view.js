@@ -89,7 +89,7 @@ class MainView {
          var newNode = this._buildNode("node-view", String(this._getNextId()), "", {});
          this._renderNode("node-view", newNode);
          this._handleNoNodesYetMessage();
-         scrolling.scrollToBottom();
+         // scrolling.scrollToBottom();
       });
 
       this._eventHub.on("please-delete-node", (e, id) => {
@@ -312,9 +312,6 @@ class MainView {
          var parentName = view.getParentName();
          var parentId;
          if (parentName) {
-            if (!this._getViewByName(parentName)) {
-               debugger
-            }
             parentId = this._getViewByName(parentName).getId();
          }
          view.setParentId(parentId);
