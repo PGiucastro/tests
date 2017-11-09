@@ -255,6 +255,7 @@ class MainView {
             throw `Unknown type [${type}]`;
          }
       } else {
+         // root nodes
          node.setMoveDownCommand(this._moveNodeDown.bind(this));
          node.setMoveUpCommand(this._moveNodeUp.bind(this));
          node.setRemoveFromPositionManagerCommand(this._removeFromOrderManager.bind(this));

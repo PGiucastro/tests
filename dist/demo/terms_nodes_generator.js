@@ -1095,7 +1095,6 @@ class MainView {
          var newNode = this._buildNode("node-view", String(this._getNextId()), "", {});
          this._renderNode("node-view", newNode);
          this._handleNoNodesYetMessage();
-         scrolling.scrollToBottom();
       });
 
       this._eventHub.on("please-delete-node", (e, id) => {
@@ -1225,7 +1224,7 @@ class MainView {
    _moveNodeUp(node) {
       var prevNode = this._orderManager.getPreviousNode(node);
       if (prevNode) {
-         node.getDomNode().insertBefore(prevNode.getDomNode());
+         node.getDomNode().insertAfter(prevNode.getDomNode());
          scrolling.scrollToNode(node);
       }
       this._orderManager.moveNodeToLowerPosition(node);
@@ -1234,7 +1233,7 @@ class MainView {
    _moveNodeDown(node) {
       var nextNode = this._orderManager.getNextNode(node);
       if (nextNode) {
-         node.getDomNode().insertAfter(nextNode.getDomNode());
+         node.getDomNode().insertBefore(nextNode.getDomNode());
          scrolling.scrollToNode(node);
       }
       this._orderManager.moveNodeToHigherPosition(node);
@@ -1261,6 +1260,7 @@ class MainView {
             throw `Unknown type [${type}]`;
          }
       } else {
+         // root nodes
          node.setMoveDownCommand(this._moveNodeDown.bind(this));
          node.setMoveUpCommand(this._moveNodeUp.bind(this));
          node.setRemoveFromPositionManagerCommand(this._removeFromOrderManager.bind(this));
@@ -1270,9 +1270,9 @@ class MainView {
          if (!previousNode && !nextNode) { // it is the first being added
             this._list.append(node.getDomNode());
          } else if (previousNode) {
-            node.getDomNode().insertAfter(previousNode.getDomNode());
+            node.getDomNode().insertBefore(previousNode.getDomNode());
          } else if (nextNode) {
-            node.getDomNode().insertBefore(nextNode.getDomNode());
+            node.getDomNode().insertAfter(nextNode.getDomNode());
          }
       }
    }
@@ -1318,9 +1318,6 @@ class MainView {
          var parentName = view.getParentName();
          var parentId;
          if (parentName) {
-            if (!this._getViewByName(parentName)) {
-               debugger
-            }
             parentId = this._getViewByName(parentName).getId();
          }
          view.setParentId(parentId);
