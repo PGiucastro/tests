@@ -27,6 +27,10 @@ class ValueView extends NodeView {
    _renderClauses() {
       // does nothing as a value node has no clauses
    }
+
+   _showTypeLabel() {
+      this._root.find(".type-label .type-value").css("display", "inline");
+   }
 }
 
 module.exports = ValueView;

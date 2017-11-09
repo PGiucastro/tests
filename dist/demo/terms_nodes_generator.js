@@ -74,14 +74,14 @@ module.exports = jQuery;
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = {
-   "main-view": __webpack_require__(9),
-   "node-view": __webpack_require__(10),
-   "clauses-view": __webpack_require__(11),
-   "checkbox-config-view": __webpack_require__(12),
-   "number-config-view": __webpack_require__(13),
-   "text-config-view": __webpack_require__(14),
-   "radio-config-view": __webpack_require__(15),
-   "reparent-node-view": __webpack_require__(16)
+   "main-view": __webpack_require__(11),
+   "node-view": __webpack_require__(12),
+   "clauses-view": __webpack_require__(13),
+   "checkbox-config-view": __webpack_require__(14),
+   "number-config-view": __webpack_require__(15),
+   "text-config-view": __webpack_require__(16),
+   "radio-config-view": __webpack_require__(17),
+   "reparent-node-view": __webpack_require__(18)
 };
 
 /***/ }),
@@ -144,11 +144,12 @@ module.exports = ConfigView;
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const _ = __webpack_require__(2);
 const $ = __webpack_require__(0);
+const _ = __webpack_require__(2);
+const slug = __webpack_require__(9);
 const templates = __webpack_require__(1);
-const ClausesView = __webpack_require__(17);
-const buildConfigView = __webpack_require__(18);
+const ClausesView = __webpack_require__(19);
+const buildConfigView = __webpack_require__(20);
 const Expander = __webpack_require__(5);
 const NodesOrderManager = __webpack_require__(6);
 const scrolling = __webpack_require__(7);
@@ -157,6 +158,7 @@ class NodeView {
 
    constructor(id, name, model, clauses, eventHub) {
       this._rendered = false;
+      this._root;
       this._id = id;
       this._parentId;
       this._name = name;
@@ -178,6 +180,10 @@ class NodeView {
 
       this._nodeViewsOrderManager = new NodesOrderManager([]);
       this._valueViewsOrderManager = new NodesOrderManager([]);
+
+      if (!this._model.title) {
+         this._model.title = "";
+      }
    }
 
    getPosition() {
@@ -461,6 +467,7 @@ class NodeView {
 
       this._renderConfigView(configType);
       this._renderClauses();
+      this._showTypeLabel();
 
       this._behaviour();
 
@@ -534,12 +541,14 @@ class NodeView {
       this._root.click((e) => {
          e.stopPropagation(); // this prevents the event from being fired when clicking on child nodes
          var trg = $(e.target);
-
          if (trg.is("input, select")) {
             trg.removeClass("error");
          }
+      });
 
-         if (trg.is(".buttons") || trg.is(".name-label")) {
+      this._root.find(".node-info").click((e) => {
+         var trg = $(e.target);
+         if (!trg.is("button")) {
             this._root.toggleClass("collapsed");
          }
       });
@@ -563,13 +572,26 @@ class NodeView {
          this._eventHub.trigger("node-name-has-been-updated", [this._id, this._name]);
       });
 
-      this._titleInput_IT.on("keyup", () => {
-         this._model._iub_title_it = this._titleInput_IT.val();
+      this._titleInput_EN.on("keyup", () => {
+         var currentTitle = this._model.title;
+         var newTitle = this._titleInput_EN.val();
+         var slagCurrentTitle = slug(currentTitle).toLowerCase();
+         var slagNewTitle = slug(newTitle).toLowerCase();
+         this._model.title = newTitle;
+         this._model._iub_title_en = newTitle;
+         if (!this._name ||slagCurrentTitle === this._name) {
+            this._name = slagNewTitle;
+            this._nameInput.val(slagNewTitle).removeClass("error");
+            this._nameLabel.text(slagNewTitle);
+         }
       });
 
-      this._titleInput_EN.on("keyup", () => {
-         this._model.title = this._titleInput_EN.val();
-         this._model._iub_title_en = this._titleInput_EN.val();
+      this._titleInput_EN.on("blur", () => {
+         this._nameInput.trigger("blur");
+      });
+
+      this._titleInput_IT.on("keyup", () => {
+         this._model._iub_title_it = this._titleInput_IT.val();
       });
 
       this._titleInput_DE.on("keyup", () => {
@@ -780,6 +802,10 @@ class NodeView {
 
    _removeValueViewFromOrderManager(node) {
       this._valueViewsOrderManager.removeNode(node);
+   }
+
+   _showTypeLabel() {
+      this._root.find(".type-label .type-node").css("display", "inline");
    }
 }
 
@@ -1318,9 +1344,222 @@ module.exports = MainView;
 
 /***/ }),
 /* 9 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-module.exports = "<div class=\"main-view\">\n\n   <header class=\"main-header\">\n      <button class=\"add btn btn-primary\">Add new node</button>\n      <button class=\"save btn btn-primary\">Save schema</button>\n   </header>\n\n   <div class=\"no-nodes-yet alert alert-warning\">there are no nodes yet</div>\n\n   <div class=\"list\"></div>\n\n</div>"
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (root) {
+// lazy require symbols table
+var _symbols, removelist;
+function symbols(code) {
+    if (_symbols) return _symbols[code];
+    _symbols = __webpack_require__(10);
+    removelist = ['sign','cross','of','symbol','staff','hand','black','white']
+        .map(function (word) {return new RegExp(word, 'gi')});
+    return _symbols[code];
+}
+
+function slug(string, opts) {
+    string = string.toString();
+    if ('string' === typeof opts)
+        opts = {replacement:opts};
+    opts = opts || {};
+    opts.mode = opts.mode || slug.defaults.mode;
+    var defaults = slug.defaults.modes[opts.mode];
+    var keys = ['replacement','multicharmap','charmap','remove','lower'];
+    for (var key, i = 0, l = keys.length; i < l; i++) { key = keys[i];
+        opts[key] = (key in opts) ? opts[key] : defaults[key];
+    }
+    if ('undefined' === typeof opts.symbols)
+        opts.symbols = defaults.symbols;
+
+    var lengths = [];
+    for (var key in opts.multicharmap) {
+        if (!opts.multicharmap.hasOwnProperty(key))
+            continue;
+
+        var len = key.length;
+        if (lengths.indexOf(len) === -1)
+            lengths.push(len);
+    }
+
+    var code, unicode, result = "";
+    for (var char, i = 0, l = string.length; i < l; i++) { char = string[i];
+        if (!lengths.some(function (len) {
+            var str = string.substr(i, len);
+            if (opts.multicharmap[str]) {
+                i += len - 1;
+                char = opts.multicharmap[str];
+                return true;
+            } else return false;
+        })) {
+            if (opts.charmap[char]) {
+                char = opts.charmap[char];
+                code = char.charCodeAt(0);
+            } else {
+                code = string.charCodeAt(i);
+            }
+            if (opts.symbols && (unicode = symbols(code))) {
+                char = unicode.name.toLowerCase();
+                for(var j = 0, rl = removelist.length; j < rl; j++) {
+                    char = char.replace(removelist[j], '');
+                }
+                char = char.replace(/^\s+|\s+$/g, '');
+            }
+        }
+        char = char.replace(/[^\w\s\-\.\_~]/g, ''); // allowed
+        if (opts.remove) char = char.replace(opts.remove, ''); // add flavour
+        result += char;
+    }
+    result = result.replace(/^\s+|\s+$/g, ''); // trim leading/trailing spaces
+    result = result.replace(/[-\s]+/g, opts.replacement); // convert spaces
+    result = result.replace(opts.replacement+"$",''); // remove trailing separator
+    if (opts.lower)
+      result = result.toLowerCase();
+    return result;
+};
+
+slug.defaults = {
+    mode: 'pretty',
+};
+
+slug.multicharmap = slug.defaults.multicharmap = {
+    '<3': 'love', '&&': 'and', '||': 'or', 'w/': 'with',
+};
+
+// https://code.djangoproject.com/browser/django/trunk/django/contrib/admin/media/js/urlify.js
+slug.charmap  = slug.defaults.charmap = {
+    // latin
+    'À': 'A', 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A', 'Å': 'A', 'Æ': 'AE',
+    'Ç': 'C', 'È': 'E', 'É': 'E', 'Ê': 'E', 'Ë': 'E', 'Ì': 'I', 'Í': 'I',
+    'Î': 'I', 'Ï': 'I', 'Ð': 'D', 'Ñ': 'N', 'Ò': 'O', 'Ó': 'O', 'Ô': 'O',
+    'Õ': 'O', 'Ö': 'O', 'Ő': 'O', 'Ø': 'O', 'Ù': 'U', 'Ú': 'U', 'Û': 'U',
+    'Ü': 'U', 'Ű': 'U', 'Ý': 'Y', 'Þ': 'TH', 'ß': 'ss', 'à':'a', 'á':'a',
+    'â': 'a', 'ã': 'a', 'ä': 'a', 'å': 'a', 'æ': 'ae', 'ç': 'c', 'è': 'e',
+    'é': 'e', 'ê': 'e', 'ë': 'e', 'ì': 'i', 'í': 'i', 'î': 'i', 'ï': 'i',
+    'ð': 'd', 'ñ': 'n', 'ò': 'o', 'ó': 'o', 'ô': 'o', 'õ': 'o', 'ö': 'o',
+    'ő': 'o', 'ø': 'o', 'ù': 'u', 'ú': 'u', 'û': 'u', 'ü': 'u', 'ű': 'u',
+    'ý': 'y', 'þ': 'th', 'ÿ': 'y', 'ẞ': 'SS',
+    // greek
+    'α':'a', 'β':'b', 'γ':'g', 'δ':'d', 'ε':'e', 'ζ':'z', 'η':'h', 'θ':'8',
+    'ι':'i', 'κ':'k', 'λ':'l', 'μ':'m', 'ν':'n', 'ξ':'3', 'ο':'o', 'π':'p',
+    'ρ':'r', 'σ':'s', 'τ':'t', 'υ':'y', 'φ':'f', 'χ':'x', 'ψ':'ps', 'ω':'w',
+    'ά':'a', 'έ':'e', 'ί':'i', 'ό':'o', 'ύ':'y', 'ή':'h', 'ώ':'w', 'ς':'s',
+    'ϊ':'i', 'ΰ':'y', 'ϋ':'y', 'ΐ':'i',
+    'Α':'A', 'Β':'B', 'Γ':'G', 'Δ':'D', 'Ε':'E', 'Ζ':'Z', 'Η':'H', 'Θ':'8',
+    'Ι':'I', 'Κ':'K', 'Λ':'L', 'Μ':'M', 'Ν':'N', 'Ξ':'3', 'Ο':'O', 'Π':'P',
+    'Ρ':'R', 'Σ':'S', 'Τ':'T', 'Υ':'Y', 'Φ':'F', 'Χ':'X', 'Ψ':'PS', 'Ω':'W',
+    'Ά':'A', 'Έ':'E', 'Ί':'I', 'Ό':'O', 'Ύ':'Y', 'Ή':'H', 'Ώ':'W', 'Ϊ':'I',
+    'Ϋ':'Y',
+    // turkish
+    'ş':'s', 'Ş':'S', 'ı':'i', 'İ':'I',
+    'ğ':'g', 'Ğ':'G',
+    // russian
+    'а':'a', 'б':'b', 'в':'v', 'г':'g', 'д':'d', 'е':'e', 'ё':'yo', 'ж':'zh',
+    'з':'z', 'и':'i', 'й':'j', 'к':'k', 'л':'l', 'м':'m', 'н':'n', 'о':'o',
+    'п':'p', 'р':'r', 'с':'s', 'т':'t', 'у':'u', 'ф':'f', 'х':'h', 'ц':'c',
+    'ч':'ch', 'ш':'sh', 'щ':'sh', 'ъ':'u', 'ы':'y', 'ь':'', 'э':'e', 'ю':'yu',
+    'я':'ya',
+    'А':'A', 'Б':'B', 'В':'V', 'Г':'G', 'Д':'D', 'Е':'E', 'Ё':'Yo', 'Ж':'Zh',
+    'З':'Z', 'И':'I', 'Й':'J', 'К':'K', 'Л':'L', 'М':'M', 'Н':'N', 'О':'O',
+    'П':'P', 'Р':'R', 'С':'S', 'Т':'T', 'У':'U', 'Ф':'F', 'Х':'H', 'Ц':'C',
+    'Ч':'Ch', 'Ш':'Sh', 'Щ':'Sh', 'Ъ':'U', 'Ы':'Y', 'Ь':'', 'Э':'E', 'Ю':'Yu',
+    'Я':'Ya',
+    // ukranian
+    'Є':'Ye', 'І':'I', 'Ї':'Yi', 'Ґ':'G', 'є':'ye', 'і':'i', 'ї':'yi', 'ґ':'g',
+    // czech
+    'č':'c', 'ď':'d', 'ě':'e', 'ň': 'n', 'ř':'r', 'š':'s', 'ť':'t', 'ů':'u',
+    'ž':'z', 'Č':'C', 'Ď':'D', 'Ě':'E', 'Ň': 'N', 'Ř':'R', 'Š':'S', 'Ť':'T',
+    'Ů':'U', 'Ž':'Z',
+    // polish
+    'ą':'a', 'ć':'c', 'ę':'e', 'ł':'l', 'ń':'n', 'ś':'s', 'ź':'z',
+    'ż':'z', 'Ą':'A', 'Ć':'C', 'Ę':'E', 'Ł':'L', 'Ń':'N', 'Ś':'S',
+    'Ź':'Z', 'Ż':'Z',
+    // latvian
+    'ā':'a', 'ē':'e', 'ģ':'g', 'ī':'i', 'ķ':'k', 'ļ':'l', 'ņ':'n',
+    'ū':'u', 'Ā':'A', 'Ē':'E', 'Ģ':'G', 'Ī':'I',
+    'Ķ':'K', 'Ļ':'L', 'Ņ':'N', 'Ū':'U',
+    // lithuanian
+    'ė':'e', 'į':'i', 'ų':'u', 'Ė': 'E', 'Į': 'I', 'Ų':'U',
+    // romanian
+    'ț':'t', 'Ț':'T', 'ţ':'t', 'Ţ':'T', 'ș':'s', 'Ș':'S', 'ă':'a', 'Ă':'A',
+    // vietnamese
+    'Ạ': 'A', 'Ả': 'A', 'Ầ': 'A', 'Ấ': 'A', 'Ậ': 'A', 'Ẩ': 'A', 'Ẫ': 'A',
+    'Ằ': 'A', 'Ắ': 'A', 'Ặ': 'A', 'Ẳ': 'A', 'Ẵ': 'A', 'Ẹ': 'E', 'Ẻ': 'E',
+    'Ẽ': 'E', 'Ề': 'E', 'Ế': 'E', 'Ệ': 'E', 'Ể': 'E', 'Ễ': 'E', 'Ị': 'I',
+    'Ỉ': 'I', 'Ĩ': 'I', 'Ọ': 'O', 'Ỏ': 'O', 'Ồ': 'O', 'Ố': 'O', 'Ộ': 'O',
+    'Ổ': 'O', 'Ỗ': 'O', 'Ơ': 'O', 'Ờ': 'O', 'Ớ': 'O', 'Ợ': 'O', 'Ở': 'O',
+    'Ỡ': 'O', 'Ụ': 'U', 'Ủ': 'U', 'Ũ': 'U', 'Ư': 'U', 'Ừ': 'U', 'Ứ': 'U',
+    'Ự': 'U', 'Ử': 'U', 'Ữ': 'U', 'Ỳ': 'Y', 'Ỵ': 'Y', 'Ỷ': 'Y', 'Ỹ': 'Y',
+    'Đ': 'D', 'ạ': 'a', 'ả': 'a', 'ầ': 'a', 'ấ': 'a', 'ậ': 'a', 'ẩ': 'a',
+    'ẫ': 'a', 'ằ': 'a', 'ắ': 'a', 'ặ': 'a', 'ẳ': 'a', 'ẵ': 'a', 'ẹ': 'e',
+    'ẻ': 'e', 'ẽ': 'e', 'ề': 'e', 'ế': 'e', 'ệ': 'e', 'ể': 'e', 'ễ': 'e',
+    'ị': 'i', 'ỉ': 'i', 'ĩ': 'i', 'ọ': 'o', 'ỏ': 'o', 'ồ': 'o', 'ố': 'o',
+    'ộ': 'o', 'ổ': 'o', 'ỗ': 'o', 'ơ': 'o', 'ờ': 'o', 'ớ': 'o', 'ợ': 'o',
+    'ở': 'o', 'ỡ': 'o', 'ụ': 'u', 'ủ': 'u', 'ũ': 'u', 'ư': 'u', 'ừ': 'u',
+    'ứ': 'u', 'ự': 'u', 'ử': 'u', 'ữ': 'u', 'ỳ': 'y', 'ỵ': 'y', 'ỷ': 'y',
+    'ỹ': 'y', 'đ': 'd',
+    // currency
+    '€': 'euro', '₢': 'cruzeiro', '₣': 'french franc', '£': 'pound',
+    '₤': 'lira', '₥': 'mill', '₦': 'naira', '₧': 'peseta', '₨': 'rupee',
+    '₩': 'won', '₪': 'new shequel', '₫': 'dong', '₭': 'kip', '₮': 'tugrik',
+    '₯': 'drachma', '₰': 'penny', '₱': 'peso', '₲': 'guarani', '₳': 'austral',
+    '₴': 'hryvnia', '₵': 'cedi', '¢': 'cent', '¥': 'yen', '元': 'yuan',
+    '円': 'yen', '﷼': 'rial', '₠': 'ecu', '¤': 'currency', '฿': 'baht',
+    "$": 'dollar', '₹': 'indian rupee',
+    // symbols
+    '©':'(c)', 'œ': 'oe', 'Œ': 'OE', '∑': 'sum', '®': '(r)', '†': '+',
+    '“': '"', '”': '"', '‘': "'", '’': "'", '∂': 'd', 'ƒ': 'f', '™': 'tm',
+    '℠': 'sm', '…': '...', '˚': 'o', 'º': 'o', 'ª': 'a', '•': '*',
+    '∆': 'delta', '∞': 'infinity', '♥': 'love', '&': 'and', '|': 'or',
+    '<': 'less', '>': 'greater',
+};
+
+slug.defaults.modes = {
+    rfc3986: {
+        replacement: '-',
+        symbols: true,
+        remove: null,
+        lower: true,
+        charmap: slug.defaults.charmap,
+        multicharmap: slug.defaults.multicharmap,
+    },
+    pretty: {
+        replacement: '-',
+        symbols: true,
+        remove: /[.]/g,
+        lower: false,
+        charmap: slug.defaults.charmap,
+        multicharmap: slug.defaults.multicharmap,
+    },
+};
+
+// Be compatible with different module systems
+
+if (true) { // AMD
+    // dont load symbols table in the browser
+    for (var key in slug.defaults.modes) {
+        if (!slug.defaults.modes.hasOwnProperty(key))
+            continue;
+
+        slug.defaults.modes[key].symbols = false;
+    }
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {return slug}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+} else if (typeof module !== 'undefined' && module.exports) { // CommonJS
+    symbols(); // preload symbols table
+    module.exports = slug;
+} else { // Script tag
+    // dont load symbols table in the browser
+    for (var key in slug.defaults.modes) {
+        if (!slug.defaults.modes.hasOwnProperty(key))
+            continue;
+
+        slug.defaults.modes[key].symbols = false;
+    }
+    root.slug = slug;
+}
+
+}(this));
+
 
 /***/ }),
 /* 10 */
@@ -1332,40 +1571,52 @@ module.exports = "<div class=\"node-view container-fluid\" data-node-view-id=\"<
 /* 11 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"clauses-view\">\n   <%= html %>\n</div>"
+module.exports = "<div class=\"main-view\">\n\n   <header class=\"main-header\">\n      <button class=\"add btn btn-primary\">Add new node</button>\n      <button class=\"save btn btn-primary\">Save schema</button>\n   </header>\n\n   <div class=\"no-nodes-yet alert alert-warning\">there are no nodes yet</div>\n\n   <div class=\"list\"></div>\n\n</div>"
 
 /***/ }),
 /* 12 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>"
+module.exports = "<div class=\"node-view container-fluid\" data-node-view-id=\"<%= id %>\">\n\n   <nav class=\"row node-info\">\n\n      <div class=\"col-md-6\">\n         <span class=\"type-label\">\n            <em class=\"type-node\">node</em>\n            <em class=\"type-value\">value</em>\n         </span>\n         <span class=\"name-label\"></span>\n      </div>\n\n      <div class=\"buttons text-right col-md-6\">\n         <button class=\"up btn\">Up</button>\n         <button class=\"down btn\">Down</button>\n         <button class=\"add-child-node btn\">Add child node</button>\n         <button class=\"add-value-input btn\">Add value input</button>\n         <button class=\"reparent btn\">Reparent</button>\n         <button class=\"delete btn\">Delete</button>\n      </div>\n\n   </nav>\n\n   <div class=\"debugger row\"></div>\n\n   <div class=\"row\">\n\n      <div class=\"col-md-4\">\n         <div class=\"form-group\">\n            <label>Name</label>\n            <input name=\"name\" type='text' class='name form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Type</label>\n            <select name=\"type\" class='type form-control'>\n               <option value=\"-\">-</option>\n               <option value=\"checkbox\">checkbox</option>\n               <option value=\"radio\">radio</option>\n               <option value=\"text\">text</option>\n               <option value=\"number\">number</option>\n            </select>\n         </div>\n\n         <div class=\"config\"></div>\n      </div>\n\n      <div class=\"col-md-4\">\n         <div class=\"form-group\">\n            <label>Title (IT)</label>\n            <input name=\"title_it\" type='text' class='title_it form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Title (EN)</label>\n            <input name=\"title_en\" type='text' class='title_en form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Title (DE)</label>\n            <input name=\"title_de\" type='text' class='title_de form-control' />\n         </div>\n      </div>\n\n      <div class=\"col-md-4\">\n         <div class=\"checkbox\">\n            <label>\n               <input name=\"exclusive-behaviour\" class=\"exclusive-behaviour\" type='checkbox' />\n               Child nodes will show an exclusive behaviour (only one can be selected at a time)</label>\n         </div>\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <button class=\"expand btn\"></button>\n      <div class=\"box\"></div>\n   </div>\n\n   <div class=\"value-views\">\n      <div class=\"box\"></div>\n   </div>\n\n   <div class=\"node-views\">\n      <div class=\"box\"></div>\n   </div>\n\n</div>"
 
 /***/ }),
 /* 13 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"config-view number-config-view\">\n\n   <button class=\"expand btn\"></button>\n\n   <section>\n      <div class=\"form-group\">\n         <label>Default</label>\n         <input type='text' name=\"default\" class='default form-control' />\n      </div>\n\n      <div class=\"form-group\">\n         <label>Min</label>\n         <input type='text' name=\"min\" class='min form-control' />\n      </div>\n\n      <div class=\"form-group\">\n         <label>Max</label>\n         <input type='text' name=\"max\" class='max form-control' />\n      </div>\n   </section>\n\n</div>"
+module.exports = "<div class=\"clauses-view\">\n   <%= html %>\n</div>"
 
 /***/ }),
 /* 14 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"config-view text-config-view\">\n\n   <button class=\"expand btn\"></button>\n\n   <section>\n\n      <div class=\"form-group\">\n         <label>Validation type</label>\n         <select name=\"validation\" class=\"validation form-control\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"form-group\">\n         <label>Default</label>\n         <input type='text' name=\"default\" class='default form-control' />\n      </div>\n   </section>\n\n</div>"
+module.exports = "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>"
 
 /***/ }),
 /* 15 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"config-view radio-config-view\">\n\n   <button class=\"expand btn\"></button>\n\n   <div class=\"prototype choice-box\" style=\"display: none\">\n      <div class=\"form-group\">\n         <label>Label</label>\n         <input type=\"text\" name=\"choice-label\" class=\"choice-label form-control\" />\n      </div>\n      <div class=\"form-group\">\n         <label>Value</label>\n         <input type=\"text\" name=\"choice-value\" class=\"choice-value form-control\" />\n      </div>    \n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"form-group\">\n         <label>Default</label>\n         <input type=\"text\" name=\"default\" class=\"default form-control\" />\n      </div>\n\n      <div class=\"form-group\">\n         <label>Validation type</label>\n         <select name=\"validation\" class=\"validation form-control\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"radios\"></div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n   </section>\n\n</div>"
+module.exports = "<div class=\"config-view number-config-view\">\n\n   <button class=\"expand btn\"></button>\n\n   <section>\n      <div class=\"form-group\">\n         <label>Default</label>\n         <input type='text' name=\"default\" class='default form-control' />\n      </div>\n\n      <div class=\"form-group\">\n         <label>Min</label>\n         <input type='text' name=\"min\" class='min form-control' />\n      </div>\n\n      <div class=\"form-group\">\n         <label>Max</label>\n         <input type='text' name=\"max\" class='max form-control' />\n      </div>\n   </section>\n\n</div>"
 
 /***/ }),
 /* 16 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"reparent-node-view\">\n\n   <span class=\"close\">Close (Esc)</span>\n\n   <div class=\"warning bg-warning\"></div>\n\n   <div class=\"form-group\">\n      <label>Choose the new parent</label>\n      <select class=\"form-control\"></select>\n   </div>\n\n   <button class=\"btn\">Reparent</button>\n\n</div>"
+module.exports = "<div class=\"config-view text-config-view\">\n\n   <button class=\"expand btn\"></button>\n\n   <section>\n\n      <div class=\"form-group\">\n         <label>Validation type</label>\n         <select name=\"validation\" class=\"validation form-control\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"form-group\">\n         <label>Default</label>\n         <input type='text' name=\"default\" class='default form-control' />\n      </div>\n   </section>\n\n</div>"
 
 /***/ }),
 /* 17 */
+/***/ (function(module, exports) {
+
+module.exports = "<div class=\"config-view radio-config-view\">\n\n   <button class=\"expand btn\"></button>\n\n   <div class=\"prototype choice-box\" style=\"display: none\">\n      <div class=\"form-group\">\n         <label>Label</label>\n         <input type=\"text\" name=\"choice-label\" class=\"choice-label form-control\" />\n      </div>\n      <div class=\"form-group\">\n         <label>Value</label>\n         <input type=\"text\" name=\"choice-value\" class=\"choice-value form-control\" />\n      </div>    \n      <span class=\"remove-choice\">remove (-)</span>\n   </div>\n\n   <section>\n      <div class=\"form-group\">\n         <label>Default</label>\n         <input type=\"text\" name=\"default\" class=\"default form-control\" />\n      </div>\n\n      <div class=\"form-group\">\n         <label>Validation type</label>\n         <select name=\"validation\" class=\"validation form-control\">\n            <option value=\"-\">-</option>\n            <option value=\"required\">required</option>\n         </select>\n      </div>\n\n      <div class=\"radios\"></div>\n\n      <span class=\"add-choice\">Add a choice (+)</span>\n\n   </section>\n\n</div>"
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports) {
+
+module.exports = "<div class=\"reparent-node-view\">\n\n   <span class=\"close\">Close (Esc)</span>\n\n   <div class=\"warning bg-warning\"></div>\n\n   <div class=\"form-group\">\n      <label>Choose the new parent</label>\n      <select class=\"form-control\"></select>\n   </div>\n\n   <button class=\"btn\">Reparent</button>\n\n</div>"
+
+/***/ }),
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const $ = __webpack_require__(0);
@@ -1422,15 +1673,15 @@ class ClausesView {
 module.exports = ClausesView;
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const $ = __webpack_require__(0);
 const ConfigView = __webpack_require__(3);
-const CheckboxConfigView = __webpack_require__(19);
-const NumberConfigView = __webpack_require__(20);
-const RadioConfigView = __webpack_require__(21);
-const TextConfigView = __webpack_require__(22);
+const CheckboxConfigView = __webpack_require__(21);
+const NumberConfigView = __webpack_require__(22);
+const RadioConfigView = __webpack_require__(23);
+const TextConfigView = __webpack_require__(24);
 
 module.exports = function(configType, nodeViewId, nodeModel, eventHub) {
 
@@ -1464,7 +1715,7 @@ module.exports = function(configType, nodeViewId, nodeModel, eventHub) {
 };
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const $ = __webpack_require__(0);
@@ -1495,7 +1746,7 @@ class CheckboxConfigView extends ConfigView {
 module.exports = CheckboxConfigView;
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const $ = __webpack_require__(0);
@@ -1550,7 +1801,7 @@ class NumberConfigView extends ConfigView {
 module.exports = NumberConfigView;
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const $ = __webpack_require__(0);
@@ -1695,7 +1946,7 @@ class RadioConfigView extends ConfigView {
 module.exports = RadioConfigView;
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const $ = __webpack_require__(0);
@@ -1737,7 +1988,7 @@ class TextConfigView extends ConfigView {
 module.exports = TextConfigView;
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const _ = __webpack_require__(2);
@@ -1768,6 +2019,10 @@ class ValueView extends NodeView {
 
    _renderClauses() {
       // does nothing as a value node has no clauses
+   }
+
+   _showTypeLabel() {
+      this._root.find(".type-label .type-value").css("display", "inline");
    }
 }
 

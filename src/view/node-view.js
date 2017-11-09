@@ -1,5 +1,6 @@
-const _ = require('underscore');
 const $ = require('jquery');
+const _ = require('underscore');
+const slug = require('slug');
 const templates = require('./../templates');
 const ClausesView = require('./clauses-view');
 const buildConfigView = require('./config/build-config-view');
@@ -11,6 +12,7 @@ class NodeView {
 
    constructor(id, name, model, clauses, eventHub) {
       this._rendered = false;
+      this._root;
       this._id = id;
       this._parentId;
       this._name = name;
@@ -32,6 +34,10 @@ class NodeView {
 
       this._nodeViewsOrderManager = new NodesOrderManager([]);
       this._valueViewsOrderManager = new NodesOrderManager([]);
+
+      if (!this._model.title) {
+         this._model.title = "";
+      }
    }
 
    getPosition() {
@@ -315,6 +321,7 @@ class NodeView {
 
       this._renderConfigView(configType);
       this._renderClauses();
+      this._showTypeLabel();
 
       this._behaviour();
 
@@ -388,12 +395,14 @@ class NodeView {
       this._root.click((e) => {
          e.stopPropagation(); // this prevents the event from being fired when clicking on child nodes
          var trg = $(e.target);
-
          if (trg.is("input, select")) {
             trg.removeClass("error");
          }
+      });
 
-         if (trg.is(".buttons") || trg.is(".name-label")) {
+      this._root.find(".node-info").click((e) => {
+         var trg = $(e.target);
+         if (!trg.is("button")) {
             this._root.toggleClass("collapsed");
          }
       });
@@ -417,13 +426,26 @@ class NodeView {
          this._eventHub.trigger("node-name-has-been-updated", [this._id, this._name]);
       });
 
-      this._titleInput_IT.on("keyup", () => {
-         this._model._iub_title_it = this._titleInput_IT.val();
+      this._titleInput_EN.on("keyup", () => {
+         var currentTitle = this._model.title;
+         var newTitle = this._titleInput_EN.val();
+         var slagCurrentTitle = slug(currentTitle).toLowerCase();
+         var slagNewTitle = slug(newTitle).toLowerCase();
+         this._model.title = newTitle;
+         this._model._iub_title_en = newTitle;
+         if (!this._name ||slagCurrentTitle === this._name) {
+            this._name = slagNewTitle;
+            this._nameInput.val(slagNewTitle).removeClass("error");
+            this._nameLabel.text(slagNewTitle);
+         }
       });
 
-      this._titleInput_EN.on("keyup", () => {
-         this._model.title = this._titleInput_EN.val();
-         this._model._iub_title_en = this._titleInput_EN.val();
+      this._titleInput_EN.on("blur", () => {
+         this._nameInput.trigger("blur");
+      });
+
+      this._titleInput_IT.on("keyup", () => {
+         this._model._iub_title_it = this._titleInput_IT.val();
       });
 
       this._titleInput_DE.on("keyup", () => {
@@ -634,6 +656,10 @@ class NodeView {
 
    _removeValueViewFromOrderManager(node) {
       this._valueViewsOrderManager.removeNode(node);
+   }
+
+   _showTypeLabel() {
+      this._root.find(".type-label .type-node").css("display", "inline");
    }
 }
 
