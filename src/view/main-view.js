@@ -89,7 +89,7 @@ class MainView {
          var newNode = this._buildNode("node-view", String(this._getNextId()), "", {});
          this._renderNode("node-view", newNode);
          this._handleNoNodesYetMessage();
-         // scrolling.scrollToBottom();
+         scrolling.scrollToBottom();
       });
 
       this._eventHub.on("please-delete-node", (e, id) => {
