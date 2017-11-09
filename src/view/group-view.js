@@ -24,7 +24,7 @@ class GroupView extends NodeView {
       this._addValueViewButton.remove();
       this._clausesSection.remove();
       this._addGroupViewButton.remove();
-      
+
       this._valueViewsSection.remove();
 
       this._nameInput.val(this._name).parent().hide();
@@ -48,6 +48,10 @@ class GroupView extends NodeView {
 
    _renderClauses() {
       // does nothing as a group node has no clauses
+   }
+
+   _showTypeLabel() {
+      this._root.find(".type-label .type-radio-group").css("display", "inline");
    }
 }
 

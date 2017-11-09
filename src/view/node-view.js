@@ -429,11 +429,11 @@ class NodeView {
       this._titleInput_EN.on("keyup", () => {
          var currentTitle = this._model.title;
          var newTitle = this._titleInput_EN.val();
-         var slagCurrentTitle = slug(currentTitle).toLowerCase();
-         var slagNewTitle = slug(newTitle).toLowerCase();
+         var slagCurrentTitle = slug(currentTitle, "_").toLowerCase();
+         var slagNewTitle = slug(newTitle, "_").toLowerCase();
          this._model.title = newTitle;
          this._model._iub_title_en = newTitle;
-         if (!this._name ||slagCurrentTitle === this._name) {
+         if (!this._name || slagCurrentTitle === this._name) {
             this._name = slagNewTitle;
             this._nameInput.val(slagNewTitle).removeClass("error");
             this._nameLabel.text(slagNewTitle);
