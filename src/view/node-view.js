@@ -14,7 +14,6 @@ class NodeView {
       this._rendered = false;
       this._root;
       this._id = id;
-      this._parentId;
       this._model = model;
       this._clauses = clauses;
 
@@ -55,10 +54,6 @@ class NodeView {
    }
 
    getParentId() {
-      return this._parentId;
-   }
-
-   getParentName() {
       return this.getModel()._iub_parent;
    }
 
@@ -104,7 +99,6 @@ class NodeView {
       } else {
          this._model._iub_parent = id;
       }
-      this._parentId = id;
    }
 
    appendNodeView(view) {
@@ -334,7 +328,6 @@ class NodeView {
          if (window.location.href.indexOf("debugger") > -1) {
             setInterval(() => {
                data = this.getData();
-               data.parentId = this._parentId;
                let oldJSON = debuggerBox.text();
                let newJSON = JSON.stringify(data, null, "  ");
                if (oldJSON !== newJSON) {

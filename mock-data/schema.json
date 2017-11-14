@@ -18,6 +18,20 @@
          "title": "Are you providing paid goods and/or paid services in your application?",
          "type": "boolean",
          "_iub_position": 2
+      },
+      "node-4": {
+         "title": "son 1",
+         "_iub_parent": "node-2",
+         "type": "boolean",
+         "_iub_position": 2,
+         "_iub_title_en": "son 1"
+      },
+      "node-5": {
+         "title": "son 2",
+         "_iub_parent": "node-2",
+         "type": "boolean",
+         "_iub_position": 1,
+         "_iub_title_en": "son 2"
       }
    }
 }

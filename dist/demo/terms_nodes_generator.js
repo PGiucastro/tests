@@ -164,7 +164,6 @@ class NodeView {
       this._rendered = false;
       this._root;
       this._id = id;
-      this._parentId;
       this._model = model;
       this._clauses = clauses;
 
@@ -205,10 +204,6 @@ class NodeView {
    }
 
    getParentId() {
-      return this._parentId;
-   }
-
-   getParentName() {
       return this.getModel()._iub_parent;
    }
 
@@ -254,7 +249,6 @@ class NodeView {
       } else {
          this._model._iub_parent = id;
       }
-      this._parentId = id;
    }
 
    appendNodeView(view) {
@@ -484,7 +478,6 @@ class NodeView {
          if (window.location.href.indexOf("debugger") > -1) {
             setInterval(() => {
                data = this.getData();
-               data.parentId = this._parentId;
                let oldJSON = debuggerBox.text();
                let newJSON = JSON.stringify(data, null, "  ");
                if (oldJSON !== newJSON) {
@@ -1006,8 +999,6 @@ class MainView {
          this._buildNode(type, id, nodes[id]);
       }
 
-      this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
-
       for (var i = 0; i < this._nodeViews.length; i++) {
          let type = this._getTypeByModel(this._nodeViews[i].getModel());
          this._renderNode(type, this._nodeViews[i]);
@@ -1063,7 +1054,7 @@ class MainView {
       });
 
       this._eventHub.on("please-create-child-node", (e, type, parentNodeId) => {
-         var newNode = this._buildNode(type, String(this._getNextId()), "", {});
+         var newNode = this._buildNode(type, this._getNextId(), {});
          newNode.setParentId(parentNodeId);
          this._renderNode(type, newNode);
          scrolling.scrollToNode(newNode);
@@ -1213,18 +1204,6 @@ class MainView {
          if (view.getId() === id) {
             return view;
          }
-      }
-   }
-
-   _setNodeViewsParentId() {
-      for (var i = 0; i < this._nodeViews.length; i++) {
-         var view = this._nodeViews[i];
-         var parentName = view.getParentName();
-         var parentId;
-         if (parentName) {
-            parentId = this._getViewByName(parentName).getId();
-         }
-         view.setParentId(parentId);
       }
    }
 
