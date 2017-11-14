@@ -13,7 +13,7 @@ const FORBIDDEN_NAME_ERROR_MESSAGE = "You have chosen a name that is forbidden o
 class MainView {
 
    constructor(eventHub, forbiddenNames) {
-      this._lastUsedId = 0;
+      this._lastUsedNumericId = 0;
       this._eventHub = eventHub;
       this._forbiddenNames = forbiddenNames;
       this._nodeViews = [];
@@ -56,9 +56,13 @@ class MainView {
 
       this._clausesModel = clauses;
 
-      for (var name in nodes) {
-         let type = this._getTypeByModel(nodes[name]);
-         this._buildNode(type, String(this._getNextId()), name, nodes[name]);
+      for (var id in nodes) {
+         var currentNumericId = parseInt(id.split("-")[1]);
+         if (currentNumericId > this._lastUsedNumericId) {
+            this._lastUsedNumericId = currentNumericId;
+         }
+         let type = this._getTypeByModel(nodes[id]);
+         this._buildNode(type, id, nodes[id]);
       }
 
       this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
@@ -86,7 +90,7 @@ class MainView {
 
       this._addButton.click((e) => {
          e.preventDefault();
-         var newNode = this._buildNode("node-view", String(this._getNextId()), "", {});
+         var newNode = this._buildNode("node-view", this._getNextId(), {});
          this._renderNode("node-view", newNode);
          this._handleNoNodesYetMessage();
          scrolling.scrollToBottom();
@@ -117,33 +121,15 @@ class MainView {
          console.log("remaining nodes and values referenced by main-view", this._nodeViews.length);
       });
 
-      this._eventHub.on("node-name-has-been-updated", (e, id, newName) => {
-         var node;
-         var valid = this._validateNodeName(id, newName);
-         if (valid) {
-            this._getViewById(id).setLastValidName(newName);
-            for (var i = 0; i < this._nodeViews.length; i++) {
-               node = this._nodeViews[i];
-               if (node.getParentId() === id) {
-                  node.setParentName(newName);
-               }
-            }
-         } else {
-            this._getViewById(id).revertNameToLastValidOne();
-            alert(FORBIDDEN_NAME_ERROR_MESSAGE);
-         }
-      });
-
-      this._eventHub.on("please-create-child-node", (e, type, parentNodeId, parentNodeName) => {
+      this._eventHub.on("please-create-child-node", (e, type, parentNodeId) => {
          var newNode = this._buildNode(type, String(this._getNextId()), "", {});
          newNode.setParentId(parentNodeId);
-         newNode.setParentName(parentNodeName);
          this._renderNode(type, newNode);
          scrolling.scrollToNode(newNode);
       });
 
       this._eventHub.on("please-show-reparent-node-view", (e, node) => {
-         console.log("show reparent view for view " + node.getName());
+         console.log("show reparent view for view " + node.getId());
          this._reparentNodeview.setNodeToBeReparented(node);
          this._reparentNodeview.show(this._nodeViews);
       });
@@ -183,32 +169,14 @@ class MainView {
       });
    }
 
-   _validateNodeName(id, name) {
-      var node;
-
-      if (this._forbiddenNames.indexOf($.trim(name).toLowerCase()) > -1) {
-         return false;
-      }
-
-      for (var i = 0; i < this._nodeViews.length; i++) {
-         node = this._nodeViews[i];
-         if (node.getId() !== id) {
-            if (node.getName() === name) {
-               return false;
-            }
-         }
-      }
-      return true;
-   }
-
-   _buildNode(type, id, name, nodeModel) {
+   _buildNode(type, id, nodeModel) {
       var nodeView;
       if (type === "node-view") {
-         nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
+         nodeView = new NodeView(id, nodeModel, this._clausesModel, this._eventHub);
       } else if (type === "value-view") {
-         nodeView = new ValueView(id, name, nodeModel, this._clausesModel, this._eventHub);
+         nodeView = new ValueView(id, nodeModel, this._clausesModel, this._eventHub);
       } else if (type === "group-view") {
-         nodeView = new GroupView(id, name, nodeModel, this._clausesModel, this._eventHub);
+         nodeView = new GroupView(id, nodeModel, this._clausesModel, this._eventHub);
       } else {
          throw `Unknown type [${type}]`;
       }
@@ -280,10 +248,10 @@ class MainView {
       }
    }
 
-   _getViewByName(name) {
+   _getViewById(id) {
       for (var i = 0; i < this._nodeViews.length; i++) {
          var view = this._nodeViews[i];
-         if (view.getName() === name) {
+         if (view.getId() === id) {
             return view;
          }
       }
@@ -320,8 +288,8 @@ class MainView {
    }
 
    _getNextId() {
-      this._lastUsedId++;
-      return this._lastUsedId;
+      this._lastUsedNumericId++;
+      return "node-" + this._lastUsedNumericId;
    }
 
    _getTypeByModel(model) {

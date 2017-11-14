@@ -72,8 +72,10 @@
   height: 245px;
   margin-bottom: 30px; }
 
-.node-view .clauses .box {
-  display: none; }
+.node-view .clauses {
+  margin-top: 30px; }
+  .node-view .clauses .box {
+    display: none; }
 
 .node-view .node-views,
 .node-view .value-views {

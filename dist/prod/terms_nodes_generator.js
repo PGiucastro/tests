@@ -127,6 +127,10 @@ class ConfigView {
       this._root.find("select").on("change", () => {
          this._triggerConfigUpdate();
       });
+
+      this._root.find("input[type='checkbox']").on("click", () => {
+         this._triggerConfigUpdate();
+      });
    }
 
    _triggerConfigUpdate() {
@@ -156,13 +160,11 @@ const scrolling = __webpack_require__(7);
 
 class NodeView {
 
-   constructor(id, name, model, clauses, eventHub) {
+   constructor(id, model, clauses, eventHub) {
       this._rendered = false;
       this._root;
       this._id = id;
       this._parentId;
-      this._name = name;
-      this._lastValidName = name;
       this._model = model;
       this._clauses = clauses;
 
@@ -210,10 +212,6 @@ class NodeView {
       return this.getModel()._iub_parent;
    }
 
-   getName() {
-      return this._name;
-   }
-
    getModel() {
       return this._model;
    }
@@ -225,18 +223,9 @@ class NodeView {
    getData() {
       return {
          id: this._id,
-         name: this._name,
          model: this._model,
          clauses: this.getClauses()
       };
-   }
-
-   setParentId(id) {
-      if (id) {
-         this._parentId = id;
-      } else {
-         delete this._parentId;
-      }
    }
 
    setPosition(index) {
@@ -259,26 +248,13 @@ class NodeView {
       this._removeFromPositionManager = f;
    }
 
-   setParentName(name) {
-      if (!name) {
+   setParentId(id) {
+      if (!id) {
          delete this._model._iub_parent;
       } else {
-         this._model._iub_parent = name;
+         this._model._iub_parent = id;
       }
-   }
-
-   setName(name) {
-      this._name = name;
-      this._nameInput.val(this._name);
-      this._nameLabel.text(this._name);
-   }
-
-   setLastValidName(name) {
-      this._lastValidName = name;
-   }
-
-   revertNameToLastValidOne() {
-      this.setName(this._lastValidName);
+      this._parentId = id;
    }
 
    appendNodeView(view) {
@@ -301,7 +277,7 @@ class NodeView {
       }
 
       this._handleNodeViewsSectionVisibility();
-      console.log(this._name + " now references " + this._nodeViews.length + " nodes");
+      console.log(this._id + " now references " + this._nodeViews.length + " nodes");
    }
 
    appendValueView(view) {
@@ -324,7 +300,7 @@ class NodeView {
       }
 
       this._handleValueViewsSectionVisibility();
-      console.log(this._name + " now references " + this._valueViews.length + " values");
+      console.log(this._id + " now references " + this._valueViews.length + " values");
    }
 
    /** 
@@ -357,8 +333,8 @@ class NodeView {
 
       this._handleNodeViewsSectionVisibility();
 
-      console.log(this._name + " has now " + this._nodeViews.length + " children", this._nodeViews.map((n) => {
-         return n.getName();
+      console.log(this._id + " has now " + this._nodeViews.length + " children", this._nodeViews.map((n) => {
+         return n.getId();
       }));
    }
 
@@ -379,8 +355,8 @@ class NodeView {
          }
       });
 
-      console.log("remaining nodes referenced by " + this._name, this._nodeViews.length);
-      console.log("remaining values referenced by " + this._name, this._valueViews.length);
+      console.log("remaining nodes referenced by " + this._id, this._nodeViews.length);
+      console.log("remaining values referenced by " + this._id, this._valueViews.length);
 
       this._handleNodeViewsSectionVisibility();
       this._handleValueViewsSectionVisibility();
@@ -436,8 +412,6 @@ class NodeView {
          id: this._id
       }));
 
-      this._nameLabel = this._root.find(".name-label");
-      this._nameInput = this._root.find(".name");
       this._titleInput_IT = this._root.find(".title_it");
       this._titleInput_EN = this._root.find(".title_en");
       this._titleInput_DE = this._root.find(".title_de");
@@ -482,11 +456,6 @@ class NodeView {
 
       this._removeErrors();
 
-      if ($.trim(this._nameInput.val()) === "") {
-         this._nameInput.addClass("error");
-         valid = false;
-      }
-
       if ($.trim(this._typeInput.val()) === "-") {
          this._typeInput.addClass("error");
          valid = false;
@@ -496,17 +465,6 @@ class NodeView {
          this._titleInput_EN.addClass("error");
          valid = false;
       }
-
-//      NOT YET
-//      if ($.trim(this._titleInput_IT.val()) === "") {
-//         this._titleInput_IT.addClass("error");
-//         valid = false;
-//      }
-//
-//      if ($.trim(this._titleInput_DE.val()) === "") {
-//         this._titleInput_DE.addClass("error");
-//         valid = false;
-//      }
 
       if (this._configView) {
          let configValid = this._configView.validate();
@@ -563,31 +521,10 @@ class NodeView {
          this._moveDown(this);
       });
 
-      this._nameInput.on("keyup", () => {
-         this._name = this._nameInput.val();
-         this._nameLabel.text(this._name);
-      });
-
-      this._nameInput.on("blur", () => {
-         this._eventHub.trigger("node-name-has-been-updated", [this._id, this._name]);
-      });
-
       this._titleInput_EN.on("keyup", () => {
-         var currentTitle = this._model.title;
          var newTitle = this._titleInput_EN.val();
-         var slagCurrentTitle = slug(currentTitle, "_").toLowerCase();
-         var slagNewTitle = slug(newTitle, "_").toLowerCase();
          this._model.title = newTitle;
          this._model._iub_title_en = newTitle;
-         if (!this._name || slagCurrentTitle === this._name) {
-            this._name = slagNewTitle;
-            this._nameInput.val(slagNewTitle).removeClass("error");
-            this._nameLabel.text(slagNewTitle);
-         }
-      });
-
-      this._titleInput_EN.on("blur", () => {
-         this._nameInput.trigger("blur");
       });
 
       this._titleInput_IT.on("keyup", () => {
@@ -621,17 +558,17 @@ class NodeView {
 
       this._addNodeViewButton.click((e) => {
          e.preventDefault();
-         this._eventHub.trigger("please-create-child-node", ["node-view", this.getId(), this.getName()]);
+         this._eventHub.trigger("please-create-child-node", ["node-view", this.getId()]);
       });
 
       this._addValueViewButton.click((e) => {
          e.preventDefault();
-         this._eventHub.trigger("please-create-child-node", ["value-view", this.getId(), this.getName()]);
+         this._eventHub.trigger("please-create-child-node", ["value-view", this.getId()]);
       });
 
       this._addGroupViewButton.click((e) => {
          e.preventDefault();
-         this._eventHub.trigger("please-create-child-node", ["group-view", this.getId(), this.getName()]);
+         this._eventHub.trigger("please-create-child-node", ["group-view", this.getId()]);
       });
 
       this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);
@@ -694,7 +631,7 @@ class NodeView {
 
       this._configView = buildConfigView(type, this._id, this._model, this._eventHub);
 
-      if (this._configView) { // newly created nodes have empty model so the created config view undefined
+      if (this._configView) { // newly created nodes have empty model so the created config view is undefined
          this._configSection.empty().append(this._configView.render());
       }
    }
@@ -707,8 +644,6 @@ class NodeView {
    }
 
    _loadModelData() {
-      this._nameLabel.text(this._name);
-      this._nameInput.val(this._name);
       this._titleInput_IT.val(this._model.title_it);
       this._titleInput_EN.val(this._model.title);
       this._titleInput_DE.val(this._model.title_de);
@@ -1019,7 +954,7 @@ const FORBIDDEN_NAME_ERROR_MESSAGE = "You have chosen a name that is forbidden o
 class MainView {
 
    constructor(eventHub, forbiddenNames) {
-      this._lastUsedId = 0;
+      this._lastUsedNumericId = 0;
       this._eventHub = eventHub;
       this._forbiddenNames = forbiddenNames;
       this._nodeViews = [];
@@ -1062,9 +997,13 @@ class MainView {
 
       this._clausesModel = clauses;
 
-      for (var name in nodes) {
-         let type = this._getTypeByModel(nodes[name]);
-         this._buildNode(type, String(this._getNextId()), name, nodes[name]);
+      for (var id in nodes) {
+         var currentNumericId = parseInt(id.split("-")[1]);
+         if (currentNumericId > this._lastUsedNumericId) {
+            this._lastUsedNumericId = currentNumericId;
+         }
+         let type = this._getTypeByModel(nodes[id]);
+         this._buildNode(type, id, nodes[id]);
       }
 
       this._setNodeViewsParentId(); // only done at startup to map parents names (available in the model) onto ids (assigned to nodes at runtime)
@@ -1092,7 +1031,7 @@ class MainView {
 
       this._addButton.click((e) => {
          e.preventDefault();
-         var newNode = this._buildNode("node-view", String(this._getNextId()), "", {});
+         var newNode = this._buildNode("node-view", this._getNextId(), {});
          this._renderNode("node-view", newNode);
          this._handleNoNodesYetMessage();
          scrolling.scrollToBottom();
@@ -1123,33 +1062,15 @@ class MainView {
          console.log("remaining nodes and values referenced by main-view", this._nodeViews.length);
       });
 
-      this._eventHub.on("node-name-has-been-updated", (e, id, newName) => {
-         var node;
-         var valid = this._validateNodeName(id, newName);
-         if (valid) {
-            this._getViewById(id).setLastValidName(newName);
-            for (var i = 0; i < this._nodeViews.length; i++) {
-               node = this._nodeViews[i];
-               if (node.getParentId() === id) {
-                  node.setParentName(newName);
-               }
-            }
-         } else {
-            this._getViewById(id).revertNameToLastValidOne();
-            alert(FORBIDDEN_NAME_ERROR_MESSAGE);
-         }
-      });
-
-      this._eventHub.on("please-create-child-node", (e, type, parentNodeId, parentNodeName) => {
+      this._eventHub.on("please-create-child-node", (e, type, parentNodeId) => {
          var newNode = this._buildNode(type, String(this._getNextId()), "", {});
          newNode.setParentId(parentNodeId);
-         newNode.setParentName(parentNodeName);
          this._renderNode(type, newNode);
          scrolling.scrollToNode(newNode);
       });
 
       this._eventHub.on("please-show-reparent-node-view", (e, node) => {
-         console.log("show reparent view for view " + node.getName());
+         console.log("show reparent view for view " + node.getId());
          this._reparentNodeview.setNodeToBeReparented(node);
          this._reparentNodeview.show(this._nodeViews);
       });
@@ -1189,32 +1110,14 @@ class MainView {
       });
    }
 
-   _validateNodeName(id, name) {
-      var node;
-
-      if (this._forbiddenNames.indexOf($.trim(name).toLowerCase()) > -1) {
-         return false;
-      }
-
-      for (var i = 0; i < this._nodeViews.length; i++) {
-         node = this._nodeViews[i];
-         if (node.getId() !== id) {
-            if (node.getName() === name) {
-               return false;
-            }
-         }
-      }
-      return true;
-   }
-
-   _buildNode(type, id, name, nodeModel) {
+   _buildNode(type, id, nodeModel) {
       var nodeView;
       if (type === "node-view") {
-         nodeView = new NodeView(id, name, nodeModel, this._clausesModel, this._eventHub);
+         nodeView = new NodeView(id, nodeModel, this._clausesModel, this._eventHub);
       } else if (type === "value-view") {
-         nodeView = new ValueView(id, name, nodeModel, this._clausesModel, this._eventHub);
+         nodeView = new ValueView(id, nodeModel, this._clausesModel, this._eventHub);
       } else if (type === "group-view") {
-         nodeView = new GroupView(id, name, nodeModel, this._clausesModel, this._eventHub);
+         nodeView = new GroupView(id, nodeModel, this._clausesModel, this._eventHub);
       } else {
          throw `Unknown type [${type}]`;
       }
@@ -1286,10 +1189,10 @@ class MainView {
       }
    }
 
-   _getViewByName(name) {
+   _getViewById(id) {
       for (var i = 0; i < this._nodeViews.length; i++) {
          var view = this._nodeViews[i];
-         if (view.getName() === name) {
+         if (view.getId() === id) {
             return view;
          }
       }
@@ -1326,8 +1229,8 @@ class MainView {
    }
 
    _getNextId() {
-      this._lastUsedId++;
-      return this._lastUsedId;
+      this._lastUsedNumericId++;
+      return "node-" + this._lastUsedNumericId;
    }
 
    _getTypeByModel(model) {
@@ -1575,7 +1478,7 @@ module.exports = "<div class=\"main-view\">\n\n   <header class=\"main-header\">
 /* 12 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"node-view container-fluid\" data-node-view-id=\"<%= id %>\">\n\n   <nav class=\"row node-info\">\n\n      <div class=\"col-md-6\">\n         <span class=\"type-label\">\n            <em class=\"type-node\">node</em>\n            <em class=\"type-value\">value</em>\n            <em class=\"type-radio-group\">radio group</em>\n         </span>\n         <span class=\"name-label\"></span>\n      </div>\n\n      <div class=\"buttons text-right col-md-6\">\n         <button class=\"up btn\">Move Up</button>\n         <button class=\"down btn\">Move Down</button>\n         <button class=\"add-child-node btn\">Add child node</button>\n         <button class=\"add-value-input btn\">Add value input</button>\n         <button class=\"add-group btn\">Add radio group</button>\n         <button class=\"reparent btn\">Reparent</button>\n         <button class=\"delete btn\">Delete</button>\n      </div>\n\n   </nav>\n\n   <div class=\"debugger row\"></div>\n\n   <div class=\"row\">\n\n      <div class=\"col-md-4\">\n         <div class=\"form-group\">\n            <label>Name</label>\n            <input name=\"name\" type='text' class='name form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Type</label>\n            <select name=\"type\" class='type form-control'>\n               <option value=\"-\">-</option>\n               <option value=\"checkbox\">checkbox</option>\n               <option value=\"radio\">radio</option>\n               <option value=\"text\">text</option>\n               <option value=\"number\">number</option>\n            </select>\n         </div>\n\n         <div class=\"config\"></div>\n      </div>\n\n      <div class=\"col-md-4\">\n         <div class=\"form-group\">\n            <label>Title (IT)</label>\n            <input name=\"title_it\" type='text' class='title_it form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Title (EN)</label>\n            <input name=\"title_en\" type='text' class='title_en form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Title (DE)</label>\n            <input name=\"title_de\" type='text' class='title_de form-control' />\n         </div>\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <button class=\"expand btn\"></button>\n      <div class=\"box\"></div>\n   </div>\n\n   <div class=\"value-views\">\n      <div class=\"box\"></div>\n   </div>\n\n   <div class=\"node-views\">\n      <div class=\"box\"></div>\n   </div>\n\n</div>"
+module.exports = "<div class=\"node-view container-fluid\" data-node-view-id=\"<%= id %>\">\n\n   <nav class=\"row node-info\">\n\n      <div class=\"col-md-6\">\n         <span class=\"type-label\">\n            <em class=\"type-node\">node</em>\n            <em class=\"type-value\">value</em>\n            <em class=\"type-radio-group\">radio group</em>\n         </span>\n         <span class=\"name-label\"></span>\n      </div>\n\n      <div class=\"buttons text-right col-md-6\">\n         <button class=\"up btn\">Move Up</button>\n         <button class=\"down btn\">Move Down</button>\n         <button class=\"add-child-node btn\">Add child node</button>\n         <button class=\"add-value-input btn\">Add value input</button>\n         <button class=\"add-group btn\">Add radio group</button>\n         <button class=\"reparent btn\">Reparent</button>\n         <button class=\"delete btn\">Delete</button>\n      </div>\n\n   </nav>\n\n   <div class=\"debugger row\"></div>\n\n   <div class=\"row\">\n\n      <div class=\"col-md-4\">\n         <div class=\"form-group\">\n            <label>Type</label>\n            <select name=\"type\" class='type form-control'>\n               <option value=\"-\">-</option>\n               <option value=\"checkbox\">checkbox</option>\n               <option value=\"radio\">radio</option>\n               <option value=\"text\">text</option>\n               <option value=\"number\">number</option>\n            </select>\n         </div>\n\n         <div class=\"config\"></div>\n      </div>\n\n      <div class=\"col-md-4\">\n         <div class=\"form-group\">\n            <label>Title (IT)</label>\n            <input name=\"title_it\" type='text' class='title_it form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Title (EN)</label>\n            <input name=\"title_en\" type='text' class='title_en form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Title (DE)</label>\n            <input name=\"title_de\" type='text' class='title_de form-control' />\n         </div>\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <button class=\"expand btn\"></button>\n      <div class=\"box\"></div>\n   </div>\n\n   <div class=\"value-views\">\n      <div class=\"box\"></div>\n   </div>\n\n   <div class=\"node-views\">\n      <div class=\"box\"></div>\n   </div>\n\n</div>"
 
 /***/ }),
 /* 13 */
@@ -1587,7 +1490,7 @@ module.exports = "<div class=\"clauses-view\">\n   <%= html %>\n</div>"
 /* 14 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"config-view checkbox-config-view\">\n   <header class=\"expand\"></header>\n\n   <section>\n   </section>\n\n</div>"
+module.exports = "<div class=\"config-view checkbox-config-view\">\n\n   <button class=\"expand btn\"></button>\n\n   <section>\n      <div class=\"checkbox\">\n         <label>\n            <input type='checkbox' name=\"default-checked\" />\n            Check this node by default\n         </label>\n      </div>\n   </section>\n\n</div>"
 
 /***/ }),
 /* 15 */
@@ -1686,7 +1589,9 @@ module.exports = function(configType, nodeViewId, nodeModel, eventHub) {
    var view;
 
    if (configType === "checkbox") {
-      view = new CheckboxConfigView(nodeViewId, {}, eventHub);
+      view = new CheckboxConfigView(nodeViewId, {
+         _iub_checked: nodeModel._iub_checked
+      }, eventHub);
    } else if (configType === "number") {
       view = new NumberConfigView(nodeViewId, {
          default: nodeModel.default,
@@ -1728,7 +1633,9 @@ class CheckboxConfigView extends ConfigView {
 
    render() {
       this._root = $(templates["checkbox-config-view"]);
-      this._root.hide(); // no config for checkbox so far, so I just hide it.
+      this._checkedByDefaultCheckbox = this._root.find("input[name='default-checked']");
+      this._loadData();
+      this._behaviour();
       return this._root;
    }
 
@@ -1737,7 +1644,15 @@ class CheckboxConfigView extends ConfigView {
    }
 
    getModel() {
-      return {};
+      var checkedByDefault = this._checkedByDefaultCheckbox.prop("checked");
+      this._model._iub_checked = checkedByDefault;
+      return this._model;
+   }
+
+   _loadData() {
+      if (this._model._iub_checked) {
+         this._checkedByDefaultCheckbox.prop("checked", true);
+      }
    }
 }
 
@@ -2117,7 +2032,7 @@ class SchemaBuilder {
          } else {
             delete model.clauses;
          }
-         schema.properties[v.getName()] = model;
+         schema.properties[v.getId()] = model;
       });
 
       return schema;

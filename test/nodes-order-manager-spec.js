@@ -13,12 +13,12 @@ describe('NodesOrderManager', function() {
 
       eventHub = $({});
 
-      node1 = new NodeView("1", "name1", {_iub_position: 1}, [], eventHub);
-      node2 = new NodeView("2", "name2", {_iub_position: 2}, [], eventHub);
-      node3 = new NodeView("3", "name3", {_iub_position: 3}, [], eventHub);
+      node1 = new NodeView("1", {_iub_position: 1}, [], eventHub);
+      node2 = new NodeView("2", {_iub_position: 2}, [], eventHub);
+      node3 = new NodeView("3", {_iub_position: 3}, [], eventHub);
 
-      newNode = new NodeView(1, "name1", {}, [], eventHub);
-      anotherNewNode = new NodeView(1, "name1", {}, [], eventHub);
+      newNode = new NodeView(1, {}, [], eventHub);
+      anotherNewNode = new NodeView(1, {}, [], eventHub);
 
       manager = new NodesOrderManager([node1, node2, node3]);
    });

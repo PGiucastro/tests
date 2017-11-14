@@ -10,13 +10,11 @@ const scrolling = require('./../utils/scrolling');
 
 class NodeView {
 
-   constructor(id, name, model, clauses, eventHub) {
+   constructor(id, model, clauses, eventHub) {
       this._rendered = false;
       this._root;
       this._id = id;
       this._parentId;
-      this._name = name;
-      this._lastValidName = name;
       this._model = model;
       this._clauses = clauses;
 
@@ -64,10 +62,6 @@ class NodeView {
       return this.getModel()._iub_parent;
    }
 
-   getName() {
-      return this._name;
-   }
-
    getModel() {
       return this._model;
    }
@@ -79,18 +73,9 @@ class NodeView {
    getData() {
       return {
          id: this._id,
-         name: this._name,
          model: this._model,
          clauses: this.getClauses()
       };
-   }
-
-   setParentId(id) {
-      if (id) {
-         this._parentId = id;
-      } else {
-         delete this._parentId;
-      }
    }
 
    setPosition(index) {
@@ -113,26 +98,13 @@ class NodeView {
       this._removeFromPositionManager = f;
    }
 
-   setParentName(name) {
-      if (!name) {
+   setParentId(id) {
+      if (!id) {
          delete this._model._iub_parent;
       } else {
-         this._model._iub_parent = name;
+         this._model._iub_parent = id;
       }
-   }
-
-   setName(name) {
-      this._name = name;
-      this._nameInput.val(this._name);
-      this._nameLabel.text(this._name);
-   }
-
-   setLastValidName(name) {
-      this._lastValidName = name;
-   }
-
-   revertNameToLastValidOne() {
-      this.setName(this._lastValidName);
+      this._parentId = id;
    }
 
    appendNodeView(view) {
@@ -155,7 +127,7 @@ class NodeView {
       }
 
       this._handleNodeViewsSectionVisibility();
-      console.log(this._name + " now references " + this._nodeViews.length + " nodes");
+      console.log(this._id + " now references " + this._nodeViews.length + " nodes");
    }
 
    appendValueView(view) {
@@ -178,7 +150,7 @@ class NodeView {
       }
 
       this._handleValueViewsSectionVisibility();
-      console.log(this._name + " now references " + this._valueViews.length + " values");
+      console.log(this._id + " now references " + this._valueViews.length + " values");
    }
 
    /** 
@@ -211,8 +183,8 @@ class NodeView {
 
       this._handleNodeViewsSectionVisibility();
 
-      console.log(this._name + " has now " + this._nodeViews.length + " children", this._nodeViews.map((n) => {
-         return n.getName();
+      console.log(this._id + " has now " + this._nodeViews.length + " children", this._nodeViews.map((n) => {
+         return n.getId();
       }));
    }
 
@@ -233,8 +205,8 @@ class NodeView {
          }
       });
 
-      console.log("remaining nodes referenced by " + this._name, this._nodeViews.length);
-      console.log("remaining values referenced by " + this._name, this._valueViews.length);
+      console.log("remaining nodes referenced by " + this._id, this._nodeViews.length);
+      console.log("remaining values referenced by " + this._id, this._valueViews.length);
 
       this._handleNodeViewsSectionVisibility();
       this._handleValueViewsSectionVisibility();
@@ -290,8 +262,6 @@ class NodeView {
          id: this._id
       }));
 
-      this._nameLabel = this._root.find(".name-label");
-      this._nameInput = this._root.find(".name");
       this._titleInput_IT = this._root.find(".title_it");
       this._titleInput_EN = this._root.find(".title_en");
       this._titleInput_DE = this._root.find(".title_de");
@@ -335,11 +305,6 @@ class NodeView {
       var valid = true;
 
       this._removeErrors();
-
-      if ($.trim(this._nameInput.val()) === "") {
-         this._nameInput.addClass("error");
-         valid = false;
-      }
 
       if ($.trim(this._typeInput.val()) === "-") {
          this._typeInput.addClass("error");
@@ -406,31 +371,10 @@ class NodeView {
          this._moveDown(this);
       });
 
-      this._nameInput.on("keyup", () => {
-         this._name = this._nameInput.val();
-         this._nameLabel.text(this._name);
-      });
-
-      this._nameInput.on("blur", () => {
-         this._eventHub.trigger("node-name-has-been-updated", [this._id, this._name]);
-      });
-
       this._titleInput_EN.on("keyup", () => {
-         var currentTitle = this._model.title;
          var newTitle = this._titleInput_EN.val();
-         var slagCurrentTitle = slug(currentTitle, "_").toLowerCase();
-         var slagNewTitle = slug(newTitle, "_").toLowerCase();
          this._model.title = newTitle;
          this._model._iub_title_en = newTitle;
-         if (!this._name || slagCurrentTitle === this._name) {
-            this._name = slagNewTitle;
-            this._nameInput.val(slagNewTitle).removeClass("error");
-            this._nameLabel.text(slagNewTitle);
-         }
-      });
-
-      this._titleInput_EN.on("blur", () => {
-         this._nameInput.trigger("blur");
       });
 
       this._titleInput_IT.on("keyup", () => {
@@ -464,17 +408,17 @@ class NodeView {
 
       this._addNodeViewButton.click((e) => {
          e.preventDefault();
-         this._eventHub.trigger("please-create-child-node", ["node-view", this.getId(), this.getName()]);
+         this._eventHub.trigger("please-create-child-node", ["node-view", this.getId()]);
       });
 
       this._addValueViewButton.click((e) => {
          e.preventDefault();
-         this._eventHub.trigger("please-create-child-node", ["value-view", this.getId(), this.getName()]);
+         this._eventHub.trigger("please-create-child-node", ["value-view", this.getId()]);
       });
 
       this._addGroupViewButton.click((e) => {
          e.preventDefault();
-         this._eventHub.trigger("please-create-child-node", ["group-view", this.getId(), this.getName()]);
+         this._eventHub.trigger("please-create-child-node", ["group-view", this.getId()]);
       });
 
       this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);
@@ -550,8 +494,6 @@ class NodeView {
    }
 
    _loadModelData() {
-      this._nameLabel.text(this._name);
-      this._nameInput.val(this._name);
       this._titleInput_IT.val(this._model.title_it);
       this._titleInput_EN.val(this._model.title);
       this._titleInput_DE.val(this._model.title_de);

@@ -22,7 +22,7 @@ class SchemaBuilder {
          } else {
             delete model.clauses;
          }
-         schema.properties[v.getName()] = model;
+         schema.properties[v.getId()] = model;
       });
 
       return schema;
