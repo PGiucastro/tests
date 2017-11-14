@@ -351,17 +351,6 @@ class NodeView {
          valid = false;
       }
 
-//      NOT YET
-//      if ($.trim(this._titleInput_IT.val()) === "") {
-//         this._titleInput_IT.addClass("error");
-//         valid = false;
-//      }
-//
-//      if ($.trim(this._titleInput_DE.val()) === "") {
-//         this._titleInput_DE.addClass("error");
-//         valid = false;
-//      }
-
       if (this._configView) {
          let configValid = this._configView.validate();
          if (!configValid) {
@@ -548,7 +537,7 @@ class NodeView {
 
       this._configView = buildConfigView(type, this._id, this._model, this._eventHub);
 
-      if (this._configView) { // newly created nodes have empty model so the created config view undefined
+      if (this._configView) { // newly created nodes have empty model so the created config view is undefined
          this._configSection.empty().append(this._configView.render());
       }
    }
