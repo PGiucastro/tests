@@ -1030,7 +1030,7 @@ class MainView {
 
       this._eventHub.on("please-delete-node", (e, id) => {
          var viewToDestroy = this._getViewById(id);
-         var parentView = this._getViewByName(viewToDestroy.getParentName());
+         var parentView = this._getViewById(viewToDestroy.getParentId());
          var ids = viewToDestroy.destroy(true);
          console.warn("removed ones", ids);
 
@@ -1071,9 +1071,9 @@ class MainView {
          console.log("from", currentParentName);
          console.log("to", newParentName);
 
-         let nodeToReparent = this._getViewByName(nameOfNodeToReparent);
-         let currentParentView = this._getViewByName(currentParentName);
-         let newParentView = this._getViewByName(newParentName);
+         let nodeToReparent = this._getViewById(nameOfNodeToReparent);
+         let currentParentView = this._getViewById(currentParentName);
+         let newParentView = this._getViewById(newParentName);
 
          if (currentParentView) { // the node might be a root one, in which case no current parent exists.
             currentParentView.detachNodeView(nodeToReparent);
@@ -1177,15 +1177,6 @@ class MainView {
          this._noNodesYet.show();
       } else {
          this._noNodesYet.hide();
-      }
-   }
-
-   _getViewById(id) {
-      for (var i = 0; i < this._nodeViews.length; i++) {
-         var view = this._nodeViews[i];
-         if (view.getId() === id) {
-            return view;
-         }
       }
    }
 
