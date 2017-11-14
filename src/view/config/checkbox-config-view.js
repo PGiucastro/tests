@@ -10,7 +10,9 @@ class CheckboxConfigView extends ConfigView {
 
    render() {
       this._root = $(templates["checkbox-config-view"]);
-      this._root.hide(); // no config for checkbox so far, so I just hide it.
+      this._checkedByDefaultCheckbox = this._root.find("input[name='default-checked']");
+      this._loadData();
+      this._behaviour();
       return this._root;
    }
 
@@ -19,7 +21,15 @@ class CheckboxConfigView extends ConfigView {
    }
 
    getModel() {
-      return {};
+      var checkedByDefault = this._checkedByDefaultCheckbox.prop("checked");
+      this._model._iub_checked = checkedByDefault;
+      return this._model;
+   }
+
+   _loadData() {
+      if (this._model._iub_checked) {
+         this._checkedByDefaultCheckbox.prop("checked", true);
+      }
    }
 }
 

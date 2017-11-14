@@ -31,6 +31,10 @@ class ConfigView {
       this._root.find("select").on("change", () => {
          this._triggerConfigUpdate();
       });
+
+      this._root.find("input[type='checkbox']").on("click", () => {
+         this._triggerConfigUpdate();
+      });
    }
 
    _triggerConfigUpdate() {

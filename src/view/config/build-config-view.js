@@ -10,7 +10,9 @@ module.exports = function(configType, nodeViewId, nodeModel, eventHub) {
    var view;
 
    if (configType === "checkbox") {
-      view = new CheckboxConfigView(nodeViewId, {}, eventHub);
+      view = new CheckboxConfigView(nodeViewId, {
+         _iub_checked: nodeModel._iub_checked
+      }, eventHub);
    } else if (configType === "number") {
       view = new NumberConfigView(nodeViewId, {
          default: nodeModel.default,
