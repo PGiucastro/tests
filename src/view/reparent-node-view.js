@@ -27,20 +27,21 @@ class ReparentNodeView {
 
    show(nodes) {
 
+      var title;
       var view, option;
-      var names = this._getSortedListOfNodeNames(nodes);
+      var titles = this._getSortedListOfNodeTitles(nodes);
 
-      this._warning.empty().text("You are about to choose a new parent for the node [" + this._node.getName() + "]");
+      this._warning.empty().text("You are about to choose a new parent for the node [" + this._node.getId() + "]");
 
       this._select.append("<option value='-'>- no parent (make it a root node) -</option>");
 
-      for (var i = 0; i < names.length; i++) {
-         name = names[i];
-         view = this._getViewByName(nodes, name);
+      for (var i = 0; i < titles.length; i++) {
+         title = titles[i];
+         view = this._getViewByTitle(nodes, title);
          if (view.canBeAParentNode() && view.getId() !== this._node.getId()) {
             option = $("<option />");
-            option.attr("value", name);
-            option.text(name);
+            option.attr("value", view.getId());
+            option.text(title);
             this._select.append(option);
          }
       }
@@ -69,13 +70,13 @@ class ReparentNodeView {
 
       this._executeButton.click((e) => {
          e.preventDefault();
-         let newParentName = this._select.val();
-         let currentParentName = this._node.getParentName();
-         if (!currentParentName && newParentName === "-") {
+         let newParentId = this._select.val();
+         let currentParentId = this._node.getParentId();
+         if (!currentParentId && newParentId === "-") {
             alert(sameParentErrorMessage);
          } else {
-            if (newParentName !== currentParentName) {
-               this._eventHub.trigger("please-reparent-this-node-view", [this._node.getName(), currentParentName, newParentName]);
+            if (newParentId !== currentParentId) {
+               this._eventHub.trigger("please-reparent-this-node-view", [this._node.getId(), newParentId]);
                this.hide();
             } else {
                alert(sameParentErrorMessage);
@@ -84,12 +85,12 @@ class ReparentNodeView {
       });
    }
 
-   _getSortedListOfNodeNames(nodes) {
-      var names = nodes.map((node) => {
-         return node.getName();
+   _getSortedListOfNodeTitles(nodes) {
+      var titles = nodes.map((node) => {
+         return node.getTitle();
       });
 
-      names.sort((a, b) => {
+      titles.sort((a, b) => {
          if (a < b) {
             return -1;
          }
@@ -99,13 +100,13 @@ class ReparentNodeView {
          return 0;
       });
 
-      return names;
+      return titles;
    }
 
-   _getViewByName(views, name) {
+   _getViewByTitle(views, title) {
       for (var i = 0; i < views.length; i++) {
          let view = views[i];
-         if (view.getName() === name) {
+         if (view.getTitle() === title) {
             return view;
          }
       }

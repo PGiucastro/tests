@@ -73,6 +73,10 @@ class NodeView {
       };
    }
 
+   getTitle() {
+      return this._model.title;
+   }
+
    setPosition(index) {
       return this._model._iub_position = index;
    }

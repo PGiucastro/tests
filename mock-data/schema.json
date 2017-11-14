@@ -2,36 +2,42 @@
    "$schema": "http://json-schema.org/draft-04/schema#",
    "type": "object",
    "properties": {
-      "node-1": {
-         "title": "Does the use of your goods and/or services imply the use/provision of software?",
-         "type": "boolean",
-         "_iub_position": 3,
-         "_iub_checked": true
-      },
-      "node-2": {
-         "title": "Do you allow user to add content?",
-         "type": "boolean",
-         "_iub_group_validation": "at-least-one-checkbox-selected",
-         "_iub_position": 1
-      },
-      "node-3": {
-         "title": "Are you providing paid goods and/or paid services in your application?",
-         "type": "boolean",
-         "_iub_position": 2
-      },
-      "node-4": {
-         "title": "son 1",
-         "_iub_parent": "node-2",
-         "type": "boolean",
-         "_iub_position": 2,
-         "_iub_title_en": "son 1"
-      },
-      "node-5": {
-         "title": "son 2",
-         "_iub_parent": "node-2",
+      "node-6": {
+         "title": "father",
          "type": "boolean",
          "_iub_position": 1,
-         "_iub_title_en": "son 2"
+         "_iub_title_en": "father"
+      },
+      "node-8": {
+         "title": "bye",
+         "_iub_parent": "node-6",
+         "_iub_position": 1,
+         "_iub_title_en": "bye",
+         "type": "string",
+         "default": "yyy",
+         "_iub_validation": "required"
+      },
+      "node-9": {
+         "title": "oooooo",
+         "type": "boolean",
+         "_iub_title_en": "oooooo",
+         "_iub_parent": "node-6",
+         "_iub_position": 1
+      },
+      "node-10": {
+         "title": "yes!",
+         "_iub_parent": "node-9",
+         "type": "boolean",
+         "_iub_title_en": "yes!",
+         "_iub_position": 2,
+         "_iub_checked": true
+      },
+      "node-11": {
+         "title": "not least",
+         "_iub_parent": "node-9",
+         "type": "boolean",
+         "_iub_position": 1,
+         "_iub_title_en": "not least"
       }
    }
 }

@@ -223,6 +223,10 @@ class NodeView {
       };
    }
 
+   getTitle() {
+      return this._model.title;
+   }
+
    setPosition(index) {
       return this._model._iub_position = index;
    }
@@ -1066,14 +1070,16 @@ class MainView {
          this._reparentNodeview.show(this._nodeViews);
       });
 
-      this._eventHub.on("please-reparent-this-node-view", (e, nameOfNodeToReparent, currentParentName, newParentName) => {
-         console.log("node to reparent", nameOfNodeToReparent);
-         console.log("from", currentParentName);
-         console.log("to", newParentName);
+      this._eventHub.on("please-reparent-this-node-view", (e, nodeToReparentId, newParentId) => {
 
-         let nodeToReparent = this._getViewById(nameOfNodeToReparent);
-         let currentParentView = this._getViewById(currentParentName);
-         let newParentView = this._getViewById(newParentName);
+         let nodeToReparent = this._getViewById(nodeToReparentId);
+         let currentParentId = nodeToReparent.getParentId();         
+         let currentParentView = this._getViewById(currentParentId);
+         let newParentView = this._getViewById(newParentId);
+
+         console.log("node to reparent", nodeToReparentId);
+         console.log("from", currentParentId);
+         console.log("to", newParentId);
 
          if (currentParentView) { // the node might be a root one, in which case no current parent exists.
             currentParentView.detachNodeView(nodeToReparent);
@@ -1086,14 +1092,14 @@ class MainView {
          if (!newParentView) { // it has been asked to make it a root node
             this._orderManager.addNode(nodeToReparent);
             nodeToReparent.setParentId(null);
-            nodeToReparent.setParentName(null);
+            nodeToReparent.setParentId(null);
             nodeToReparent.setMoveDownCommand(this._moveNodeDown.bind(this));
             nodeToReparent.setMoveUpCommand(this._moveNodeUp.bind(this));
             nodeToReparent.setRemoveFromPositionManagerCommand(this._removeFromOrderManager.bind(this));
             this._list.append(nodeToReparent.getDomNode());
          } else {
             nodeToReparent.setParentId(newParentView.getId());
-            nodeToReparent.setParentName(newParentName);
+            nodeToReparent.setParentId(newParentId);
             newParentView.appendNodeView(nodeToReparent);
          }
 
@@ -2044,20 +2050,21 @@ class ReparentNodeView {
 
    show(nodes) {
 
+      var title;
       var view, option;
-      var names = this._getSortedListOfNodeNames(nodes);
+      var titles = this._getSortedListOfNodeTitles(nodes);
 
-      this._warning.empty().text("You are about to choose a new parent for the node [" + this._node.getName() + "]");
+      this._warning.empty().text("You are about to choose a new parent for the node [" + this._node.getId() + "]");
 
       this._select.append("<option value='-'>- no parent (make it a root node) -</option>");
 
-      for (var i = 0; i < names.length; i++) {
-         name = names[i];
-         view = this._getViewByName(nodes, name);
+      for (var i = 0; i < titles.length; i++) {
+         title = titles[i];
+         view = this._getViewByTitle(nodes, title);
          if (view.canBeAParentNode() && view.getId() !== this._node.getId()) {
             option = $("<option />");
-            option.attr("value", name);
-            option.text(name);
+            option.attr("value", view.getId());
+            option.text(title);
             this._select.append(option);
          }
       }
@@ -2086,13 +2093,13 @@ class ReparentNodeView {
 
       this._executeButton.click((e) => {
          e.preventDefault();
-         let newParentName = this._select.val();
-         let currentParentName = this._node.getParentName();
-         if (!currentParentName && newParentName === "-") {
+         let newParentId = this._select.val();
+         let currentParentId = this._node.getParentId();
+         if (!currentParentId && newParentId === "-") {
             alert(sameParentErrorMessage);
          } else {
-            if (newParentName !== currentParentName) {
-               this._eventHub.trigger("please-reparent-this-node-view", [this._node.getName(), currentParentName, newParentName]);
+            if (newParentId !== currentParentId) {
+               this._eventHub.trigger("please-reparent-this-node-view", [this._node.getId(), newParentId]);
                this.hide();
             } else {
                alert(sameParentErrorMessage);
@@ -2101,12 +2108,12 @@ class ReparentNodeView {
       });
    }
 
-   _getSortedListOfNodeNames(nodes) {
-      var names = nodes.map((node) => {
-         return node.getName();
+   _getSortedListOfNodeTitles(nodes) {
+      var titles = nodes.map((node) => {
+         return node.getTitle();
       });
 
-      names.sort((a, b) => {
+      titles.sort((a, b) => {
          if (a < b) {
             return -1;
          }
@@ -2116,13 +2123,13 @@ class ReparentNodeView {
          return 0;
       });
 
-      return names;
+      return titles;
    }
 
-   _getViewByName(views, name) {
+   _getViewByTitle(views, title) {
       for (var i = 0; i < views.length; i++) {
          let view = views[i];
-         if (view.getName() === name) {
+         if (view.getTitle() === title) {
             return view;
          }
       }

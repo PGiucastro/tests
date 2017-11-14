@@ -132,14 +132,16 @@ class MainView {
          this._reparentNodeview.show(this._nodeViews);
       });
 
-      this._eventHub.on("please-reparent-this-node-view", (e, nameOfNodeToReparent, currentParentName, newParentName) => {
-         console.log("node to reparent", nameOfNodeToReparent);
-         console.log("from", currentParentName);
-         console.log("to", newParentName);
+      this._eventHub.on("please-reparent-this-node-view", (e, nodeToReparentId, newParentId) => {
 
-         let nodeToReparent = this._getViewById(nameOfNodeToReparent);
-         let currentParentView = this._getViewById(currentParentName);
-         let newParentView = this._getViewById(newParentName);
+         let nodeToReparent = this._getViewById(nodeToReparentId);
+         let currentParentId = nodeToReparent.getParentId();         
+         let currentParentView = this._getViewById(currentParentId);
+         let newParentView = this._getViewById(newParentId);
+
+         console.log("node to reparent", nodeToReparentId);
+         console.log("from", currentParentId);
+         console.log("to", newParentId);
 
          if (currentParentView) { // the node might be a root one, in which case no current parent exists.
             currentParentView.detachNodeView(nodeToReparent);
@@ -152,14 +154,14 @@ class MainView {
          if (!newParentView) { // it has been asked to make it a root node
             this._orderManager.addNode(nodeToReparent);
             nodeToReparent.setParentId(null);
-            nodeToReparent.setParentName(null);
+            nodeToReparent.setParentId(null);
             nodeToReparent.setMoveDownCommand(this._moveNodeDown.bind(this));
             nodeToReparent.setMoveUpCommand(this._moveNodeUp.bind(this));
             nodeToReparent.setRemoveFromPositionManagerCommand(this._removeFromOrderManager.bind(this));
             this._list.append(nodeToReparent.getDomNode());
          } else {
             nodeToReparent.setParentId(newParentView.getId());
-            nodeToReparent.setParentName(newParentName);
+            nodeToReparent.setParentId(newParentId);
             newParentView.appendNodeView(nodeToReparent);
          }
 
