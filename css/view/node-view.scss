@@ -4,6 +4,8 @@
    margin: 30px 0;
    border: 1px solid #ccc;
    padding: 30px;
+   max-height: 5000px;
+   transition: max-height 1s;
 }
 
 .node-view.group-view {
@@ -15,22 +17,6 @@
 
    nav {
       margin-bottom: 0;
-   }
-}
-
-.node-view.collapsed {
-
-   height: 94px;
-
-   nav {
-
-      .chevron-up {
-         display: none;
-      }
-
-      .chevron-down {
-         display: inline-block;
-      }
    }
 }
 
@@ -53,21 +39,36 @@
 }
 
 .node-view nav {
-   margin-bottom: 30px;
-}
 
-.node-view nav {
+   margin-bottom: 30px;
 
    .chevron {
-      font-size: 30px;
+      font-size: 18px;
       margin-right: 5px;
       display: inline-block;
       cursor: pointer;
       line-height: 0;
    }
 
-   .chevron-down {
+   .glyphicon-chevron-right {
       display: none;
+   }
+}
+
+.node-view.collapsed {
+
+   max-height: 94px;
+   transition: max-height 0.5s;
+
+   nav {
+
+      .glyphicon-chevron-down {
+         display: none;
+      }
+
+      .glyphicon-chevron-right {
+         display: inline-block;
+      }
    }
 }
 
