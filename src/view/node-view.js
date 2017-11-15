@@ -259,6 +259,9 @@ class NodeView {
          id: this._id
       }));
 
+      this._chevronUp = this._root.find(".chevron-up");
+      this._chevronDown = this._root.find(".chevron-down");
+
       this._titleLabel = this._root.find(".title-label");
       this._titleInput_IT = this._root.find(".title_it");
       this._titleInput_EN = this._root.find(".title_en");
@@ -459,7 +462,7 @@ class NodeView {
       delete this._model["_iub_min"];
       delete this._model["_iub_max"];
       delete this._model["_iub_validation"];
-      delete this._model["_iub_labels"];      
+      delete this._model["_iub_labels"];
 
       if (id === this._id) {
          for (var p in configModel) {

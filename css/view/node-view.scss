@@ -19,7 +19,19 @@
 }
 
 .node-view.collapsed {
+
    height: 94px;
+
+   nav {
+
+      .chevron-up {
+         display: none;
+      }
+
+      .chevron-down {
+         display: inline-block;
+      }
+   }
 }
 
 .node-view .node-view {
@@ -42,6 +54,21 @@
 
 .node-view nav {
    margin-bottom: 30px;
+}
+
+.node-view nav {
+
+   .chevron {
+      font-size: 30px;
+      margin-right: 5px;
+      display: inline-block;
+      cursor: pointer;
+      line-height: 0;
+   }
+
+   .chevron-down {
+      display: none;
+   }
 }
 
 .node-view nav .type-label {
