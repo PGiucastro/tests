@@ -2,57 +2,63 @@
    "$schema": "http://json-schema.org/draft-04/schema#",
    "type": "object",
    "properties": {
-      "node-16": {
+      "node-1": {
          "title": "root-node-1",
          "type": "boolean",
          "_iub_position": 1,
          "_iub_title_en": "root-node-1",
          "default": "checked"
       },
-      "node-17": {
+      "node-2": {
          "title": "child-node-1",
-         "_iub_parent": "node-16",
+         "_iub_parent": "node-1",
          "type": "boolean",
          "_iub_position": 2,
          "_iub_title_en": "child-node-1",
          "default": "checked"
       },
-      "node-18": {
+      "node-3": {
          "title": "child-value-1",
-         "_iub_parent": "node-16",
+         "_iub_parent": "node-1",
          "_iub_position": 1,
          "_iub_title_en": "child-value-1",
          "type": "string",
          "default": "Foo",
          "_iub_validation": "required"
       },
-      "group-19": {
+      "group-4": {
          "title": "",
-         "_iub_parent": "node-16",
+         "_iub_parent": "node-1",
          "type": "group",
          "_iub_position": 1
       },
-      "node-20": {
+      "node-5": {
          "title": "child-checkbox-radio-1",
-         "_iub_parent": "group-19",
+         "_iub_parent": "group-4",
          "type": "boolean",
          "_iub_position": 1,
          "_iub_title_en": "child-checkbox-radio-1",
          "default": "checked"
       },
-      "node-21": {
+      "node-6": {
          "title": "child-checkbox-radio-2",
-         "_iub_parent": "group-19",
+         "_iub_parent": "group-4",
          "type": "boolean",
          "_iub_position": 2,
          "_iub_title_en": "child-checkbox-radio-2"
       },
-      "node-22": {
+      "node-7": {
          "title": "child-of-checkbox-radio",
-         "_iub_parent": "node-20",
+         "_iub_parent": "node-5",
          "type": "boolean",
          "_iub_position": 1,
          "_iub_title_en": "child-of-checkbox-radio"
+      },
+      "node-8": {
+         "title": "root-node-2",
+         "type": "boolean",
+         "_iub_position": 2,
+         "_iub_title_en": "root-node-2"
       }
    }
 }
