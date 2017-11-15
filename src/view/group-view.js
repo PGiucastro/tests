@@ -2,18 +2,10 @@ const _ = require('underscore');
 const $ = require('jquery');
 const NodeView = require('./node-view');
 
-var counter = 0;
-
 class GroupView extends NodeView {
 
-   constructor(id, name, model, clauses, eventHub) {
-      super(id, name, model, clauses, eventHub);
-      if (name) {
-         this._name = name;
-         counter = parseInt(name.split("-")[1]);
-      } else {
-         this._name = "group-" + (++counter);
-      }
+   constructor(id, model, clauses, eventHub) {
+      super(id.replace("node", "group"), model, clauses, eventHub);
    }
 
    render() {
@@ -27,7 +19,6 @@ class GroupView extends NodeView {
 
       this._valueViewsSection.remove();
 
-      this._nameInput.val(this._name).parent().hide();
       this._titleInput_IT.parent().remove();
       this._titleInput_EN.parent().remove();
       this._titleInput_DE.parent().remove();

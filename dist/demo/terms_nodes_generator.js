@@ -395,8 +395,7 @@ class NodeView {
    }
 
    canBeAParentNode() {
-      var type = this._getSelectTypeFromModel();
-      return type === "checkbox";
+      return this._getSelectTypeFromModel() === "checkbox";
    }
 
    render() {
@@ -1925,18 +1924,10 @@ const _ = __webpack_require__(2);
 const $ = __webpack_require__(0);
 const NodeView = __webpack_require__(4);
 
-var counter = 0;
-
 class GroupView extends NodeView {
 
-   constructor(id, name, model, clauses, eventHub) {
-      super(id, name, model, clauses, eventHub);
-      if (name) {
-         this._name = name;
-         counter = parseInt(name.split("-")[1]);
-      } else {
-         this._name = "group-" + (++counter);
-      }
+   constructor(id, model, clauses, eventHub) {
+      super(id.replace("node", "group"), model, clauses, eventHub);
    }
 
    render() {
@@ -1950,7 +1941,6 @@ class GroupView extends NodeView {
 
       this._valueViewsSection.remove();
 
-      this._nameInput.val(this._name).parent().hide();
       this._titleInput_IT.parent().remove();
       this._titleInput_EN.parent().remove();
       this._titleInput_DE.parent().remove();

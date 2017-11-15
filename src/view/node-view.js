@@ -245,8 +245,7 @@ class NodeView {
    }
 
    canBeAParentNode() {
-      var type = this._getSelectTypeFromModel();
-      return type === "checkbox";
+      return this._getSelectTypeFromModel() === "checkbox";
    }
 
    render() {
