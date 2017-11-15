@@ -7,7 +7,7 @@
          "type": "boolean",
          "_iub_position": 1,
          "_iub_title_en": "root-node-1",
-         "_iub_checked": true
+         "default": "checked"
       },
       "node-17": {
          "title": "child-node-1",
@@ -15,7 +15,7 @@
          "type": "boolean",
          "_iub_position": 2,
          "_iub_title_en": "child-node-1",
-         "_iub_checked": true
+         "default": "checked"
       },
       "node-18": {
          "title": "child-value-1",
@@ -38,7 +38,7 @@
          "type": "boolean",
          "_iub_position": 1,
          "_iub_title_en": "child-checkbox-radio-1",
-         "_iub_checked": true
+         "default": "checked"
       },
       "node-21": {
          "title": "child-checkbox-radio-2",

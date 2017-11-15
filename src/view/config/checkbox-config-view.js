@@ -22,12 +22,17 @@ class CheckboxConfigView extends ConfigView {
 
    getModel() {
       var checkedByDefault = this._checkedByDefaultCheckbox.prop("checked");
-      this._model._iub_checked = checkedByDefault;
+      
+      if (checkedByDefault) {
+         this._model.default = "checked";
+      } else {
+         delete this._model.default;
+      }
       return this._model;
    }
 
    _loadData() {
-      if (this._model._iub_checked) {
+      if (this._model.default === "checked") {
          this._checkedByDefaultCheckbox.prop("checked", true);
       }
    }
