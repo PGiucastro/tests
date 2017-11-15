@@ -409,6 +409,7 @@ class NodeView {
          id: this._id
       }));
 
+      this._titleLabel = this._root.find(".title-label");
       this._titleInput_IT = this._root.find(".title_it");
       this._titleInput_EN = this._root.find(".title_en");
       this._titleInput_DE = this._root.find(".title_de");
@@ -521,6 +522,7 @@ class NodeView {
          var newTitle = this._titleInput_EN.val();
          this._model.title = newTitle;
          this._model._iub_title_en = newTitle;
+         this._titleLabel.text(newTitle);
       });
 
       this._titleInput_IT.on("keyup", () => {
@@ -643,6 +645,7 @@ class NodeView {
       this._titleInput_IT.val(this._model.title_it);
       this._titleInput_EN.val(this._model.title);
       this._titleInput_DE.val(this._model.title_de);
+      this._titleLabel.text(this._model.title);
       this._loadModelType();
    }
 
@@ -1453,7 +1456,7 @@ module.exports = "<div class=\"main-view\">\n\n   <header class=\"main-header\">
 /* 12 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"node-view container-fluid\" data-node-view-id=\"<%= id %>\">\n\n   <nav class=\"row node-info\">\n\n      <div class=\"col-md-6\">\n         <span class=\"type-label\">\n            <em class=\"type-node\">node</em>\n            <em class=\"type-value\">value</em>\n            <em class=\"type-radio-group\">radio group</em>\n         </span>\n         <span class=\"name-label\"></span>\n      </div>\n\n      <div class=\"buttons text-right col-md-6\">\n         <button class=\"up btn\">Move Up</button>\n         <button class=\"down btn\">Move Down</button>\n         <button class=\"add-child-node btn\">Add child node</button>\n         <button class=\"add-value-input btn\">Add value input</button>\n         <button class=\"add-group btn\">Add radio group</button>\n         <button class=\"reparent btn\">Reparent</button>\n         <button class=\"delete btn\">Delete</button>\n      </div>\n\n   </nav>\n\n   <div class=\"debugger row\"></div>\n\n   <div class=\"row\">\n\n      <div class=\"col-md-4\">\n         <div class=\"form-group\">\n            <label>Type</label>\n            <select name=\"type\" class='type form-control'>\n               <option value=\"-\">-</option>\n               <option value=\"checkbox\">checkbox</option>\n               <option value=\"radio\">radio</option>\n               <option value=\"text\">text</option>\n               <option value=\"number\">number</option>\n            </select>\n         </div>\n\n         <div class=\"config\"></div>\n      </div>\n\n      <div class=\"col-md-4\">\n         <div class=\"form-group\">\n            <label>Title (IT)</label>\n            <input name=\"title_it\" type='text' class='title_it form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Title (EN)</label>\n            <input name=\"title_en\" type='text' class='title_en form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Title (DE)</label>\n            <input name=\"title_de\" type='text' class='title_de form-control' />\n         </div>\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <button class=\"expand btn\"></button>\n      <div class=\"box\"></div>\n   </div>\n\n   <div class=\"value-views\">\n      <div class=\"box\"></div>\n   </div>\n\n   <div class=\"node-views\">\n      <div class=\"box\"></div>\n   </div>\n\n</div>"
+module.exports = "<div class=\"node-view container-fluid\" data-node-view-id=\"<%= id %>\">\n\n   <nav class=\"row node-info\">\n\n      <div class=\"col-md-6\">\n         <span class=\"type-label\">\n            <em class=\"type-node\">node</em>\n            <em class=\"type-value\">value</em>\n            <em class=\"type-radio-group\">radio group</em>\n         </span>\n         <span class=\"title-label\"></span>\n      </div>\n\n      <div class=\"buttons text-right col-md-6\">\n         <button class=\"up btn\">Move Up</button>\n         <button class=\"down btn\">Move Down</button>\n         <button class=\"add-child-node btn\">Add child node</button>\n         <button class=\"add-value-input btn\">Add value input</button>\n         <button class=\"add-group btn\">Add radio group</button>\n         <button class=\"reparent btn\">Reparent</button>\n         <button class=\"delete btn\">Delete</button>\n      </div>\n\n   </nav>\n\n   <div class=\"debugger row\"></div>\n\n   <div class=\"row\">\n\n      <div class=\"col-md-4\">\n         <div class=\"form-group\">\n            <label>Type</label>\n            <select name=\"type\" class='type form-control'>\n               <option value=\"-\">-</option>\n               <option value=\"checkbox\">checkbox</option>\n               <option value=\"radio\">radio</option>\n               <option value=\"text\">text</option>\n               <option value=\"number\">number</option>\n            </select>\n         </div>\n\n         <div class=\"config\"></div>\n      </div>\n\n      <div class=\"col-md-4\">\n         <div class=\"form-group\">\n            <label>Title (IT)</label>\n            <input name=\"title_it\" type='text' class='title_it form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Title (EN)</label>\n            <input name=\"title_en\" type='text' class='title_en form-control' />\n         </div>\n\n         <div class=\"form-group\">\n            <label>Title (DE)</label>\n            <input name=\"title_de\" type='text' class='title_de form-control' />\n         </div>\n      </div>\n\n   </div>\n\n   <div class=\"clauses\">\n      <button class=\"expand btn\"></button>\n      <div class=\"box\"></div>\n   </div>\n\n   <div class=\"value-views\">\n      <div class=\"box\"></div>\n   </div>\n\n   <div class=\"node-views\">\n      <div class=\"box\"></div>\n   </div>\n\n</div>"
 
 /***/ }),
 /* 13 */

@@ -259,6 +259,7 @@ class NodeView {
          id: this._id
       }));
 
+      this._titleLabel = this._root.find(".title-label");
       this._titleInput_IT = this._root.find(".title_it");
       this._titleInput_EN = this._root.find(".title_en");
       this._titleInput_DE = this._root.find(".title_de");
@@ -371,6 +372,7 @@ class NodeView {
          var newTitle = this._titleInput_EN.val();
          this._model.title = newTitle;
          this._model._iub_title_en = newTitle;
+         this._titleLabel.text(newTitle);
       });
 
       this._titleInput_IT.on("keyup", () => {
@@ -493,6 +495,7 @@ class NodeView {
       this._titleInput_IT.val(this._model.title_it);
       this._titleInput_EN.val(this._model.title);
       this._titleInput_DE.val(this._model.title_de);
+      this._titleLabel.text(this._model.title);
       this._loadModelType();
    }
 

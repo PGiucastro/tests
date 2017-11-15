@@ -9,7 +9,7 @@
 .node-view.group-view {
    background: lightskyblue !important;
 
-   .name-label {
+   .title-label {
       visibility: hidden;
    }
 
@@ -57,7 +57,7 @@
    }
 }
 
-.node-view nav .name-label {
+.node-view nav .title-label {
    font-weight: bold;
    font-size: 18px;
 }
@@ -71,7 +71,7 @@
    background: pink;
 }
 
-.node-view .name-label {
+.node-view .title-label {
    line-height: 38px;
 }
 
@@ -91,9 +91,9 @@
 }
 
 .node-view .clauses {
-   
+
    margin-top: 30px;
-   
+
    .box {
       display: none;
    }
