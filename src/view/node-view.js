@@ -454,10 +454,12 @@ class NodeView {
 
    _onConfigUpdated(e, id, configModel) {
 
-      // TODO: here the received config model might contains less properties than the model during the previous update
-      // therefore stale data copied over from the previous version config model could remain in the node view model...
-      // Address this defect!
-      // A good example is the default, validation and triggering value of the radio config view.
+      // Clean old config stuff that would otherwise get stale
+      delete this._model["default"];
+      delete this._model["_iub_min"];
+      delete this._model["_iub_max"];
+      delete this._model["_iub_validation"];
+      delete this._model["_iub_labels"];      
 
       if (id === this._id) {
          for (var p in configModel) {
