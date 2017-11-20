@@ -48,6 +48,7 @@
             "yes",
             "no"
          ],
+         "default": "yes",
          "_iub_title_en": "Do you want some coffee?"
       },
       "group-7": {
