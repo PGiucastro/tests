@@ -2,63 +2,83 @@
    "$schema": "http://json-schema.org/draft-04/schema#",
    "type": "object",
    "properties": {
-      "node-1": {
-         "title": "root-node-1",
-         "type": "boolean",
-         "_iub_position": 1,
-         "_iub_title_en": "root-node-1",
-         "default": "checked"
-      },
-      "node-2": {
-         "title": "child-node-1",
-         "_iub_parent": "node-1",
+      "node-9": {
+         "title": "root node 1",
          "type": "boolean",
          "_iub_position": 2,
-         "_iub_title_en": "child-node-1",
-         "default": "checked"
+         "_iub_title_en": "root node 1"
       },
-      "node-3": {
-         "title": "child-value-1",
-         "_iub_parent": "node-1",
+      "node-10": {
+         "title": "root node 2",
+         "type": "boolean",
          "_iub_position": 1,
-         "_iub_title_en": "child-value-1",
+         "_iub_title_en": "root node 2"
+      },
+      "node-11": {
+         "title": "I own a dog",
+         "_iub_parent": "node-9",
+         "type": "boolean",
+         "_iub_position": 1,
+         "_iub_title_en": "I own a dog"
+      },
+      "node-12": {
+         "title": "What's your name",
+         "_iub_parent": "node-9",
+         "_iub_position": 1,
+         "_iub_title_en": "What's your name",
+         "type": "string"
+      },
+      "node-13": {
+         "title": "How old are you?",
+         "_iub_parent": "node-9",
+         "_iub_position": 2,
+         "type": "number",
+         "_iub_title_en": "How old are you?"
+      },
+      "node-14": {
+         "title": "Do you want some coffee?",
+         "_iub_parent": "node-9",
+         "_iub_position": 3,
          "type": "string",
-         "default": "Foo",
-         "_iub_validation": "required"
+         "enum": [
+            "yes",
+            "no"
+         ],
+         "_iub_labels": [
+            "Yes please",
+            "No thanks"
+         ],
+         "_iub_title_en": "Do you want some coffee?"
       },
-      "group-4": {
+      "group-15": {
          "title": "",
-         "_iub_parent": "node-1",
+         "_iub_parent": "node-9",
          "type": "group",
-         "_iub_position": 1
+         "_iub_position": 2
       },
-      "node-5": {
-         "title": "child-checkbox-radio-1",
-         "_iub_parent": "group-4",
+      "node-16": {
+         "title": "I enjoy the sunshine",
+         "_iub_parent": "group-15",
          "type": "boolean",
          "_iub_position": 1,
-         "_iub_title_en": "child-checkbox-radio-1",
-         "default": "checked"
+         "_iub_title_en": "I enjoy the sunshine"
       },
-      "node-6": {
-         "title": "child-checkbox-radio-2",
-         "_iub_parent": "group-4",
+      "node-17": {
+         "title": "I do not enjoy the sunshine",
+         "_iub_parent": "group-15",
          "type": "boolean",
          "_iub_position": 2,
-         "_iub_title_en": "child-checkbox-radio-2"
+         "_iub_title_en": "I do not enjoy the sunshine"
       },
-      "node-7": {
-         "title": "child-of-checkbox-radio",
-         "_iub_parent": "node-5",
-         "type": "boolean",
+      "node-19": {
+         "title": "How many days a week do you sunbathe",
+         "_iub_parent": "node-16",
          "_iub_position": 1,
-         "_iub_title_en": "child-of-checkbox-radio"
-      },
-      "node-8": {
-         "title": "root-node-2",
-         "type": "boolean",
-         "_iub_position": 2,
-         "_iub_title_en": "root-node-2"
+         "_iub_title_en": "How many days a week do you sunbathe",
+         "type": "number",
+         "default": null,
+         "_iub_min": "0",
+         "_iub_max": 7
       }
    }
 }

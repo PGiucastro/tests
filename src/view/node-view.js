@@ -29,6 +29,8 @@ class NodeView {
       this._nodeViews = [];
       this._valueViews = [];
 
+      this._isCollapsed = false;
+
       this._nodeViewsOrderManager = new NodesOrderManager([]);
       this._valueViewsOrderManager = new NodesOrderManager([]);
 
@@ -262,6 +264,8 @@ class NodeView {
       this._chevronUp = this._root.find(".chevron-up");
       this._chevronDown = this._root.find(".chevron-down");
 
+      this._content = $(this._root.find("section")[0]); //  TODO refactor dom query
+
       this._titleLabel = this._root.find(".title-label");
       this._titleInput_IT = this._root.find(".title_it");
       this._titleInput_EN = this._root.find(".title_en");
@@ -357,7 +361,15 @@ class NodeView {
       this._root.find(".node-info").click((e) => {
          var trg = $(e.target);
          if (!trg.is("button")) {
-            this._root.toggleClass("collapsed");
+            if (this._isCollapsed) {
+               this._root.removeClass("collapsed");
+               this._content.slideDown();
+            } else {
+               this._root.addClass("collapsed");
+               this._content.slideUp();
+            }
+            this._isCollapsed = !this._isCollapsed;
+
          }
       });
 
@@ -409,17 +421,30 @@ class NodeView {
 
       this._addNodeViewButton.click((e) => {
          e.preventDefault();
-         this._eventHub.trigger("please-create-child-node", ["node-view", this.getId()]);
+         this._root.removeClass("collapsed");
+         this._content.slideDown(() => {
+            this._isCollapsed = false;
+            this._eventHub.trigger("please-create-child-node", ["node-view", this.getId()]);
+         });
       });
 
       this._addValueViewButton.click((e) => {
          e.preventDefault();
-         this._eventHub.trigger("please-create-child-node", ["value-view", this.getId()]);
+         this._root.removeClass("collapsed");
+         this._content.slideDown(() => {
+            this._isCollapsed = false;
+            this._eventHub.trigger("please-create-child-node", ["value-view", this.getId()]);
+         });
       });
+
 
       this._addGroupViewButton.click((e) => {
          e.preventDefault();
-         this._eventHub.trigger("please-create-child-node", ["group-view", this.getId()]);
+         this._root.removeClass("collapsed");
+         this._content.slideDown(() => {
+            this._isCollapsed = false;
+            this._eventHub.trigger("please-create-child-node", ["group-view", this.getId()]);
+         });
       });
 
       this._onConfigUpdatedBound = this._onConfigUpdated.bind(this);

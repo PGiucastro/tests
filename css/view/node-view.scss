@@ -4,7 +4,7 @@
    margin: 30px 0;
    border: 1px solid #ccc;
    padding: 30px;
-   max-height: 5000px;
+   max-height: 10000px;
    transition: max-height 1s;
 }
 
@@ -56,9 +56,6 @@
 }
 
 .node-view.collapsed {
-
-   max-height: 94px;
-   transition: max-height 0.5s;
 
    nav {
 

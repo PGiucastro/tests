@@ -30,53 +30,57 @@
 
    <div class="debugger row"></div>
 
-   <div class="row">
+   <section>
 
-      <div class="col-md-4">
-         <div class="form-group">
-            <label>Type</label>
-            <select name="type" class='type form-control'>
-               <option value="-">-</option>
-               <option value="checkbox">checkbox</option>
-               <option value="radio">radio</option>
-               <option value="text">text</option>
-               <option value="number">number</option>
-            </select>
+      <div class="row">
+
+         <div class="col-md-4">
+            <div class="form-group">
+               <label>Type</label>
+               <select name="type" class='type form-control'>
+                  <option value="-">-</option>
+                  <option value="checkbox">checkbox</option>
+                  <option value="radio">radio</option>
+                  <option value="text">text</option>
+                  <option value="number">number</option>
+               </select>
+            </div>
+
+            <div class="config"></div>
          </div>
 
-         <div class="config"></div>
+         <div class="col-md-4">
+            <div class="form-group">
+               <label>Title (IT)</label>
+               <input name="title_it" type='text' class='title_it form-control' />
+            </div>
+
+            <div class="form-group">
+               <label>Title (EN)</label>
+               <input name="title_en" type='text' class='title_en form-control' />
+            </div>
+
+            <div class="form-group">
+               <label>Title (DE)</label>
+               <input name="title_de" type='text' class='title_de form-control' />
+            </div>
+         </div>
+
       </div>
 
-      <div class="col-md-4">
-         <div class="form-group">
-            <label>Title (IT)</label>
-            <input name="title_it" type='text' class='title_it form-control' />
-         </div>
-
-         <div class="form-group">
-            <label>Title (EN)</label>
-            <input name="title_en" type='text' class='title_en form-control' />
-         </div>
-
-         <div class="form-group">
-            <label>Title (DE)</label>
-            <input name="title_de" type='text' class='title_de form-control' />
-         </div>
+      <div class="clauses">
+         <button class="expand btn"></button>
+         <div class="box"></div>
       </div>
 
-   </div>
+      <div class="value-views">
+         <div class="box"></div>
+      </div>
 
-   <div class="clauses">
-      <button class="expand btn"></button>
-      <div class="box"></div>
-   </div>
+      <div class="node-views">
+         <div class="box"></div>
+      </div>
 
-   <div class="value-views">
-      <div class="box"></div>
-   </div>
-
-   <div class="node-views">
-      <div class="box"></div>
-   </div>
+   </section>
 
 </div>
