@@ -14,10 +14,6 @@
    .title-label:first-child {
       visibility: hidden;
    }
-
-   nav {
-      margin-bottom: 0;
-   }
 }
 
 .node-view .node-view {
@@ -39,8 +35,6 @@
 }
 
 .node-view nav {
-
-   margin-bottom: 30px;
 
    .chevron {
       font-size: 18px;
@@ -110,6 +104,10 @@
    overflow-x: auto;
    height: 245px;
    margin-bottom: 30px;
+}
+
+.node-view section { 
+   padding-top: 30px;
 }
 
 .node-view .clauses {
