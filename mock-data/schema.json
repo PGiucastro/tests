@@ -48,7 +48,8 @@
             "Yes please",
             "No thanks"
          ],
-         "_iub_title_en": "Do you want some coffee?"
+         "_iub_title_en": "Do you want some coffee?",
+         "default": "yes"
       },
       "group-15": {
          "title": "",
