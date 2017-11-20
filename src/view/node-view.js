@@ -370,7 +370,6 @@ class NodeView {
                this._content.slideUp();
             }
             this._isCollapsed = !this._isCollapsed;
-
          }
       });
 
