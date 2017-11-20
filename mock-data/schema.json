@@ -42,7 +42,10 @@
          "title": "Do you want some coffee?",
          "_iub_parent": "node-1",
          "_iub_position": 3,
-         "_iub_labels": ["Yes please", "No thanks"],
+         "_iub_labels": [
+            "Yes please",
+            "No thanks"
+         ],
          "type": "string",
          "enum": [
             "yes",
@@ -62,7 +65,8 @@
          "_iub_parent": "group-7",
          "type": "boolean",
          "_iub_position": 1,
-         "_iub_title_en": "I enjoy the sunshine"
+         "_iub_title_en": "I enjoy the sunshine",
+         "default": "checked"
       },
       "node-9": {
          "title": "I do not enjoy the sunshine",
@@ -76,7 +80,10 @@
          "_iub_parent": "node-8",
          "_iub_position": 1,
          "_iub_title_en": "How many days a week do you sunbathe",
-         "type": "number"
+         "type": "number",
+         "default": null,
+         "_iub_min": "0",
+         "_iub_max": 7
       }
    }
 }

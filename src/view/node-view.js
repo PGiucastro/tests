@@ -482,6 +482,10 @@ class NodeView {
 
    _onConfigUpdated(e, id, configModel) {
 
+      if (this._id !== id) {
+         return;
+      }
+
       // Clean old config stuff that would otherwise get stale
       delete this._model["default"];
       delete this._model["_iub_min"];
