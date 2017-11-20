@@ -55,17 +55,14 @@
    }
 }
 
-.node-view.collapsed {
+.node-view nav.collapsed {
 
-   nav {
+   .glyphicon-chevron-down {
+      display: none;
+   }
 
-      .glyphicon-chevron-down {
-         display: none;
-      }
-
-      .glyphicon-chevron-right {
-         display: inline-block;
-      }
+   .glyphicon-chevron-right {
+      display: inline-block;
    }
 }
 

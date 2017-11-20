@@ -2,84 +2,80 @@
    "$schema": "http://json-schema.org/draft-04/schema#",
    "type": "object",
    "properties": {
-      "node-9": {
+      "node-1": {
          "title": "root node 1",
          "type": "boolean",
          "_iub_position": 2,
          "_iub_title_en": "root node 1"
       },
-      "node-10": {
+      "node-2": {
          "title": "root node 2",
          "type": "boolean",
          "_iub_position": 1,
          "_iub_title_en": "root node 2"
       },
-      "node-11": {
+      "node-3": {
          "title": "I own a dog",
-         "_iub_parent": "node-9",
+         "_iub_parent": "node-1",
          "type": "boolean",
          "_iub_position": 1,
          "_iub_title_en": "I own a dog"
       },
-      "node-12": {
+      "node-4": {
          "title": "What's your name",
-         "_iub_parent": "node-9",
+         "_iub_parent": "node-1",
          "_iub_position": 1,
          "_iub_title_en": "What's your name",
          "type": "string"
       },
-      "node-13": {
+      "node-5": {
          "title": "How old are you?",
-         "_iub_parent": "node-9",
+         "_iub_parent": "node-1",
          "_iub_position": 2,
          "type": "number",
-         "_iub_title_en": "How old are you?"
+         "_iub_title_en": "How old are you?",
+         "default": 42,
+         "_iub_min": 18,
+         "_iub_max": 99
       },
-      "node-14": {
+      "node-6": {
          "title": "Do you want some coffee?",
-         "_iub_parent": "node-9",
+         "_iub_parent": "node-1",
          "_iub_position": 3,
+         "_iub_labels": ["Yes please", "No thanks"],
          "type": "string",
          "enum": [
             "yes",
             "no"
          ],
-         "_iub_labels": [
-            "Yes please",
-            "No thanks"
-         ],
-         "_iub_title_en": "Do you want some coffee?",
-         "default": "yes"
+         "_iub_title_en": "Do you want some coffee?"
       },
-      "group-15": {
+      "group-7": {
          "title": "",
-         "_iub_parent": "node-9",
+         "_iub_parent": "node-1",
          "type": "group",
          "_iub_position": 2
       },
-      "node-16": {
+      "node-8": {
          "title": "I enjoy the sunshine",
-         "_iub_parent": "group-15",
+         "_iub_parent": "group-7",
          "type": "boolean",
          "_iub_position": 1,
          "_iub_title_en": "I enjoy the sunshine"
       },
-      "node-17": {
+      "node-9": {
          "title": "I do not enjoy the sunshine",
-         "_iub_parent": "group-15",
+         "_iub_parent": "group-7",
          "type": "boolean",
          "_iub_position": 2,
          "_iub_title_en": "I do not enjoy the sunshine"
       },
-      "node-19": {
+      "node-10": {
          "title": "How many days a week do you sunbathe",
-         "_iub_parent": "node-16",
+         "_iub_parent": "node-8",
          "_iub_position": 1,
          "_iub_title_en": "How many days a week do you sunbathe",
-         "type": "number",
-         "default": null,
-         "_iub_min": "0",
-         "_iub_max": 7
+         "type": "number"
       }
    }
 }

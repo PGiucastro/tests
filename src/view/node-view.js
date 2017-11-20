@@ -264,6 +264,7 @@ class NodeView {
       this._chevronUp = this._root.find(".chevron-up");
       this._chevronDown = this._root.find(".chevron-down");
 
+      this._nav = $(this._root.find("nav")[0]); //  TODO refactor dom query
       this._content = $(this._root.find("section")[0]); //  TODO refactor dom query
 
       this._titleLabel = this._root.find(".title-label");
@@ -362,10 +363,10 @@ class NodeView {
          var trg = $(e.target);
          if (!trg.is("button")) {
             if (this._isCollapsed) {
-               this._root.removeClass("collapsed");
+               this._nav.removeClass("collapsed");
                this._content.slideDown();
             } else {
-               this._root.addClass("collapsed");
+               this._nav.addClass("collapsed");
                this._content.slideUp();
             }
             this._isCollapsed = !this._isCollapsed;
@@ -421,7 +422,7 @@ class NodeView {
 
       this._addNodeViewButton.click((e) => {
          e.preventDefault();
-         this._root.removeClass("collapsed");
+         this._nav.removeClass("collapsed");
          this._content.slideDown(() => {
             this._isCollapsed = false;
             this._eventHub.trigger("please-create-child-node", ["node-view", this.getId()]);
@@ -430,7 +431,7 @@ class NodeView {
 
       this._addValueViewButton.click((e) => {
          e.preventDefault();
-         this._root.removeClass("collapsed");
+         this._nav.removeClass("collapsed");
          this._content.slideDown(() => {
             this._isCollapsed = false;
             this._eventHub.trigger("please-create-child-node", ["value-view", this.getId()]);
@@ -440,7 +441,7 @@ class NodeView {
 
       this._addGroupViewButton.click((e) => {
          e.preventDefault();
-         this._root.removeClass("collapsed");
+         this._nav.removeClass("collapsed");
          this._content.slideDown(() => {
             this._isCollapsed = false;
             this._eventHub.trigger("please-create-child-node", ["group-view", this.getId()]);
