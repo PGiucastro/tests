@@ -13,7 +13,8 @@
          "type": "boolean",
          "_iub_position": 1,
          "_iub_title_en": "root node 2",
-         "_iub_help_en": "help text"
+         "_iub_help_en": "help text",
+         "_iub_help_it": "testo di aiuto"
       },
       "node-3": {
          "title": "I own a dog",
