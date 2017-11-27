@@ -135,7 +135,7 @@ class MainView {
       this._eventHub.on("please-reparent-this-node-view", (e, nodeToReparentId, newParentId) => {
 
          let nodeToReparent = this._getViewById(nodeToReparentId);
-         let currentParentId = nodeToReparent.getParentId();         
+         let currentParentId = nodeToReparent.getParentId();
          let currentParentView = this._getViewById(currentParentId);
          let newParentView = this._getViewById(newParentId);
 
@@ -215,10 +215,8 @@ class MainView {
       node.render();
 
       if (parent) {
-         if (type === "node-view" || type === "group-view") {
+         if (type === "node-view" || type === "group-view" || type === "value-view") {
             parent.appendNodeView(node);
-         } else if (type === "value-view") {
-            parent.appendValueView(node);
          } else {
             throw `Unknown type [${type}]`;
          }

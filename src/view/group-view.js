@@ -17,8 +17,6 @@ class GroupView extends NodeView {
       this._clausesSection.remove();
       this._addGroupViewButton.remove();
 
-      this._valueViewsSection.remove();
-
       this._titleInput_IT.parent().remove();
       this._titleInput_EN.parent().remove();
       this._titleInput_DE.parent().remove();

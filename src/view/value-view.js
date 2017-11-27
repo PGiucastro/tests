@@ -13,7 +13,6 @@ class ValueView extends NodeView {
       this._reparentButton.remove();      
       this._clausesSection.remove();
       this._nodeViewsSection.remove();
-      this._valueViewsSection.remove();
    }
 
    _getTypeOptionsToRemove() {

@@ -27,12 +27,10 @@ class NodeView {
       this._clausesView;
 
       this._nodeViews = [];
-      this._valueViews = [];
 
       this._isCollapsed = false;
 
       this._nodeViewsOrderManager = new NodesOrderManager([]);
-      this._valueViewsOrderManager = new NodesOrderManager([]);
 
       if (!this._model.title) {
          this._model.title = "";
@@ -130,29 +128,6 @@ class NodeView {
       console.log(this._id + " now references " + this._nodeViews.length + " nodes");
    }
 
-   appendValueView(view) {
-      this._valueViews.push(view);
-      this._valueViewsOrderManager.addNode(view);
-
-      var previousNode = this._valueViewsOrderManager.getPreviousNode(view);
-      var nextNode = this._valueViewsOrderManager.getNextNode(view);
-
-      view.setMoveUpCommand(this._moveValueViewUp.bind(this));
-      view.setMoveDownCommand(this._moveValueViewDown.bind(this));
-      view.setRemoveFromPositionManagerCommand(this._removeValueViewFromOrderManager.bind(this));
-
-      if (!previousNode && !nextNode) { // it is the first being added
-         this._valueViewsContainer.append(view.getDomNode());
-      } else if (previousNode) {
-         view.getDomNode().insertAfter(previousNode.getDomNode());
-      } else if (nextNode) {
-         view.getDomNode().insertBefore(nextNode.getDomNode());
-      }
-
-      this._handleValueViewsSectionVisibility();
-      console.log(this._id + " now references " + this._valueViews.length + " values");
-   }
-
    /** 
     * Detach a certain node from the list of child nodes.
     * 
@@ -196,20 +171,11 @@ class NodeView {
                break;
             }
          }
-
-         for (var i = 0; i < this._valueViews.length; i++) {
-            if (this._valueViews[i].getId() === id) {
-               this._valueViews.splice(i, 1);
-               break;
-            }
-         }
       });
 
       console.log("remaining nodes referenced by " + this._id, this._nodeViews.length);
-      console.log("remaining values referenced by " + this._id, this._valueViews.length);
 
       this._handleNodeViewsSectionVisibility();
-      this._handleValueViewsSectionVisibility();
    }
 
    /**
@@ -233,15 +199,7 @@ class NodeView {
          });
       }
 
-      for (var j = 0; j < this._valueViews.length; j++) {
-         let ids = this._valueViews[j].destroy();
-         ids.forEach((id) => {
-            destroyedIds.push(id);
-         });
-      }
-
       this._nodeViews = [];
-      this._valueViews = [];
 
       return destroyedIds;
    }
@@ -289,9 +247,6 @@ class NodeView {
       this._clausesContainer = this._clausesSection.find(".box");
       this._nodeViewsSection = this._root.find(".node-views");
       this._nodeViewsContainer = this._nodeViewsSection.find(".box");
-      this._valueViewsSection = this._root.find(".value-views");
-      this._valueViewsContainer = this._valueViewsSection.find(".box");
-
 
       this._loadModelData();
       this._removeTypeOptions();
@@ -452,7 +407,6 @@ class NodeView {
          });
       });
 
-
       this._addGroupViewButton.click((e) => {
          e.preventDefault();
          this._nav.removeClass("collapsed");
@@ -478,14 +432,6 @@ class NodeView {
          this._nodeViewsSection.css("display", "none");
       } else {
          this._nodeViewsSection.css("display", "block");
-      }
-   }
-
-   _handleValueViewsSectionVisibility() {
-      if (this._valueViews.length === 0) {
-         this._valueViewsSection.css("display", "none");
-      } else {
-         this._valueViewsSection.css("display", "block");
       }
    }
 
@@ -616,28 +562,6 @@ class NodeView {
 
    _removeNodeViewFromOrderManager(node) {
       this._nodeViewsOrderManager.removeNode(node);
-   }
-
-   _moveValueViewUp(node) {
-      var prevNode = this._valueViewsOrderManager.getPreviousNode(node);
-      if (prevNode) {
-         node.getDomNode().insertBefore(prevNode.getDomNode());
-         scrolling.scrollToNode(node);
-      }
-      this._valueViewsOrderManager.moveNodeToLowerPosition(node);
-   }
-
-   _moveValueViewDown(node) {
-      var nextNode = this._valueViewsOrderManager.getNextNode(node);
-      if (nextNode) {
-         node.getDomNode().insertAfter(nextNode.getDomNode());
-         scrolling.scrollToNode(node);
-      }
-      this._valueViewsOrderManager.moveNodeToHigherPosition(node);
-   }
-
-   _removeValueViewFromOrderManager(node) {
-      this._valueViewsOrderManager.removeNode(node);
    }
 
    _showTypeLabel() {

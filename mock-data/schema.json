@@ -20,7 +20,7 @@
          "title": "I own a dog",
          "_iub_parent": "node-1",
          "type": "boolean",
-         "_iub_position": 1,
+         "_iub_position": 5,
          "_iub_title_en": "I own a dog"
       },
       "node-4": {
@@ -60,7 +60,7 @@
          "title": "",
          "_iub_parent": "node-1",
          "type": "group",
-         "_iub_position": 2
+         "_iub_position": 6
       },
       "node-8": {
          "title": "I enjoy the sunshine",
@@ -86,6 +86,14 @@
          "default": null,
          "_iub_min": "0",
          "_iub_max": 7
+      },
+      "node-12": {
+         "title": "I like cats",
+         "_iub_parent": "node-1",
+         "type": "boolean",
+         "_iub_position": 4,
+         "_iub_title_it": "",
+         "_iub_title_en": "I also like cats"
       }
    }
 }
