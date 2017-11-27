@@ -271,6 +271,7 @@ class NodeView {
       this._titleInput_IT = this._root.find(".title_it");
       this._titleInput_EN = this._root.find(".title_en");
       this._titleInput_DE = this._root.find(".title_de");
+      this._helpInput_EN = this._root.find(".help_en");
       this._typeInput = this._root.find(".type");
 
       this._upButton = this._root.find("button.up");
@@ -396,6 +397,10 @@ class NodeView {
 
       this._titleInput_DE.on("keyup", () => {
          this._model._iub_title_de = this._titleInput_DE.val();
+      });
+
+      this._helpInput_EN.on("keyup", () => {
+         this._model._iub_help_en = this._helpInput_EN.val();
       });
 
       this._typeInput.on("change", () => {
@@ -526,9 +531,10 @@ class NodeView {
    }
 
    _loadModelData() {
-      this._titleInput_IT.val(this._model.title_it);
+      this._titleInput_IT.val(this._model._iub_title_it);
       this._titleInput_EN.val(this._model.title);
-      this._titleInput_DE.val(this._model.title_de);
+      this._titleInput_DE.val(this._model._iub_title_de);
+      this._helpInput_EN.val(this._model._iub_help_en);
       this._titleLabel.text(this._model.title);
       this._loadModelType();
    }
