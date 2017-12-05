@@ -167,6 +167,19 @@ class MainView {
 
          scrolling.scrollToNode(nodeToReparent);
       });
+
+      this._eventHub.on("please-validate-node-view-name", (e, node) => {
+         var name = node.getLogicalName();
+         for (var i = 0; i < this._nodeViews.length; i++) {
+            var view = this._nodeViews[i];
+            if (view !== node) {
+               if (view.getLogicalName() === name) {
+                  node.focusOnLogicalName(`The name "${name}" has been used already. Please change it.`);
+                  return;
+               }
+            }
+         }
+      });
    }
 
    _buildNode(type, id, nodeModel) {

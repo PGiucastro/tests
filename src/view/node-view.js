@@ -53,6 +53,10 @@ class NodeView {
       return this._id;
    }
 
+   getLogicalName() {
+      return this._model.name;
+   }
+
    getParentId() {
       return this.getModel()._iub_parent;
    }
@@ -103,6 +107,11 @@ class NodeView {
       } else {
          this._model._iub_parent = id;
       }
+   }
+
+   focusOnLogicalName(error) {
+      this._logicalNameError.show().text(error);
+      this._logicalName[0].select();
    }
 
    appendNodeView(view) {
@@ -225,6 +234,8 @@ class NodeView {
       this._nav = $(this._root.find("nav")[0]); //  TODO refactor dom query
       this._content = $(this._root.find("section")[0]); //  TODO refactor dom query
 
+      this._logicalName = this._root.find(".logical-name");
+      this._logicalNameError = this._root.find(".logical-name-error");
       this._titleLabel = this._root.find(".title-label");
       this._titleInput_IT = this._root.find(".title_it");
       this._titleInput_EN = this._root.find(".title_en");
@@ -339,6 +350,18 @@ class NodeView {
       this._downButton.click((e) => {
          e.preventDefault();
          this._moveDown(this);
+      });
+
+      this._logicalName.on("keyup", () => {
+         var value = this._logicalName.val();
+         var clean = value.replace(" ", "").replace("-", "");
+         this._logicalName.val(clean);
+         this._model.name = clean;
+         this._logicalNameError.hide();
+      });
+
+      this._logicalName.blur(() => {
+         this._eventHub.trigger("please-validate-node-view-name", [this]);
       });
 
       this._titleInput_EN.on("keyup", () => {
@@ -487,6 +510,7 @@ class NodeView {
    }
 
    _loadModelData() {
+      this._logicalName.val(this._model.name);
       this._titleInput_IT.val(this._model._iub_title_it);
       this._titleInput_EN.val(this._model.title);
       this._titleInput_DE.val(this._model._iub_title_de);
