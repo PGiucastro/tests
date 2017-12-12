@@ -235,6 +235,7 @@ class NodeView {
       this._content = $(this._root.find("section")[0]); //  TODO refactor dom query
 
       this._logicalName = this._root.find(".logical-name");
+      this._logicalName.parent().hide();
       this._logicalNameError = this._root.find(".logical-name-error");
       this._titleLabel = this._root.find(".title-label");
       this._titleInput_IT = this._root.find(".title_it");
