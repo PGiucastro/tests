@@ -14,13 +14,9 @@ class GroupView extends NodeView {
       this.getDomNode().addClass("group-view");
 
       this._addValueViewButton.remove();
-      this._clausesSection.remove();
       this._addGroupViewButton.remove();
-
-      this._titleInput_IT.parent().remove();
-      this._titleInput_EN.parent().remove();
-      this._titleInput_DE.parent().remove();
-      this._typeInput.parent().remove();
+      this._clausesSection.remove();
+      this._root.find(".inputs-block").remove();
    }
 
    validate() {

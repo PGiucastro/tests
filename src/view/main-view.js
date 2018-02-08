@@ -67,7 +67,7 @@ class MainView {
 
       for (var i = 0; i < this._nodeViews.length; i++) {
          let type = this._getTypeByModel(this._nodeViews[i].getModel());
-         this._renderNode(type, this._nodeViews[i]);
+         this._appendNode(type, this._nodeViews[i]);
       }
 
       this._reparentNodeview = new ReparentNodeView(this._eventHub);
@@ -89,7 +89,7 @@ class MainView {
       this._addButton.click((e) => {
          e.preventDefault();
          var newNode = this._buildNode("node-view", this._getNextId(), {});
-         this._renderNode("node-view", newNode);
+         this._appendNode("node-view", newNode);
          this._handleNoNodesYetMessage();
          scrolling.scrollToBottom();
       });
@@ -122,7 +122,7 @@ class MainView {
       this._eventHub.on("please-create-child-node", (e, type, parentNodeId) => {
          var newNode = this._buildNode(type, this._getNextId(), {});
          newNode.setParentId(parentNodeId);
-         this._renderNode(type, newNode);
+         this._appendNode(type, newNode);
          scrolling.scrollToNode(newNode);
       });
 
@@ -193,6 +193,8 @@ class MainView {
       } else {
          throw `Unknown type [${type}]`;
       }
+      
+      nodeView.render();
       this._nodeViews.push(nodeView);
       return nodeView;
    }
@@ -219,14 +221,13 @@ class MainView {
       this._orderManager.removeNode(node);
    }
 
-   _renderNode(type, node) {
+   _appendNode(type, node) {
       var parentId = node.getParentId();
       var parent = this._getViewById(parentId);
       var previousNode;
       var nextNode;
 
-      node.render();
-
+      // append to a parent if there is one...
       if (parent) {
          if (type === "node-view" || type === "group-view" || type === "value-view") {
             parent.appendNodeView(node);
@@ -234,7 +235,7 @@ class MainView {
             throw `Unknown type [${type}]`;
          }
       } else {
-         // root nodes
+         // ...otherwise it means it is a root nodes
          node.setMoveDownCommand(this._moveNodeDown.bind(this));
          node.setMoveUpCommand(this._moveNodeUp.bind(this));
          node.setRemoveFromPositionManagerCommand(this._removeFromOrderManager.bind(this));
